@@ -1,0 +1,44 @@
+export function Footer() {
+  return (
+    <footer className="bg-primary text-primary-foreground py-16">
+      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12">
+        <div className="col-span-1 md:col-span-2">
+          <h3 className="font-display text-lg font-semibold uppercase tracking-widest mb-4 text-secondary">
+            10,000 Days Capital
+          </h3>
+          <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-md">
+            Disciplined capital allocation for the long term. We combine fundamental analysis with quantitative rigor to preserve and grow wealth across market cycles.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-bold uppercase tracking-widest mb-4 text-secondary">Contact</h4>
+          <address className="not-italic text-sm text-primary-foreground/70 space-y-2">
+            <p>100 Greenwich Avenue</p>
+            <p>Greenwich, CT 06830</p>
+            <p>+1 (203) 555-0123</p>
+            <p>ir@10000days.cap</p>
+          </address>
+        </div>
+
+        <div>
+          <h4 className="text-sm font-bold uppercase tracking-widest mb-4 text-secondary">Legal</h4>
+          <ul className="text-sm text-primary-foreground/70 space-y-2">
+            <li><a href="#" className="hover:text-white transition-colors">Terms of Use</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+            <li><a href="#" className="hover:text-white transition-colors">Form ADV</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-primary-foreground/10">
+        <p className="text-xs text-primary-foreground/50 text-justify leading-relaxed">
+          For institutional and accredited investors only. This website is for informational purposes and does not constitute an offer to sell or a solicitation of an offer to buy any interests in 10,000 Days Capital Management, LP or any of its affiliated funds. Past performance is not indicative of future results. All investments involve risk, including the loss of principal.
+        </p>
+        <p className="text-xs text-primary-foreground/50 mt-4">
+          © {new Date().getFullYear()} 10,000 Days Capital Management, LP. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}
