@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import logo from "@assets/10k_logo_no_words_1768927881066.png";
 
 export function Navbar() {
   const [location] = useLocation();
@@ -19,8 +20,11 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link href="/">
-          <a className="font-display font-semibold text-xl tracking-tight text-primary uppercase hover:opacity-80 transition-opacity">
-            10,000 Days <span className="text-secondary font-light">Capital</span>
+          <a className="flex items-center gap-3 font-display font-semibold text-xl tracking-tight text-primary uppercase hover:opacity-80 transition-opacity">
+            <img src={logo} alt="10,000 Days Capital Logo" className="h-10 w-auto" />
+            <span>
+              10,000 Days <span className="text-secondary font-light">Capital</span>
+            </span>
           </a>
         </Link>
 

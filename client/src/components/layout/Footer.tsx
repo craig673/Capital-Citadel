@@ -1,11 +1,16 @@
+import logo from "@assets/10k_logo_no_words_1768927881066.png";
+
 export function Footer() {
   return (
     <footer className="bg-primary text-primary-foreground py-16">
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12">
         <div className="col-span-1 md:col-span-2">
-          <h3 className="font-display text-lg font-semibold uppercase tracking-widest mb-4 text-secondary">
-            10,000 Days Capital
-          </h3>
+          <div className="flex items-center gap-3 mb-4">
+            <img src={logo} alt="10,000 Days Capital Logo" className="h-8 w-auto brightness-0 invert" />
+            <h3 className="font-display text-lg font-semibold uppercase tracking-widest text-secondary">
+              10,000 Days Capital
+            </h3>
+          </div>
           <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-md">
             Disciplined capital allocation for the long term. We combine fundamental analysis with quantitative rigor to preserve and grow wealth across market cycles.
           </p>
