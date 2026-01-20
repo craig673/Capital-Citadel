@@ -1,4 +1,4 @@
-import heroVideo from "@assets/generated_videos/futuristic_data_center_with_glowing_lights.mp4";
+import heroVideo from "@assets/generated_videos/spacex_style_rocket_launch.mp4";
 import { motion } from "framer-motion";
 
 export function Hero() {
