@@ -14,18 +14,33 @@ export default function Home() {
         
         {/* Intro Teaser */}
         <section className="py-24 bg-background">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <h2 className="text-3xl md:text-4xl font-display text-primary mb-8">
-              We invest with a <span className="text-secondary italic">century-long</span> horizon.
-            </h2>
-            <p className="text-muted-foreground text-lg leading-relaxed mb-12">
-              At 10,000 Days Capital, we believe that true wealth is built through patience, not velocity. Our proprietary models isolate signal from noise, allowing us to execute high-conviction strategies that withstand market volatility.
-            </p>
-            <Link href="/who-we-are">
-              <a className="inline-flex items-center gap-2 text-primary font-semibold tracking-wide border-b border-secondary pb-1 hover:text-secondary transition-colors">
-                Discover Our Philosophy <ArrowRight size={16} />
-              </a>
-            </Link>
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="grid md:grid-cols-2 gap-16 mb-16">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-display text-primary mb-6">
+                  Driven by <span className="text-secondary">Culture</span>
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  10,000 Days Capital is built on a foundation of unwavering dedication and collaborative excellence. We foster an environment where integrity, discipline, and long-term thinking are paramount to our shared success.
+                </p>
+              </div>
+              <div>
+                <h2 className="text-3xl md:text-4xl font-display text-primary mb-6">
+                  Powered by <span className="text-secondary">Work Ethic</span>
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  Our team is defined by relentless effort and intellectual rigor. We believe that sustained achievement is the result of continuous learning, deep focus, and a commitment to outworking the challenge.
+                </p>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <Link href="/who-we-are">
+                <a className="inline-flex items-center gap-2 text-primary font-semibold tracking-wide border-b border-secondary pb-1 hover:text-secondary transition-colors">
+                  Discover Our Philosophy <ArrowRight size={16} />
+                </a>
+              </Link>
+            </div>
           </div>
         </section>
 
