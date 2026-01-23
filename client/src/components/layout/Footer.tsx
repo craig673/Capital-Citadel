@@ -12,17 +12,18 @@ export function Footer() {
             </h3>
           </div>
           <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-md">
-            Disciplined capital allocation for the long term. We combine fundamental analysis with quantitative rigor to preserve and grow wealth across market cycles.
+            We are an investment firm led by Cody Willard. We build on his 30+ years of experience to maintain excellence in today's market.
           </p>
         </div>
 
         <div>
           <h4 className="text-sm font-bold uppercase tracking-widest mb-4 text-secondary">Contact</h4>
           <address className="not-italic text-sm text-primary-foreground/70 space-y-2">
-            <p>100 Greenwich Avenue</p>
-            <p>Greenwich, CT 06830</p>
-            <p>+1 (203) 555-0123</p>
-            <p>ir@10000days.cap</p>
+            <p>555 Fifth Avenue, Ninth Floor</p>
+            <p>Suite 900</p>
+            <p>New York, NY 10017</p>
+            <p>+1 (505) 555-5555 Ext 555</p>
+            <p>ir@10000dayscapital.com</p>
           </address>
         </div>
 
