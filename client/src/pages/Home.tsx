@@ -53,7 +53,7 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
             >
-              <div className="text-4xl font-display text-secondary mb-2">$12.5B+</div>
+              <div className="text-4xl font-display text-secondary mb-2">~$60M</div>
               <div className="text-sm uppercase tracking-widest opacity-70">Assets Under Management</div>
             </motion.div>
             <motion.div 
@@ -62,8 +62,8 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
             >
-              <div className="text-4xl font-display text-secondary mb-2">24/7</div>
-              <div className="text-sm uppercase tracking-widest opacity-70">Global Risk Monitoring</div>
+              <div className="text-3xl md:text-4xl font-display text-secondary mb-2">Data-Driven</div>
+              <div className="text-sm uppercase tracking-widest opacity-70">Proprietary Algorithms</div>
             </motion.div>
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
@@ -71,8 +71,8 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
             >
-              <div className="text-4xl font-display text-secondary mb-2">18</div>
-              <div className="text-sm uppercase tracking-widest opacity-70">Years of Excellence</div>
+              <div className="text-3xl md:text-4xl font-display text-secondary mb-2">Tech-Enabled</div>
+              <div className="text-sm uppercase tracking-widest opacity-70">Continuous Research & Market Signal Monitoring</div>
             </motion.div>
           </div>
         </section>
