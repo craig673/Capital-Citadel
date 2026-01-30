@@ -1,3 +1,4 @@
+import { Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
@@ -21,18 +22,26 @@ export default function Team() {
           <div className="border-b border-border py-12 first:pt-0 last:border-0" data-testid="card-team-cody">
             <div className="grid md:grid-cols-4 gap-8">
               <div className="md:col-span-1">
-                <div className="bg-white border border-border" data-testid="card-team-cody-headshot">
+                <Link
+                  href="/about/leadership"
+                  className="group block bg-white border border-border overflow-hidden"
+                  data-testid="link-team-cody-image"
+                >
                   <img
                     src={codyHeadshot}
                     alt="Cody Willard"
-                    className="w-full aspect-[4/3] object-cover"
+                    className="w-full aspect-[4/3] object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                     data-testid="img-team-cody"
                   />
-                </div>
+                </Link>
 
-                <h3 className="mt-6 text-xl font-display text-primary font-medium" data-testid="text-team-name">
+                <Link
+                  href="/about/leadership"
+                  className="mt-6 inline-block text-xl font-display text-primary font-medium hover:text-secondary transition-colors"
+                  data-testid="link-team-cody-name"
+                >
                   Cody Willard
-                </h3>
+                </Link>
                 <p className="text-sm text-secondary uppercase tracking-widest mt-1" data-testid="text-team-title-role">
                   Portfolio Manager
                 </p>
