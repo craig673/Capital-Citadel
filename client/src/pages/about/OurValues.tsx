@@ -57,7 +57,7 @@ export default function OurValues() {
                 className="font-display text-4xl md:text-6xl text-primary leading-tight"
                 data-testid="text-values-hero-title"
               >
-                Principled performance.
+                Principled Performance
               </h1>
               <p
                 className="mt-8 text-lg text-muted-foreground leading-relaxed"
