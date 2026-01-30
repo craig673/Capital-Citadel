@@ -25,30 +25,31 @@ export function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/">
-          <a className="flex items-center gap-3 font-display font-semibold text-xl tracking-tight text-primary uppercase hover:opacity-80 transition-opacity" data-testid="link-home-logo">
-            <img src={logo} alt="10,000 Days Capital Logo" className="h-10 w-auto" data-testid="img-logo" />
-            <span data-testid="text-brand-name">
-              10,000 Days <span className="text-secondary font-light">Capital</span>
-            </span>
-          </a>
+        <Link
+          href="/"
+          className="flex items-center gap-3 font-display font-semibold text-xl tracking-tight text-primary uppercase hover:opacity-80 transition-opacity"
+          data-testid="link-home-logo"
+        >
+          <img src={logo} alt="10,000 Days Capital Logo" className="h-10 w-auto" data-testid="img-logo" />
+          <span data-testid="text-brand-name">
+            10,000 Days <span className="text-secondary font-light">Capital</span>
+          </span>
         </Link>
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-8">
           {/* About dropdown */}
           <div className="relative group">
-            <Link href="/about/what-we-do">
-              <a
-                className={cn(
-                  "inline-flex items-center gap-1 text-sm font-medium tracking-wide transition-colors hover:text-secondary",
-                  location.startsWith("/about") ? "text-primary" : "text-muted-foreground"
-                )}
-                data-testid="nav-about-trigger"
-              >
-                About Us
-                <ChevronDown className="h-4 w-4 opacity-70 transition-transform duration-200 group-hover:rotate-180" />
-              </a>
+            <Link
+              href="/about/what-we-do"
+              className={cn(
+                "inline-flex items-center gap-1 text-sm font-medium tracking-wide transition-colors hover:text-secondary",
+                location.startsWith("/about") ? "text-primary" : "text-muted-foreground"
+              )}
+              data-testid="nav-about-trigger"
+            >
+              About Us
+              <ChevronDown className="h-4 w-4 opacity-70 transition-transform duration-200 group-hover:rotate-180" />
             </Link>
 
             <div className="pointer-events-none absolute left-0 top-full pt-3 opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto">
@@ -62,19 +63,19 @@ export function Navbar() {
                   {aboutItems.map((item) => {
                     const active = location === item.href;
                     return (
-                      <Link key={item.href} href={item.href}>
-                        <a
-                          className={cn(
-                            "flex items-center justify-between px-4 py-2.5 text-sm transition-colors",
-                            active
-                              ? "text-secondary bg-white/5"
-                              : "text-primary-foreground/90 hover:bg-white/5 hover:text-white"
-                          )}
-                          data-testid={`nav-about-item-${item.href}`}
-                        >
-                          {item.label}
-                          <span className="text-secondary/70">→</span>
-                        </a>
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                          "flex items-center justify-between px-4 py-2.5 text-sm transition-colors",
+                          active
+                            ? "text-secondary bg-white/5"
+                            : "text-primary-foreground/90 hover:bg-white/5 hover:text-white"
+                        )}
+                        data-testid={`nav-about-item-${item.href}`}
+                      >
+                        {item.label}
+                        <span className="text-secondary/70">→</span>
                       </Link>
                     );
                   })}
@@ -84,23 +85,25 @@ export function Navbar() {
           </div>
 
           {links.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <a
-                className={cn(
-                  "text-sm font-medium tracking-wide transition-colors hover:text-secondary",
-                  location === link.href ? "text-primary" : "text-muted-foreground"
-                )}
-                data-testid={`nav-link-${link.href}`}
-              >
-                {link.label}
-              </a>
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "text-sm font-medium tracking-wide transition-colors hover:text-secondary",
+                location === link.href ? "text-primary" : "text-muted-foreground"
+              )}
+              data-testid={`nav-link-${link.href}`}
+            >
+              {link.label}
             </Link>
           ))}
 
-          <Link href="/login">
-            <a className="bg-primary text-primary-foreground px-5 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors" data-testid="button-client-login">
-              Client Login
-            </a>
+          <Link
+            href="/login"
+            className="bg-primary text-primary-foreground px-5 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
+            data-testid="button-client-login"
+          >
+            Client Login
           </Link>
         </div>
 
@@ -124,38 +127,37 @@ export function Navbar() {
             </div>
             <div className="flex flex-col gap-2">
               {aboutItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <a
-                    className="text-lg font-medium text-primary hover:text-secondary"
-                    onClick={() => setIsOpen(false)}
-                    data-testid={`mobile-about-item-${item.href}`}
-                  >
-                    {item.label}
-                  </a>
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-lg font-medium text-primary hover:text-secondary"
+                  onClick={() => setIsOpen(false)}
+                  data-testid={`mobile-about-item-${item.href}`}
+                >
+                  {item.label}
                 </Link>
               ))}
             </div>
           </div>
 
           {links.map((link) => (
-            <Link key={link.href} href={link.href}>
-              <a
-                className="text-lg font-medium text-primary hover:text-secondary"
-                onClick={() => setIsOpen(false)}
-                data-testid={`mobile-link-${link.href}`}
-              >
-                {link.label}
-              </a>
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-lg font-medium text-primary hover:text-secondary"
+              onClick={() => setIsOpen(false)}
+              data-testid={`mobile-link-${link.href}`}
+            >
+              {link.label}
             </Link>
           ))}
-          <Link href="/login">
-            <a
-              className="text-lg font-medium text-secondary"
-              onClick={() => setIsOpen(false)}
-              data-testid="mobile-link-login"
-            >
-              Client Login
-            </a>
+          <Link
+            href="/login"
+            className="text-lg font-medium text-secondary"
+            onClick={() => setIsOpen(false)}
+            data-testid="mobile-link-login"
+          >
+            Client Login
           </Link>
         </div>
       )}

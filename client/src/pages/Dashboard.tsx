@@ -18,7 +18,11 @@ export default function Dashboard() {
       <div className="bg-primary text-primary-foreground pt-32 pb-12 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-2 text-xs text-secondary uppercase tracking-widest mb-4">
-            <Link href="/"><a className="hover:underline">Home</a></Link> <ChevronRight size={10} /> <span>Portal</span>
+            <Link href="/" className="hover:underline" data-testid="link-dashboard-breadcrumb-home">
+              Home
+            </Link>
+            <ChevronRight size={10} />
+            <span data-testid="text-dashboard-breadcrumb-current">Portal</span>
           </div>
           <h1 className="text-3xl font-display">Investor Dashboard</h1>
           <p className="text-primary-foreground/60 mt-2">Welcome, Institutional Partner.</p>
