@@ -70,7 +70,7 @@ export default function Curated() {
                   className="h-full flex flex-col bg-primary text-primary-foreground border border-secondary/30 p-8 shadow-[0_0_0_1px_rgba(197,160,89,0.10)]"
                   data-testid={`card-curated-entry-${idx}`}
                 >
-                  <div className="flex-1" data-testid={`section-curated-top-${idx}`}>
+                  <div className="flex-1 flex flex-col" data-testid={`section-curated-top-${idx}`}>
                     <div
                       className="text-xs font-bold uppercase tracking-widest text-secondary"
                       data-testid={`text-curated-tag-${idx}`}
@@ -90,7 +90,7 @@ export default function Curated() {
                     </div>
 
                     <div
-                      className="mt-7 border border-secondary/20 bg-white/5 p-6"
+                      className="mt-7 flex-1 border border-secondary/20 bg-white/5 p-6"
                       data-testid={`card-curated-take-${idx}`}
                     >
                       <div
@@ -108,7 +108,7 @@ export default function Curated() {
                     </div>
                   </div>
 
-                  <div className="mt-8" data-testid={`row-curated-actions-${idx}`}>
+                  <div className="mt-6" data-testid={`row-curated-actions-${idx}`}>
                     <a
                       href={item.href}
                       target="_blank"
