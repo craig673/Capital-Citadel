@@ -4,7 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 
 import codyHeadshot from "../../../attached_assets/COdy_in_Library_2_1769807534796.png";
 import bryceHeadshot from "../../../attached_assets/Bryce_Headshot_3_1769806381148.jpg";
-import craigHeadshot from "../../../attached_assets/Gemini_Generated_Image_a5m4c1a5m4c1a5m4_1769808363328.png";
+import craigHeadshot from "../../../attached_assets/Gemini_Generated_Image_mvxfawmvxfawmvxf_1769809064307.png";
 
 export default function Team() {
   return (
@@ -116,10 +116,10 @@ export default function Team() {
               <div className="md:col-span-3">
                 <p className="text-muted-foreground leading-relaxed max-w-2xl text-justify" data-testid="text-team-craig-bio">
                   A graduate from the University of New Orleans, Craig Delaune brings prior experience from a GE joint
-                  venture during a major expansion cycle. A distinct achiever, they helped lead the UNO team to a 3rd
+                  venture during a major expansion cycle. A distinct achiever, he helped lead the UNO team to a 3rd
                   place finish in Portfolio Performance at the 2024 Student Managed Investment Fund Competition. Craig
                   Delaune is currently preparing for the CFA examinations with a specialized focus on equity research.
-                  In their downtime, they are an avid traveler, PC enthusiast, and connoisseur of fine wine.
+                  In his downtime, he is an avid traveler, PC enthusiast, and connoisseur of fine wine.
                 </p>
               </div>
             </div>
