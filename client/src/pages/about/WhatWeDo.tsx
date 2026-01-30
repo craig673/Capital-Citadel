@@ -32,8 +32,8 @@ export default function WhatWeDo() {
                 className="mt-8 text-lg text-muted-foreground leading-relaxed"
                 data-testid="text-whatwedo-hero-subtext"
               >
-                10,000 Days Capital Management is a private investment firm dedicated to
-                delivering superior risk-adjusted returns. We navigate complex markets with a
+                10,000 Days Capital Management is a private investment firm dedicated to the
+                preservation and growth of capital. We navigate complex markets with a
                 disciplined, long-term perspective.
               </p>
             </motion.div>
@@ -129,19 +129,6 @@ export default function WhatWeDo() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-20 border-t border-border">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="bg-primary text-primary-foreground px-10 py-14 border border-secondary/20" data-testid="card-whatwedo-cta">
-              <div className="text-secondary font-bold uppercase tracking-widest mb-3 text-xs" data-testid="text-whatwedo-cta-kicker">
-                Patient Capital
-              </div>
-              <div className="font-display text-2xl md:text-3xl" data-testid="text-whatwedo-cta-title">
-                “Discover the power of patient capital.”
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       <Footer />
     </div>
