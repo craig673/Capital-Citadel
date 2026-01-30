@@ -4,6 +4,7 @@ import { Footer } from "@/components/layout/Footer";
 
 import codyHeadshot from "../../../attached_assets/COdy_in_Library_2_1769807534796.png";
 import bryceHeadshot from "../../../attached_assets/Bryce_Headshot_3_1769806381148.jpg";
+import craigHeadshot from "../../../attached_assets/Gemini_Generated_Image_a5m4c1a5m4c1a5m4_1769808363328.png";
 
 export default function Team() {
   return (
@@ -87,6 +88,38 @@ export default function Team() {
                   background includes corporate litigation, oil &amp; gas regulation, and project management for major
                   public works. When not analyzing markets, Bryce can be found competitively team roping or working on
                   his ranch in rural New Mexico.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-b border-border py-12 first:pt-0 last:border-0" data-testid="card-team-craig">
+            <div className="grid md:grid-cols-4 gap-8">
+              <div className="md:col-span-1">
+                <div className="bg-white border border-border overflow-hidden" data-testid="card-team-craig-headshot">
+                  <img
+                    src={craigHeadshot}
+                    alt="Craig Delaune"
+                    className="w-full aspect-[4/3] object-cover"
+                    data-testid="img-team-craig"
+                  />
+                </div>
+
+                <h3 className="mt-6 text-xl font-display text-primary font-medium" data-testid="text-team-craig-name">
+                  Craig Delaune
+                </h3>
+                <p className="text-sm text-secondary uppercase tracking-widest mt-1" data-testid="text-team-craig-role">
+                  Research &amp; Operations Associate
+                </p>
+              </div>
+
+              <div className="md:col-span-3">
+                <p className="text-muted-foreground leading-relaxed max-w-2xl text-justify" data-testid="text-team-craig-bio">
+                  A graduate from the University of New Orleans, Craig Delaune brings prior experience from a GE joint
+                  venture during a major expansion cycle. A distinct achiever, they helped lead the UNO team to a 3rd
+                  place finish in Portfolio Performance at the 2024 Student Managed Investment Fund Competition. Craig
+                  Delaune is currently preparing for the CFA examinations with a specialized focus on equity research.
+                  In their downtime, they are an avid traveler, PC enthusiast, and connoisseur of fine wine.
                 </p>
               </div>
             </div>
