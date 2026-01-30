@@ -8,7 +8,7 @@ const pillars = [
     title: "Radical Alignment",
     subtitle: "The “Investor First” Standard.",
     body:
-      "Our investors are not simply clients; they are partners. The team proudly invests alongside our Limited Partners. We succeed only when you succeed. We operate with absolute transparency and ethical rigidity because we are stewards of your trust, not just your capital.",
+      "Our investors are not simply clients but partners, and the team proudly invests alongside our Limited Partners. We succeed only when you succeed. We operate with absolute transparency and ethical rigidity because we are stewards of your trust, not just your capital.",
   },
   {
     number: "02",
