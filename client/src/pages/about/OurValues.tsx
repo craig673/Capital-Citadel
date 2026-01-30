@@ -8,7 +8,7 @@ const pillars = [
     title: "Radical Alignment",
     subtitle: "The “Investor First” Standard.",
     body:
-      "We do not view our investors as clients; we view them as partners. A significant portion of the firm’s capital is invested alongside our Limited Partners. We succeed only when you succeed. We operate with absolute transparency and ethical rigidity because we are stewards of your trust, not just your capital.",
+      "Our investors are not simply clients; they are partners. The team proudly invests alongside our Limited Partners. We succeed only when you succeed. We operate with absolute transparency and ethical rigidity because we are stewards of your trust, not just your capital.",
   },
   {
     number: "02",
@@ -63,7 +63,7 @@ export default function OurValues() {
                 className="mt-8 text-lg text-muted-foreground leading-relaxed"
                 data-testid="text-values-hero-subtext"
               >
-                We believe that high standards drive high returns. We operate with absolute
+                We believe that high standards are non-negotiable in our field. We operate with absolute
                 integrity and transparency, ensuring that our ethical commitments are the
                 foundation of our partnership with you.
               </p>
