@@ -10,7 +10,7 @@ export function Navbar() {
 
   const links = [
     { href: "/who-we-are", label: "Who We Are" },
-    { href: "/process", label: "Our Process" },
+    { href: "/philosophy", label: "Our Philosophy" },
     { href: "/team", label: "Our Team" },
     { href: "/insights", label: "Insights" },
   ];
