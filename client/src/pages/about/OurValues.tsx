@@ -57,15 +57,15 @@ export default function OurValues() {
                 className="font-display text-4xl md:text-6xl text-primary leading-tight"
                 data-testid="text-values-hero-title"
               >
-                Principles over profits.
+                Principled performance.
               </h1>
               <p
                 className="mt-8 text-lg text-muted-foreground leading-relaxed"
                 data-testid="text-values-hero-subtext"
               >
-                In a world of fleeting transactions, we are built on enduring relationships. Our
-                values are not marketing slogans; they are the architectural constraints that
-                define how we manage risk, capital, and our conduct.
+                We believe that high standards drive high returns. We operate with absolute
+                integrity and transparency, ensuring that our ethical commitments are the
+                foundation of our partnership with you.
               </p>
             </motion.div>
           </div>
