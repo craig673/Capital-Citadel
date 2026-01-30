@@ -3,7 +3,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
 import codyHeadshot from "../../../attached_assets/Cody_in_library_3_1769804665633.png";
-import bryceHeadshot from "../../../attached_assets/Bryce_Headshot_2_1769806309124.jpg";
+import bryceHeadshot from "../../../attached_assets/Bryce_Headshot_3_1769806381148.jpg";
 
 export default function Team() {
   return (
