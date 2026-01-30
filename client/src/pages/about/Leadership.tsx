@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 
 import codyOnCnbc from "../../../../attached_assets/Cody_on_CNBC_3_1769800619131.jpg";
-import codyFamily from "../../../../attached_assets/image_1769800671351.png";
+import codyFamily from "../../../../attached_assets/Cody_&_Fam_1769800970387.jpg";
 
 export default function Leadership() {
   return (
