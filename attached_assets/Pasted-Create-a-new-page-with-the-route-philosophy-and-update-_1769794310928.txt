@@ -1,0 +1,46 @@
+Create a new page with the route "/philosophy" and update the "Discover Our Philosophy" link on the Home Page to point to it.
+
+Design the new Philosophy page to match the site's high-end, institutional aesthetic (clean typography, plenty of whitespace, midnight navy/gold accents).
+
+Use the following content for the page:
+
+---
+
+# [Hero Section]
+**Headline:** WE DO NOT CHASE TRENDS. WE MAP THE FUTURE.
+**Subtext:** Innovation is insufficient. True progress does not come from iterating on the status quo; it comes from breaking it. BlackBerry was an innovator, but the Smartphone Revolution reshaped how humanity connects. Automakers innovated for a century, but the transition to "robots on wheels" redefined the very concept of movement.
+
+At **10,000 Days Capital**, our focus is singular: identifying the structural shifts that will reshape the global economy and the human experience over the next 27.4 years. We look past the noise of the moment to find the signal of the future. We are students of the paradigm shift. We are focused on **Revolutions.**
+
+---
+
+# [Section: The AIRS Revolution]
+**Headline:** The AIRS Revolution
+**Intro:** We stand at the precipice of a convergence unlike any in history. Three distinct yet interconnected forces are accelerating simultaneously to alter the fabric of society.
+
+**1. The AI Revolution (The Cognitive Shift)**
+Artificial Intelligence is not just software; it is the decoupling of intelligence from biological constraints. It is the revolution of logic, creativity, and efficiency. We are moving from an era of static computation to one of generative reasoning, where machines do not just execute commands but solve problems. This revolution will redefine the value of human labor and the speed of scientific discovery.
+
+**2. The Robotics Revolution (The Physical Shift)**
+While AI transforms the digital world, Robotics reclaims the physical one. From autonomous logistics to humanoid assistants, we are witnessing the automation of the tangible. This is not just about manufacturing; it is about liberating humanity from dangerous and repetitive toil, allowing the physical world to move and adapt with the speed of software.
+
+**3. The Space Revolution (The Boundary Shift)**
+For all of human history, our economy has been earthbound. That era is ending. The Space Revolution is not merely about exploration; it is about expansion. It is the industrialization of orbit, the harvesting of infinite resources, and the creation of a multi-planetary civilization. We view the stars not as a destination, but as the new frontier of economic and societal necessity.
+
+---
+
+# [Section: Our Discipline]
+**1. The Discipline of 10,000 Days**
+Civilization is built on long horizons. While the world reacts to the volatility of the hour, we operate on a timeline of 10,000 days. We model the future not by quarters, but by decades. This long-term discipline allows us to see past the "froth" of hype cycles and identify the enduring technologies that will thrive long after the bubbles burst.
+
+**2. The Contrarian Mindset**
+The Status Quo is rarely the future. To see what others miss, one must be willing to stand apart. We challenge conventional wisdom and reject the comfort of the crowd. When the world sees fear, we see opportunity. When the world sees euphoria, we see caution. We strip away emotional bias to view the mechanics of society with absolute clarity.
+
+**3. The Proprietary Lens**
+Understanding a Revolution requires both a telescope and a microscope.
+* **Top-Down:** We analyze the macroscopic shifts in demographics, energy, and geopolitics that create the fertile ground for change.
+* **Bottom-Up:** We apply rigorous mathematical modeling to the specific engines of these Revolutions—the entities executing the vision.
+By quantifying factors like "Inflection Points" and "Scalability" through our proprietary models, we turn abstract visions into measurable data.
+
+**4. The Human Element**
+Technology is the tool, but humanity is the architect. Our approach is driven by a collective of thinkers, engineers, and analysts united by a single ambition: to be on the right side of history.

@@ -35,8 +35,8 @@ export default function Home() {
             </div>
             
             <div className="text-center">
-              <Link href="/who-we-are">
-                <a className="inline-flex items-center gap-2 text-primary font-semibold tracking-wide border-b border-secondary pb-1 hover:text-secondary transition-colors">
+              <Link href="/philosophy">
+                <a className="inline-flex items-center gap-2 text-primary font-semibold tracking-wide border-b border-secondary pb-1 hover:text-secondary transition-colors" data-testid="link-discover-philosophy">
                   Discover Our Philosophy <ArrowRight size={16} />
                 </a>
               </Link>

@@ -13,6 +13,7 @@ import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
+import Philosophy from "@/pages/Philosophy";
 
 function Router() {
   return (
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
+      <Route path="/philosophy" component={Philosophy} />
       <Route component={NotFound} />
     </Switch>
   );
