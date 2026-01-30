@@ -47,6 +47,15 @@ export default function Leadership() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid lg:grid-cols-12 gap-12 items-start" data-testid="grid-leadership-profile">
               <div className="lg:col-span-5">
+                <div className="mb-4">
+                  <div className="text-secondary text-xs font-bold uppercase tracking-widest" data-testid="text-leadership-cody-role">
+                    Portfolio Manager
+                  </div>
+                  <div className="mt-1 text-primary font-display text-3xl" data-testid="text-leadership-cody-name">
+                    Cody Willard
+                  </div>
+                </div>
+
                 <div className="bg-white border border-border" data-testid="card-leadership-cody">
                   <div className="relative">
                     <img
@@ -55,15 +64,7 @@ export default function Leadership() {
                       className="w-full h-auto"
                       data-testid="img-leadership-cody-cnbc"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
-                    <div className="absolute left-6 bottom-6">
-                      <div className="text-secondary text-xs font-bold uppercase tracking-widest" data-testid="text-leadership-cody-role">
-                        Portfolio Manager
-                      </div>
-                      <div className="text-white font-display text-2xl" data-testid="text-leadership-cody-name">
-                        Cody Willard
-                      </div>
-                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
                   </div>
                   <div className="p-8">
                     <div className="grid grid-cols-2 gap-6" data-testid="grid-leadership-cody-stats">
