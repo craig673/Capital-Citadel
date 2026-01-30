@@ -1,0 +1,34 @@
+Update the content of the "Our Values" page (/about/values) to match the site's institutional aesthetic.
+
+Use the following content structure:
+
+---
+
+# [Hero Section]
+**Headline:** PRINCIPLES OVER PROFITS.
+**Subtext:** In a world of fleeting transactions, we are built on enduring relationships. Our values are not marketing slogans; they are the architectural constraints that define how we manage risk, capital, and our conduct.
+
+---
+
+# [Section: The Four Pillars]
+
+### 1. Radical Alignment
+*The "Investor First" Standard.*
+We do not view our investors as clients; we view them as partners. A significant portion of the firm's capital is invested alongside our Limited Partners. We succeed only when you succeed. We operate with absolute transparency and ethical rigidity because we are stewards of your trust, not just your capital.
+
+### 2. The Synthesis of Truth
+*Fundamental Insight + Quantitative Rigor.*
+We reject the false choice between human intuition and machine precision. We believe true alpha is found at their intersection. We use proprietary algorithms to stress-test our fundamental theses, stripping away bias to reveal the raw reality of an investment. We let the data challenge our convictions, ensuring our decisions are based on evidence, not ego.
+
+### 3. Intellectual Courage
+*The Anti-Consensus Mindset.*
+Consensus is priced in; opportunity is not. We foster a culture where dissenting views are encouraged and conventional wisdom is interrogated. To capture the upside of a Revolution, one must have the courage to stand apart from the crowd and the discipline to hold that ground when the market disagrees.
+
+### 4. Generational Discipline
+*The 10,000 Days Horizon.*
+Speed is a commodity; patience is an edge. We refuse to sacrifice long-term compounding for short-term optics. We build portfolios designed to weather the volatility of the moment and capture the structural growth of the decade. We are not racing for the quarter; we are building for the era.
+
+---
+
+# [Footer Call to Action]
+**Text:** "Integrity is our only non-depreciating asset."
