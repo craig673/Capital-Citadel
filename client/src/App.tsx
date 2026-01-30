@@ -14,6 +14,10 @@ import Dashboard from "@/pages/Dashboard";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
 import Philosophy from "@/pages/Philosophy";
+import AboutWhatWeDo from "@/pages/about/WhatWeDo";
+import AboutOurValues from "@/pages/about/OurValues";
+import AboutLeadership from "@/pages/about/Leadership";
+import AboutLocations from "@/pages/about/Locations";
 
 function Router() {
   return (
@@ -28,6 +32,10 @@ function Router() {
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/philosophy" component={Philosophy} />
+      <Route path="/about/what-we-do" component={AboutWhatWeDo} />
+      <Route path="/about/values" component={AboutOurValues} />
+      <Route path="/about/leadership" component={AboutLeadership} />
+      <Route path="/about/locations" component={AboutLocations} />
       <Route component={NotFound} />
     </Switch>
   );
