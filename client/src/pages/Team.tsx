@@ -12,11 +12,11 @@ export default function Team() {
       <Navbar />
       <main className="flex-grow pt-32 pb-24">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="mb-20">
-            <h6 className="text-secondary font-bold uppercase tracking-widest mb-4 text-sm" data-testid="text-team-kicker">
-              Our Team
-            </h6>
-            <h1 className="font-display text-4xl md:text-5xl text-primary mb-6" data-testid="text-team-title">
+          <div className="mb-16">
+            <h1
+              className="font-display text-4xl md:text-5xl text-primary pb-4 border-b-4 border-secondary inline-block"
+              data-testid="text-team-title"
+            >
               Investment Team
             </h1>
           </div>
