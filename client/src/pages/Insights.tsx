@@ -1,6 +1,71 @@
+import { Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Play } from "lucide-react";
+import { FileText, PlayCircle, Globe, ArrowRight } from "lucide-react";
+
+function HubCard({
+  href,
+  title,
+  description,
+  icon,
+  testId,
+}: {
+  href: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  testId: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group block bg-primary text-primary-foreground border border-secondary/30 p-8 shadow-[0_0_0_1px_rgba(197,160,89,0.08)] transition-all duration-300 hover:-translate-y-1 hover:border-secondary/60 hover:shadow-[0_14px_40px_rgba(0,0,0,0.20),0_0_0_1px_rgba(197,160,89,0.22)] focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      data-testid={testId}
+    >
+      <div className="flex items-start justify-between gap-6">
+        <div className="min-w-0">
+          <div className="flex items-center gap-3">
+            <div
+              className="text-secondary"
+              aria-hidden="true"
+              data-testid={`${testId}-icon`}
+            >
+              {icon}
+            </div>
+            <h2
+              className="font-display text-2xl text-primary-foreground"
+              data-testid={`${testId}-title`}
+            >
+              {title}
+            </h2>
+          </div>
+          <p
+            className="mt-4 text-sm leading-relaxed text-primary-foreground/70"
+            data-testid={`${testId}-description`}
+          >
+            {description}
+          </p>
+        </div>
+
+        <div
+          className="mt-1 shrink-0 text-secondary/80 transition-colors group-hover:text-secondary"
+          aria-hidden="true"
+        >
+          <ArrowRight size={18} />
+        </div>
+      </div>
+
+      <div className="mt-7 h-px bg-secondary/20" aria-hidden="true" />
+
+      <div
+        className="mt-5 text-xs font-semibold uppercase tracking-widest text-secondary"
+        data-testid={`${testId}-cta`}
+      >
+        Explore
+      </div>
+    </Link>
+  );
+}
 
 export default function Insights() {
   return (
@@ -8,55 +73,37 @@ export default function Insights() {
       <Navbar />
       <main className="flex-grow pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-16 border-b border-border pb-8">
-            <h1 className="font-display text-4xl md:text-5xl text-primary mb-4">Insights</h1>
-            <p className="text-muted-foreground max-w-2xl">
-              Research, market commentary, and perspectives on the global economy from our investment team.
+          <div className="mb-14 border-b border-border pb-8">
+            <h1 className="font-display text-4xl md:text-5xl text-primary mb-4" data-testid="text-insights-title">
+              Insights
+            </h1>
+            <p className="text-muted-foreground max-w-2xl" data-testid="text-insights-subtext">
+              Research, market commentary, and perspectives from our investment team.
             </p>
           </div>
 
-          {/* Featured Video */}
-          <div className="mb-24">
-            <h3 className="text-sm font-bold uppercase tracking-widest mb-6 text-secondary flex items-center gap-2">
-              <Play size={16} fill="currentColor" /> Featured Analysis
-            </h3>
-            <div className="aspect-video w-full bg-black/5 rounded-sm overflow-hidden relative group cursor-pointer">
-              <iframe 
-                width="100%" 
-                height="100%" 
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=Placeholder" 
-                title="Market Analysis" 
-                frameBorder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                allowFullScreen
-                className="absolute inset-0"
-              />
-            </div>
-            <h2 className="text-2xl font-display text-primary mt-6">The Great Deleveraging: Navigating the Next Cycle</h2>
-            <p className="text-muted-foreground mt-2">CIO Alexander Sterling discusses the impact of rate normalization on global asset classes.</p>
-          </div>
-
-          {/* Articles Grid */}
-          <div className="grid md:grid-cols-3 gap-x-8 gap-y-16">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <article key={i} className="group cursor-pointer">
-                <div className="h-48 bg-muted mb-6 overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5 group-hover:scale-105 transition-transform duration-700" />
-                </div>
-                <div className="text-xs font-bold text-secondary uppercase tracking-widest mb-3">
-                  Market Commentary • Oct 2025
-                </div>
-                <h3 className="text-xl font-display text-primary font-medium mb-3 group-hover:text-secondary transition-colors">
-                  {i % 2 === 0 ? "Asymmetric Opportunities in Emerging Debt" : "The Convergence of Volatility and Liquidity"}
-                </h3>
-                <p className="text-muted-foreground text-sm line-clamp-3 leading-relaxed">
-                  We explore the underlying structural shifts that are creating new pockets of alpha in traditionally overlooked markets. Our analysis suggests a rotation is imminent...
-                </p>
-                <div className="mt-4 text-xs font-semibold text-primary underline decoration-secondary/50 underline-offset-4 group-hover:decoration-secondary transition-all">
-                  Read Report
-                </div>
-              </article>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" data-testid="grid-insights-hub">
+            <HubCard
+              href="/insights/commentary"
+              title="Market Commentary"
+              description="Read our latest memos, quarterly letters, and deep-dive analysis on the structural shifts defining the economy."
+              icon={<FileText size={22} />}
+              testId="card-insights-commentary"
+            />
+            <HubCard
+              href="/insights/videos"
+              title="Video Perspectives"
+              description="Watch interviews, broadcast appearances, and roundtable discussions with our investment team."
+              icon={<PlayCircle size={22} />}
+              testId="card-insights-videos"
+            />
+            <HubCard
+              href="/insights/curated"
+              title="Curated Intelligence"
+              description="What we are reading. A selection of external research, historical analogies, and economic theory that informs our worldview."
+              icon={<Globe size={22} />}
+              testId="card-insights-curated"
+            />
           </div>
         </div>
       </main>

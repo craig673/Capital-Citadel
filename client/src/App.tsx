@@ -9,6 +9,9 @@ import WhoWeAre from "@/pages/WhoWeAre";
 import Process from "@/pages/Process";
 import Team from "@/pages/Team";
 import Insights from "@/pages/Insights";
+import InsightsCommentary from "@/pages/insights/Commentary";
+import InsightsVideos from "@/pages/insights/Videos";
+import InsightsCurated from "@/pages/insights/Curated";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
 import Terms from "@/pages/Terms";
@@ -27,6 +30,9 @@ function Router() {
       <Route path="/process" component={Process} />
       <Route path="/team" component={Team} />
       <Route path="/insights" component={Insights} />
+      <Route path="/insights/commentary" component={InsightsCommentary} />
+      <Route path="/insights/videos" component={InsightsVideos} />
+      <Route path="/insights/curated" component={InsightsCurated} />
       <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/terms" component={Terms} />
