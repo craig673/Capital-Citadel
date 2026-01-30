@@ -22,7 +22,7 @@ export function Footer() {
             <p>555 Fifth Avenue, Ninth Floor</p>
             <p>Suite 900</p>
             <p>New York, NY 10017</p>
-            <p>+1 (505) 555-5555 Ext 555</p>
+            <p>+1 (575) 203-1075 Ext 100</p>
             <p>ir@10000dayscapital.com</p>
           </address>
         </div>
