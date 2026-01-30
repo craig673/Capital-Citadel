@@ -24,6 +24,13 @@ const entries = [
     take: "Innovation is often romanticized, but the reality is a crucible of adversity. Rising from a turbulent childhood in South Africa to architecting the future of energy and space, Musk’s path defines the relentless will required to reshape civilization. It is a reminder that the future is built by those who can endure the most pain to execute the longest vision.",
     href: "https://www.simonandschuster.com/books/Elon-Musk/Walter-Isaacson/9781982181284",
   },
+  {
+    tag: "THE SPACE REVOLUTION",
+    title: "Project Suncatcher: Scalable Compute in Space",
+    source: "Google DeepMind / arXiv",
+    take: "If AI is a foundational technology, demand for compute—and energy—will soon outpace terrestrial grids. The Sun is the solar system's largest energy source, and this paper outlines the architecture for tapping into it. By deploying autonomous satellite fleets equipped with TPUs, we can decouple compute growth from earthly constraints. This is the blueprint for the industrialization of orbit.",
+    href: "https://arxiv.org/abs/2511.19468",
+  },
 ];
 
 export default function Curated() {
