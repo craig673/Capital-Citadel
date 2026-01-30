@@ -1,0 +1,41 @@
+Create the content for the "Curated Intelligence" page (/insights/curated).
+
+**Design Goal:** A high-end "Reading Room" aesthetic. This is a collection of external resources that inform the firm's worldview.
+
+**Layout:**
+* **Hero Section:**
+    * **Headline:** THE LIBRARY.
+    * **Subtext:** "To understand the future, one must study the past. This is a living collection of the research, historical analogies, and economic theories that shape our investment thesis."
+* **The Content Grid:**
+    * Use a 2-column grid layout (stacking to 1-column on mobile).
+    * Each entry should be a "Card" with a Midnight Navy background and Gold border.
+
+**Card Structure:**
+1.  **Category Tag** (e.g., "History", "Macro", "Technology") - Small gold text at top.
+2.  **Title:** Large, bold white text.
+3.  **Source:** (e.g., "Federal Reserve History" or "Nature Journal").
+4.  **"The 10,000 Days Take":** A distinct section with a slightly lighter background or border where we explain *why* this matters. (e.g., "Why we read this: This paper perfectly illustrates the deflationary impact of automation...").
+5.  **Action:** A "Read Source" button that opens the external URL in a new tab.
+
+**Sample Content to Populate:**
+
+* **Entry 1:**
+    * **Tag:** HISTORY
+    * **Title:** "The 4th Turning: An American Prophecy"
+    * **Source:** Neil Howe & William Strauss
+    * **Our Take:** "Essential reading for understanding generational cycles. The parallels between the 1930s and the 2020s provide a roadmap for the institutional shifts we are currently witnessing."
+    * **Link:** `#` (Placeholder)
+
+* **Entry 2:**
+    * **Tag:** TECHNOLOGY
+    * **Title:** "Computing Machinery and Intelligence"
+    * **Source:** Alan Turing (1950)
+    * **Our Take:** "Turing’s original imitation game paper. It reminds us that the goal of AI is not just processing power, but the replication of reasoning—a revolution we are only now realizing."
+    * **Link:** `#` (Placeholder)
+
+* **Entry 3:**
+    * **Tag:** MACROECONOMICS
+    * **Title:** "The Use of Knowledge in Society"
+    * **Source:** F.A. Hayek
+    * **Our Take:** "A masterclass in why decentralized markets outperform central planning. In an era of AI-driven data, Hayek’s thesis on the 'dispersion of knowledge' is more relevant than ever."
+    * **Link:** `#` (Placeholder)
