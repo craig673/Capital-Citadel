@@ -4,11 +4,11 @@ import { ExternalLink, BookOpen } from "lucide-react";
 
 const entries = [
   {
-    tag: "HISTORY",
-    title: "The 4th Turning: An American Prophecy",
-    source: "Neil Howe & William Strauss",
-    take: "Essential reading for understanding generational cycles. The parallels between the 1930s and the 2020s provide a roadmap for the institutional shifts we are currently witnessing.",
-    href: "#",
+    tag: "NETWORK ECONOMICS",
+    title: "Information Rules: A Strategic Guide to the Network Economy",
+    source: "Carl Shapiro & Hal R. Varian",
+    take: "Essential reading for understanding how underlying economic principles that have persisted for ages continue to be the foundation of solid analysis today.",
+    href: "https://store.hbr.org/product/information-rules-a-strategic-guide-to-the-network-economy/863X",
   },
   {
     tag: "TECHNOLOGY",
