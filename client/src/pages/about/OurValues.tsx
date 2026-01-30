@@ -123,25 +123,6 @@ export default function OurValues() {
           </div>
         </section>
 
-        {/* CTA */}
-        <section className="py-20 border-t border-border">
-          <div className="max-w-7xl mx-auto px-6">
-            <div
-              className="bg-primary text-primary-foreground px-10 py-14 border border-secondary/20"
-              data-testid="card-values-cta"
-            >
-              <div
-                className="text-secondary font-bold uppercase tracking-widest mb-3 text-xs"
-                data-testid="text-values-cta-kicker"
-              >
-                Standard
-              </div>
-              <div className="font-display text-2xl md:text-3xl" data-testid="text-values-cta-title">
-                “Integrity is our only non-depreciating asset.”
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
       <Footer />
     </div>
