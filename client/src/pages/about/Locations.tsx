@@ -3,7 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 
 import nycImg from "@/assets/locations-nyc.jpg";
-import nmImg from "@/assets/locations-newmexico.jpg";
+import nmImg from "../../../../attached_assets/organ-mountains-las-cruces-new-mexico-loree-johnson_1769802600303.jpg";
 
 function LocationBlock({
   header,
@@ -123,7 +123,7 @@ export default function Locations() {
         <LocationBlock
           header="Headquarters"
           title="New York"
-          description="Located in the heart of Midtown Manhattan, our headquarters anchors our fundamental research and investor relations teams."
+          description="Our headquarters are located in the heart of Midtown Manhattan."
           addressLines={["555 Fifth Avenue, Ninth Floor", "Suite 900", "New York, NY 10017"]}
           contactLabel="Contact"
           contactValue="ir@10000dayscapital.com"
