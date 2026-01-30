@@ -11,6 +11,7 @@ import Team from "@/pages/Team";
 import Insights from "@/pages/Insights";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
+import Terms from "@/pages/Terms";
 
 function Router() {
   return (
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/insights" component={Insights} />
       <Route path="/login" component={Login} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/terms" component={Terms} />
       <Route component={NotFound} />
     </Switch>
   );
