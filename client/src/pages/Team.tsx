@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
-import codyHeadshot from "../../../attached_assets/Gemini_Generated_Image_9ua71a9ua71a9ua7_1769806792023.png";
+import codyHeadshot from "../../../attached_assets/Gemini_Generated_Image_p6cncxp6cncxp6cn_1769807072188.png";
 import bryceHeadshot from "../../../attached_assets/Bryce_Headshot_3_1769806381148.jpg";
 
 export default function Team() {
