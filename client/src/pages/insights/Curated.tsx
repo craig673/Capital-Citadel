@@ -18,11 +18,11 @@ const entries = [
     href: "https://www.simonandschuster.com/books/Steve-Jobs/Walter-Isaacson/9781982176860",
   },
   {
-    tag: "MACROECONOMICS",
-    title: "The Use of Knowledge in Society",
-    source: "F.A. Hayek",
-    take: "A masterclass in why decentralized markets outperform central planning. In an era of AI-driven data, Hayek’s thesis on the 'dispersion of knowledge' is more relevant than ever.",
-    href: "#",
+    tag: "VISIONARY LEADERSHIP",
+    title: "Elon Musk",
+    source: "Walter Isaacson",
+    take: "Innovation is often romanticized, but the reality is a crucible of adversity. Rising from a turbulent childhood in South Africa to architecting the future of energy and space, Musk’s path defines the relentless will required to reshape civilization. It is a reminder that the future is built by those who can endure the most pain to execute the longest vision.",
+    href: "https://www.simonandschuster.com/books/Elon-Musk/Walter-Isaacson/9781982181284",
   },
 ];
 
