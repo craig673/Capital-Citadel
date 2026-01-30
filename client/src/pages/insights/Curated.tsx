@@ -11,11 +11,11 @@ const entries = [
     href: "https://store.hbr.org/product/information-rules-a-strategic-guide-to-the-network-economy/863X",
   },
   {
-    tag: "TECHNOLOGY",
-    title: "Computing Machinery and Intelligence",
-    source: "Alan Turing (1950)",
-    take: "Turing’s original imitation game paper. It reminds us that the goal of AI is not just processing power, but the replication of reasoning—a revolution we are only now realizing.",
-    href: "#",
+    tag: "VISIONARY LEADERSHIP",
+    title: "Steve Jobs",
+    source: "Walter Isaacson",
+    take: "To understand the anatomy of a Revolution, one must study its architects. This biography is the definitive study of how brilliance, obsession, and artistic perfectionism converge to redefine entire industries.",
+    href: "https://www.simonandschuster.com/books/Steve-Jobs/Walter-Isaacson/9781982176860",
   },
   {
     tag: "MACROECONOMICS",
