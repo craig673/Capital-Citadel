@@ -26,21 +26,20 @@ const interviews = [
 const aiRevolutionCall = [
   {
     id: "SINhxpfRNYs",
-    title: "Why is everyone talking about Claude?",
+    title: "The AI Revolution Call: Jan 27",
     context:
-      "The team discusses the rise of Anthropic's Claude, the coding revolution, and why 'software' is being redefined.",
+      "Weekly analysis of major tech equities (TSLA, NVDA), crypto markets, and the macroeconomic outlook for late January.",
   },
   {
     id: "MMSGUjoTFZU",
-    title: "First Call of 2026: CES & Gemini",
+    title: "The AI Revolution Call: Jan 21",
     context:
-      "A breakdown of CES 2026, Jensen Huang's keynote, and Apple's integration of Gemini on the iPhone.",
+      "A deep dive into Q1 market trends, key support levels for major indices, and the evolving AI hardware trade.",
   },
   {
     id: "GdPICJ2tM8c",
-    title: "Wearable Tech in 2026",
-    context:
-      "How Meta Glasses and next-gen wearables are shifting the 'Attention Economy' away from the screen.",
+    title: "The AI Revolution Call: Jan 13",
+    context: "Weekly market analysis and positioning across the AI complex.",
   },
 ];
 
