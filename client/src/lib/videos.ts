@@ -41,6 +41,14 @@ export const videos: Video[] = [
     series: "interviews",
   },
   {
+    id: "dl5tXnI1F8g",
+    title: "The AI Revolution Call: Jan 26",
+    date: "2025-01-26",
+    description:
+      "Latest weekly analysis of the AI complex, market structure, and macro outlook.",
+    series: "ai_revolution_call",
+  },
+  {
     id: "SINhxpfRNYs",
     title: "The AI Revolution Call: Jan 19",
     date: "2025-01-19",
