@@ -11,6 +11,13 @@ const documents = [
     href: "/assets/The-AIRS-Revolution.pdf",
   },
   {
+    date: "DECEMBER 2025",
+    title: "Our 2026 Predictions",
+    summary:
+      "A high-conviction set of calls spanning markets, macro, and the AIRS landscape\u2014from shifting sentiment around stores of value to the next phase of AI infrastructure, energy, and space. The note pairs Cody\u2019s macro-market expectations with Bryce\u2019s forward-looking milestones in humanoid adoption, direct-to-cell connectivity, and AI-driven platform breakouts. It\u2019s a staple because it crisply communicates how we think, what we\u2019re watching, and why Revolution Investing stays focused on multi-year compounding over short-term noise.",
+    href: "/assets/Our-2026-Predictions.pdf",
+  },
+  {
     date: "OCTOBER 2025",
     title: "Robotics Supply Chain Inflection Point",
     summary:
