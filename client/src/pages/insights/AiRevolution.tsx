@@ -1,30 +1,10 @@
+import { format } from "date-fns";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ArrowLeft, Radio } from "lucide-react";
 import { Link } from "wouter";
+import { getVideosBySeries, sortVideosByDateDesc, videos, type Video } from "@/lib/videos";
 
-const episodes = [
-  {
-    date: "JAN 19, 2025",
-    id: "SINhxpfRNYs",
-    title: "The AI Revolution Call: Jan 19",
-    context:
-      "Weekly analysis of major tech equities (TSLA, NVDA), crypto markets, and the macroeconomic outlook for late January.",
-  },
-  {
-    date: "JAN 12, 2025",
-    id: "MMSGUjoTFZU",
-    title: "The AI Revolution Call: Jan 12",
-    context:
-      "A deep dive into Q1 market trends, key support levels for major indices, and the evolving AI hardware trade.",
-  },
-  {
-    date: "DEC 29, 2024",
-    id: "GdPICJ2tM8c",
-    title: "The AI Revolution Call: Dec 29",
-    context: "Weekly market analysis and positioning across the AI complex.",
-  },
-];
 
 function VideoFrame({
   id,
@@ -102,8 +82,12 @@ export default function AiRevolution() {
           </section>
 
           <section data-testid="section-ai-revolution-grid">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-testid="grid-ai-revolution-episodes">
-              {episodes.map((ep, idx) => (
+            {(() => {
+              const list = sortVideosByDateDesc(getVideosBySeries(videos, "ai_revolution_call"));
+
+              return (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-testid="grid-ai-revolution-episodes">
+                  {list.map((ep: Video, idx) => (
                 <article
                   key={ep.id}
                   className="h-full flex flex-col border border-secondary/30 bg-white/[0.03] shadow-[0_0_0_1px_rgba(197,160,89,0.08)]"
@@ -116,7 +100,7 @@ export default function AiRevolution() {
                       className="text-xs font-bold uppercase tracking-widest text-secondary"
                       data-testid={`text-ai-revolution-date-${idx}`}
                     >
-                      {ep.date}
+                      {format(new Date(ep.date), "MMM d, yyyy")}
                     </div>
                     <h2
                       className="mt-3 font-display text-2xl text-primary-foreground"
@@ -128,12 +112,14 @@ export default function AiRevolution() {
                       className="mt-3 text-sm leading-relaxed text-primary-foreground/75"
                       data-testid={`text-ai-revolution-context-${idx}`}
                     >
-                      {ep.context}
+                      {ep.description}
                     </p>
                   </div>
                 </article>
-              ))}
-            </div>
+                  ))}
+                </div>
+              );
+            })()}
           </section>
         </div>
       </main>

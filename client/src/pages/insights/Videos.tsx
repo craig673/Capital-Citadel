@@ -1,47 +1,15 @@
 import { Link } from "wouter";
+import { format } from "date-fns";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ArrowRight, PlayCircle } from "lucide-react";
-
-const interviews = [
-  {
-    id: "nUvMkLI3eXM",
-    title: "AI as a Market Force",
-    context:
-      "Cody discusses why the AI shift is larger than geopolitical tensions and how it reshapes labor and capital.",
-  },
-  {
-    id: "uJauiCLefj8",
-    title: "The Energy & Automation Supercycle",
-    context: "A deep dive into why Tesla, AI, and the Middle East are just getting started.",
-  },
-  {
-    id: "ORgT7lZtazE",
-    title: "Live Q&A: Navigating Volatility",
-    context:
-      "Unscripted analysis of Bitcoin, Gold, and the tech sector during market drawdowns.",
-  },
-];
-
-const aiRevolutionCall = [
-  {
-    id: "SINhxpfRNYs",
-    title: "The AI Revolution Call: Jan 19",
-    context:
-      "Weekly analysis of major tech equities (TSLA, NVDA), crypto markets, and the macroeconomic outlook for late January.",
-  },
-  {
-    id: "MMSGUjoTFZU",
-    title: "The AI Revolution Call: Jan 12",
-    context:
-      "A deep dive into Q1 market trends, key support levels for major indices, and the evolving AI hardware trade.",
-  },
-  {
-    id: "GdPICJ2tM8c",
-    title: "The AI Revolution Call: Dec 29",
-    context: "Weekly market analysis and positioning across the AI complex.",
-  },
-];
+import {
+  getMostRecentVideo,
+  getVideosBySeries,
+  sortVideosByDateDesc,
+  videos,
+  type Video,
+} from "@/lib/videos";
 
 function VideoFrame({
   id,
@@ -76,7 +44,7 @@ function VideoGrid({
   items,
   testId,
 }: {
-  items: Array<{ id: string; title: string; context: string }>;
+  items: Video[];
   testId: string;
 }) {
   return (
@@ -90,17 +58,23 @@ function VideoGrid({
           <VideoFrame id={v.id} title={v.title} testId={`video-${testId}-${idx}`} />
 
           <div className="p-6" data-testid={`section-${testId}-meta-${idx}`}>
+            <div
+              className="text-xs font-bold uppercase tracking-widest text-secondary"
+              data-testid={`text-${testId}-date-${idx}`}
+            >
+              {format(new Date(v.date), "MMM d, yyyy")}
+            </div>
             <h3
-              className="font-display text-xl text-primary-foreground"
+              className="mt-3 font-display text-xl text-primary-foreground"
               data-testid={`text-${testId}-title-${idx}`}
             >
               {v.title}
             </h3>
             <p
               className="mt-3 text-sm leading-relaxed text-primary-foreground/75"
-              data-testid={`text-${testId}-context-${idx}`}
+              data-testid={`text-${testId}-description-${idx}`}
             >
-              {v.context}
+              {v.description}
             </p>
           </div>
         </article>
@@ -123,21 +97,25 @@ export default function Videos() {
               </div>
             </div>
 
-            <div className="mt-5" data-testid="wrap-videos-feature-player">
-              <VideoFrame
-                id="OWi7ePKPI8I"
-                title="Stop Investing in the Wrong Companies"
-                testId="video-feature"
-              />
-            </div>
+            {(() => {
+              const allSorted = sortVideosByDateDesc(videos);
+              const featured = getMostRecentVideo(allSorted);
 
-            <p
-              className="mt-6 max-w-4xl text-sm md:text-base leading-relaxed text-primary-foreground/80"
-              data-testid="text-videos-feature-caption"
-            >
-              The Revolution Investing Framework: How to identify the trillion-dollar companies of tomorrow before the
-              crowd arrives.
-            </p>
+              return (
+                <>
+                  <div className="mt-5" data-testid="wrap-videos-feature-player">
+                    <VideoFrame id={featured.id} title={featured.title} testId="video-feature" />
+                  </div>
+
+                  <p
+                    className="mt-6 max-w-4xl text-sm md:text-base leading-relaxed text-primary-foreground/80"
+                    data-testid="text-videos-feature-caption"
+                  >
+                    {featured.description}
+                  </p>
+                </>
+              );
+            })()}
 
             <div className="mt-12 h-px bg-secondary/20" aria-hidden="true" />
           </section>
@@ -152,7 +130,10 @@ export default function Videos() {
               </h2>
             </div>
 
-            <VideoGrid items={interviews} testId="grid-interviews" />
+            {(() => {
+              const list = sortVideosByDateDesc(getVideosBySeries(videos, "interviews"));
+              return <VideoGrid items={list} testId="grid-interviews" />;
+            })()}
           </section>
 
           <section className="pt-14 border-t border-secondary/20" data-testid="section-videos-ai-revolution">
@@ -178,7 +159,10 @@ export default function Videos() {
               </Link>
             </div>
 
-            <VideoGrid items={aiRevolutionCall} testId="grid-ai-revolution" />
+            {(() => {
+              const list = sortVideosByDateDesc(getVideosBySeries(videos, "ai_revolution_call"));
+              return <VideoGrid items={list} testId="grid-ai-revolution" />;
+            })()}
           </section>
         </div>
       </main>
