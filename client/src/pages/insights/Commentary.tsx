@@ -4,6 +4,13 @@ import { Download, FileText } from "lucide-react";
 
 const documents = [
   {
+    date: "OCTOBER 2025",
+    title: "Robotics Supply Chain Inflection Point",
+    summary:
+      "A sector update outlining why robotics is poised for an acceleration as AI shifts machines from programmed automation to learned behavior. We highlight the investable opportunity in the humanoid and broader robotics supply chain, where differentiated component makers can benefit regardless of which OEMs ultimately scale. We also frame key risks—vertical integration and low-cost competition—against the durability of Western, high-trust components.",
+    href: "/assets/Robotics-Supply-Chain-Inflection-Point.pdf",
+  },
+  {
     date: "JANUARY 2026",
     title: "The Year of the Construct",
     summary:
