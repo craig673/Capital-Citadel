@@ -5,23 +5,23 @@ import { Link } from "wouter";
 
 const episodes = [
   {
-    date: "JAN 27, 2025",
+    date: "JAN 19, 2025",
     id: "SINhxpfRNYs",
-    title: "The AI Revolution Call: Jan 27",
+    title: "The AI Revolution Call: Jan 19",
     context:
       "Weekly analysis of major tech equities (TSLA, NVDA), crypto markets, and the macroeconomic outlook for late January.",
   },
   {
-    date: "JAN 21, 2025",
+    date: "JAN 12, 2025",
     id: "MMSGUjoTFZU",
-    title: "The AI Revolution Call: Jan 21",
+    title: "The AI Revolution Call: Jan 12",
     context:
       "A deep dive into Q1 market trends, key support levels for major indices, and the evolving AI hardware trade.",
   },
   {
-    date: "JAN 13, 2025",
+    date: "DEC 29, 2024",
     id: "GdPICJ2tM8c",
-    title: "The AI Revolution Call: Jan 13",
+    title: "The AI Revolution Call: Dec 29",
     context: "Weekly market analysis and positioning across the AI complex.",
   },
 ];
