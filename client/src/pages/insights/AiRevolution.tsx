@@ -88,34 +88,34 @@ export default function AiRevolution() {
               return (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6" data-testid="grid-ai-revolution-episodes">
                   {list.map((ep: Video, idx) => (
-                <article
-                  key={ep.id}
-                  className="h-full flex flex-col border border-secondary/30 bg-white/[0.03] shadow-[0_0_0_1px_rgba(197,160,89,0.08)]"
-                  data-testid={`card-ai-revolution-${idx}`}
-                >
-                  <VideoFrame id={ep.id} title={ep.title} testId={`video-ai-revolution-${idx}`} />
+                    <article
+                      key={ep.id}
+                      className="h-full flex flex-col border border-secondary/30 bg-white/[0.03] shadow-[0_0_0_1px_rgba(197,160,89,0.08)]"
+                      data-testid={`card-ai-revolution-${idx}`}
+                    >
+                      <VideoFrame id={ep.id} title={ep.title} testId={`video-ai-revolution-${idx}`} />
 
-                  <div className="p-6 flex-1 flex flex-col" data-testid={`section-ai-revolution-meta-${idx}`}>
-                    <div
-                      className="text-xs font-bold uppercase tracking-widest text-secondary"
-                      data-testid={`text-ai-revolution-date-${idx}`}
-                    >
-                      {format(new Date(ep.date), "MMM d, yyyy")}
-                    </div>
-                    <h2
-                      className="mt-3 font-display text-2xl text-primary-foreground"
-                      data-testid={`text-ai-revolution-episode-title-${idx}`}
-                    >
-                      {ep.title}
-                    </h2>
-                    <p
-                      className="mt-3 text-sm leading-relaxed text-primary-foreground/75"
-                      data-testid={`text-ai-revolution-context-${idx}`}
-                    >
-                      {ep.description}
-                    </p>
-                  </div>
-                </article>
+                      <div className="p-6 flex-1 flex flex-col" data-testid={`section-ai-revolution-meta-${idx}`}>
+                        <div
+                          className="text-xs font-bold uppercase tracking-widest text-secondary"
+                          data-testid={`text-ai-revolution-date-${idx}`}
+                        >
+                          {format(new Date(ep.date), "MMM d, yyyy")}
+                        </div>
+                        <h2
+                          className="mt-3 font-display text-2xl text-primary-foreground"
+                          data-testid={`text-ai-revolution-episode-title-${idx}`}
+                        >
+                          {ep.title}
+                        </h2>
+                        <p
+                          className="mt-3 text-sm leading-relaxed text-primary-foreground/75"
+                          data-testid={`text-ai-revolution-context-${idx}`}
+                        >
+                          {ep.description}
+                        </p>
+                      </div>
+                    </article>
                   ))}
                 </div>
               );
