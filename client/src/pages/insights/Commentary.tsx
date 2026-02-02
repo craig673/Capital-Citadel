@@ -24,27 +24,6 @@ const documents = [
       "A sector update outlining why robotics is poised for an acceleration as AI shifts machines from programmed automation to learned behavior. We highlight the investable opportunity in the humanoid and broader robotics supply chain, where differentiated component makers can benefit regardless of which OEMs ultimately scale. We also frame key risks\u2014vertical integration and low-cost competition\u2014against the durability of Western, high-trust components.",
     href: "/assets/Robotics-Supply-Chain-Inflection-Point.pdf",
   },
-  {
-    date: "JANUARY 2026",
-    title: "The Year of the Construct",
-    summary:
-      "Our 2026 outlook focuses on the convergence of AI infrastructure and energy markets. We discuss why we are increasing exposure to the 'physical layer' of the compute revolution.",
-    href: "/assets/2026-Outlook.pdf",
-  },
-  {
-    date: "OCTOBER 2025",
-    title: "Volatility as an Asset Class",
-    summary:
-      "A review of Q3 performance and our thesis on interest rate normalization. Why we believe the era of 'free money' distortion is ending, and what it means for valuation multiples.",
-    href: "/assets/Q3-Letter.pdf",
-  },
-  {
-    date: "JULY 2025",
-    title: "The Robotics Supercycle",
-    summary:
-      "Deep dive into the industrial automation sector. We analyze the labor shortage data and the capital expenditure intentions of the Fortune 500.",
-    href: "/assets/Robotics-Paper.pdf",
-  },
 ];
 
 export default function Commentary() {
