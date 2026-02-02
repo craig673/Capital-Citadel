@@ -4,10 +4,17 @@ import { Download, FileText } from "lucide-react";
 
 const documents = [
   {
+    date: "JANUARY 2026",
+    title: "The AIRS Revolution",
+    summary:
+      "A foundational framework piece that explains why AI, robotics, and space are converging into a single compounding supercycle\u2014the AIRS Revolution. It reframes macro noise as secondary to technology-driven productivity and wealth creation, positioning 10,000 Days Capital as long-horizon Revolution Investors. This is a staple narrative for clients because it clarifies what we own, why we own it, and why the next 25 years are structurally different.",
+    href: "/assets/The-AIRS-Revolution.pdf",
+  },
+  {
     date: "OCTOBER 2025",
     title: "Robotics Supply Chain Inflection Point",
     summary:
-      "A sector update outlining why robotics is poised for an acceleration as AI shifts machines from programmed automation to learned behavior. We highlight the investable opportunity in the humanoid and broader robotics supply chain, where differentiated component makers can benefit regardless of which OEMs ultimately scale. We also frame key risks—vertical integration and low-cost competition—against the durability of Western, high-trust components.",
+      "A sector update outlining why robotics is poised for an acceleration as AI shifts machines from programmed automation to learned behavior. We highlight the investable opportunity in the humanoid and broader robotics supply chain, where differentiated component makers can benefit regardless of which OEMs ultimately scale. We also frame key risks\u2014vertical integration and low-cost competition\u2014against the durability of Western, high-trust components.",
     href: "/assets/Robotics-Supply-Chain-Inflection-Point.pdf",
   },
   {
