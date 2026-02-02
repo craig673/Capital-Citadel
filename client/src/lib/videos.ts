@@ -42,8 +42,8 @@ export const videos: Video[] = [
   },
   {
     id: "dl5tXnI1F8g",
-    title: "The AI Revolution Call: Jan 26",
-    date: "2025-01-26",
+    title: "The AI Revolution Call: February 2",
+    date: "2026-02-02T12:00:00",
     description:
       "Latest weekly analysis of the AI complex, market structure, and macro outlook.",
     series: "ai_revolution_call",
@@ -51,7 +51,7 @@ export const videos: Video[] = [
   {
     id: "SINhxpfRNYs",
     title: "The AI Revolution Call: Jan 19",
-    date: "2025-01-19",
+    date: "2026-01-19T12:00:00",
     description:
       "Weekly analysis of major tech equities (TSLA, NVDA), crypto markets, and the macroeconomic outlook for late January.",
     series: "ai_revolution_call",
@@ -59,7 +59,7 @@ export const videos: Video[] = [
   {
     id: "MMSGUjoTFZU",
     title: "The AI Revolution Call: Jan 12",
-    date: "2025-01-12",
+    date: "2026-01-12T12:00:00",
     description:
       "A deep dive into Q1 market trends, key support levels for major indices, and the evolving AI hardware trade.",
     series: "ai_revolution_call",
@@ -67,7 +67,7 @@ export const videos: Video[] = [
   {
     id: "GdPICJ2tM8c",
     title: "The AI Revolution Call: Dec 29",
-    date: "2024-12-29",
+    date: "2025-12-29T12:00:00",
     description: "Weekly market analysis and positioning across the AI complex.",
     series: "ai_revolution_call",
   },
