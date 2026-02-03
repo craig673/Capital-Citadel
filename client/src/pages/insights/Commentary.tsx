@@ -11,6 +11,13 @@ const documents = [
     href: "/assets/The-AIRS-Revolution.pdf",
   },
   {
+    date: "JUNE 2023",
+    title: "What Does it Mean to be a Revolution Investor?",
+    summary:
+      "A clear, first-principles explanation of the Revolution Investing playbook: identify paradigm-shifting technological revolutions, determine the likely winners and losers, and position capital early while maintaining discipline through inevitable cycles. Bryce outlines why these shifts repeatedly drive multi-billion and trillion-dollar value creation—and why the real edge comes from sustained research, integrity, and long-term conviction rather than reactive macro noise. The piece reinforces our focus on learning, perspective, and community to continually surface the next compounding opportunities.",
+    href: "/assets/What-Does-It-Mean-To-Be-A-Revolution-Investor.pdf",
+  },
+  {
     date: "DECEMBER 2025",
     title: "Our 2026 Predictions",
     summary:
