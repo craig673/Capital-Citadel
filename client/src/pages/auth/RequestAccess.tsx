@@ -4,6 +4,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
 export default function RequestAccess() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -31,7 +33,7 @@ export default function RequestAccess() {
       const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, isApproved: false, role: "user" }),
+        body: JSON.stringify({ firstName, lastName, email, password, isApproved: false, role: "user" }),
       });
 
       const data = await response.json();
@@ -43,6 +45,8 @@ export default function RequestAccess() {
       }
 
       setSuccess(true);
+      setFirstName("");
+      setLastName("");
       setEmail("");
       setPassword("");
       setConfirmPassword("");
@@ -101,6 +105,37 @@ export default function RequestAccess() {
             </p>
 
             <form onSubmit={handleSubmit} data-testid="form-request-access">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-semibold text-primary-foreground mb-2">
+                    First Name
+                  </label>
+                  <input
+                    id="firstName"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className="w-full bg-background/50 border border-secondary/30 px-4 py-2 text-primary-foreground focus:outline-none focus:border-secondary"
+                    required
+                    data-testid="input-first-name"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-semibold text-primary-foreground mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    id="lastName"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    className="w-full bg-background/50 border border-secondary/30 px-4 py-2 text-primary-foreground focus:outline-none focus:border-secondary"
+                    required
+                    data-testid="input-last-name"
+                  />
+                </div>
+              </div>
+
               <div className="mb-4">
                 <label htmlFor="email" className="block text-sm font-semibold text-primary-foreground mb-2">
                   Email

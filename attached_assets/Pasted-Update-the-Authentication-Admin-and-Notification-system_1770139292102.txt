@@ -1,0 +1,39 @@
+Update the Authentication, Admin, and Notification systems with the following features:
+
+1. Database Schema Updates:
+
+Update the User model to include firstName (text) and lastName (text).
+
+Add fields to track denials: denialCount (integer, default 0) and lastDenialDate (timestamp).
+
+2. Registration Page (/auth/request-access):
+
+Add required input fields for First Name and Last Name.
+
+Lockout Logic: If a user with the same email has been denied twice within the last 7 days, prevent them from submitting the form and show the error: "Access request limit reached. Please try again in 7 days."
+
+3. Email Notification System:
+
+Implement an email service (using Nodemailer or similar) to handle system notifications.
+
+Admin Alert: When a new user requests access, immediately email craig@10000daysfund.com with the subject "New Access Request" and the user's details.
+
+User Denial Alert: When an admin denies a request, automatically email the user with the subject "Update on your Access Request" and the following body text:
+
+"Dear [First Name], Thank you for requesting access to the 10,000 Days Capital portal. We have received your request, but are unable to grant access at this time. To continue the verification process, please reach out to your designated contact at 10,000 Days Capital directly. Sincerely, The 10,000 Days Capital Team"
+
+4. Admin Dashboard (/admin/approvals):
+
+Display: Show the user's Full Name, Email, and Current Role.
+
+Role Toggle (Admin-Only): Add a toggle next to the "Approve" button to switch the role between "user" and "admin" before approval.
+
+Security Note: Ensure this toggle is only visible to logged-in Admins. Protect the backend route so non-admins cannot hack a request to change roles.
+
+Deny Button: Add a "Deny" button (styled red).
+
+Action: Clicking this must increment the user's denialCount, update lastDenialDate, remove them from the pending list, and trigger the denial email mentioned above.
+
+5. Styling:
+
+Ensure all new inputs and buttons match the Midnight Navy and Gold theme.

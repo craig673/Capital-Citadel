@@ -16,7 +16,9 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getPendingUsers(): Promise<User[]>;
-  approveUser(id: string): Promise<User | undefined>;
+  approveUser(id: string, role?: string): Promise<User | undefined>;
+  denyUser(id: string): Promise<User | undefined>;
+  deleteUser(id: string): Promise<void>;
   getAllUsers(): Promise<User[]>;
 }
 
@@ -40,13 +42,39 @@ export class DrizzleStorage implements IStorage {
     return await db.select().from(users).where(eq(users.isApproved, false));
   }
 
-  async approveUser(id: string): Promise<User | undefined> {
+  async approveUser(id: string, role: string = "user"): Promise<User | undefined> {
     const result = await db
       .update(users)
-      .set({ isApproved: true })
+      .set({ isApproved: true, role })
       .where(eq(users.id, id))
       .returning();
     return result[0];
+  }
+
+  async denyUser(id: string): Promise<User | undefined> {
+    const result = await db
+      .update(users)
+      .set({ 
+        denialCount: users.denialCount, 
+        lastDenialDate: new Date() 
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (result[0]) {
+      // Increment denial count manually since we can't do arithmetic in set
+      const updated = await db
+        .update(users)
+        .set({ denialCount: (result[0].denialCount || 0) + 1 })
+        .where(eq(users.id, id))
+        .returning();
+      return updated[0];
+    }
+    return result[0];
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
   }
 
   async getAllUsers(): Promise<User[]> {

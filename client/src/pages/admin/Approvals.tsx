@@ -11,7 +11,8 @@ export default function Approvals() {
   const [pendingUsers, setPendingUsers] = useState<UserWithoutPassword[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [approving, setApproving] = useState<string | null>(null);
+  const [processing, setProcessing] = useState<string | null>(null);
+  const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
 
   useEffect(() => {
     fetchPendingUsers();
@@ -40,12 +41,15 @@ export default function Approvals() {
   };
 
   const handleApprove = async (userId: string) => {
-    setApproving(userId);
+    setProcessing(userId);
     setError("");
 
     try {
+      const role = selectedRoles[userId] || "user";
       const response = await fetch(`/api/admin/approve-user/${userId}`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ role }),
       });
 
       if (!response.ok) {
@@ -53,11 +57,44 @@ export default function Approvals() {
       }
 
       setPendingUsers(pendingUsers.filter((user) => user.id !== userId));
-      setApproving(null);
+      setProcessing(null);
     } catch (err: any) {
       setError(err.message || "Failed to approve user");
-      setApproving(null);
+      setProcessing(null);
     }
+  };
+
+  const handleDeny = async (userId: string) => {
+    setProcessing(userId);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/admin/deny-user/${userId}`, {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to deny user");
+      }
+
+      setPendingUsers(pendingUsers.filter((user) => user.id !== userId));
+      setProcessing(null);
+    } catch (err: any) {
+      setError(err.message || "Failed to deny user");
+      setProcessing(null);
+    }
+  };
+
+  const toggleRole = (userId: string) => {
+    setSelectedRoles((prev) => ({
+      ...prev,
+      [userId]: prev[userId] === "admin" ? "user" : "admin",
+    }));
+  };
+
+  const getFullName = (user: UserWithoutPassword) => {
+    const parts = [user.firstName, user.lastName].filter(Boolean);
+    return parts.length > 0 ? parts.join(" ") : "—";
   };
 
   return (
@@ -106,28 +143,61 @@ export default function Approvals() {
               {pendingUsers.map((user, idx) => (
                 <article
                   key={user.id}
-                  className="bg-primary text-primary-foreground border border-secondary/30 p-6 shadow-[0_0_0_1px_rgba(197,160,89,0.10)] flex items-center justify-between"
+                  className="bg-primary text-primary-foreground border border-secondary/30 p-6 shadow-[0_0_0_1px_rgba(197,160,89,0.10)]"
                   data-testid={`card-user-${idx}`}
                 >
-                  <div>
-                    <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-2" data-testid={`text-user-label-${idx}`}>
-                      Pending Approval
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex-grow">
+                      <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-2" data-testid={`text-user-label-${idx}`}>
+                        Pending Approval
+                      </div>
+                      <h2 className="font-display text-xl text-primary-foreground" data-testid={`text-user-name-${idx}`}>
+                        {getFullName(user)}
+                      </h2>
+                      <p className="text-sm text-muted-foreground mt-1" data-testid={`text-user-email-${idx}`}>
+                        {user.email}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1" data-testid={`text-user-role-${idx}`}>
+                        Current Role: {user.role}
+                      </p>
                     </div>
-                    <h2 className="font-display text-xl text-primary-foreground" data-testid={`text-user-email-${idx}`}>
-                      {user.email}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-1" data-testid={`text-user-role-${idx}`}>
-                      Role: {user.role}
-                    </p>
+
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground uppercase tracking-wide">Assign as:</span>
+                        <button
+                          onClick={() => toggleRole(user.id)}
+                          className={`px-3 py-1 text-xs font-semibold uppercase tracking-widest border transition-colors ${
+                            (selectedRoles[user.id] || "user") === "admin"
+                              ? "bg-secondary text-secondary-foreground border-secondary"
+                              : "bg-transparent text-primary-foreground border-secondary/50 hover:border-secondary"
+                          }`}
+                          data-testid={`button-toggle-role-${idx}`}
+                        >
+                          {selectedRoles[user.id] || "user"}
+                        </button>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApprove(user.id)}
+                          disabled={processing === user.id}
+                          className="bg-secondary text-secondary-foreground px-5 py-2 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
+                          data-testid={`button-approve-${idx}`}
+                        >
+                          {processing === user.id ? "..." : "Approve"}
+                        </button>
+                        <button
+                          onClick={() => handleDeny(user.id)}
+                          disabled={processing === user.id}
+                          className="bg-red-600 text-white px-5 py-2 text-sm font-semibold uppercase tracking-widest hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          data-testid={`button-deny-${idx}`}
+                        >
+                          {processing === user.id ? "..." : "Deny"}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => handleApprove(user.id)}
-                    disabled={approving === user.id}
-                    className="bg-secondary text-secondary-foreground px-6 py-2 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
-                    data-testid={`button-approve-${idx}`}
-                  >
-                    {approving === user.id ? "Approving..." : "Approve"}
-                  </button>
                 </article>
               ))}
             </div>

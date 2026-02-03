@@ -6,6 +6,7 @@ import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import pg from "pg";
 import { insertUserSchema } from "@shared/schema";
+import { sendNewAccessRequestEmail, sendDenialEmail } from "./email";
 
 const { Pool } = pg;
 const PgSession = connectPgSimple(session);
@@ -88,7 +89,27 @@ export async function registerRoutes(
       
       const existingUser = await storage.getUserByEmail(validatedData.email);
       if (existingUser) {
-        return res.status(400).json({ error: "Email already exists" });
+        // Check if user has been denied twice in the last 7 days
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        
+        if (
+          existingUser.denialCount >= 2 &&
+          existingUser.lastDenialDate &&
+          existingUser.lastDenialDate > sevenDaysAgo
+        ) {
+          return res.status(429).json({ 
+            error: "Access request limit reached. Please try again in 7 days." 
+          });
+        }
+
+        // If already approved, don't allow re-registration
+        if (existingUser.isApproved) {
+          return res.status(400).json({ error: "This email already has an approved account." });
+        }
+
+        // If pending, don't allow duplicate
+        return res.status(400).json({ error: "A request with this email is already pending." });
       }
 
       const hashedPassword = await bcrypt.hash(validatedData.password, 10);
@@ -98,6 +119,13 @@ export async function registerRoutes(
         password: hashedPassword,
         isApproved: false,
         role: "user",
+      });
+
+      // Send email notification to admin
+      sendNewAccessRequestEmail({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
       });
 
       res.json({ 
@@ -177,7 +205,13 @@ export async function registerRoutes(
   app.post("/api/admin/approve-user/:id", requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
       const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const user = await storage.approveUser(userId);
+      const { role } = req.body;
+      
+      // Validate role if provided
+      const validRoles = ["user", "admin"];
+      const assignRole = validRoles.includes(role) ? role : "user";
+      
+      const user = await storage.approveUser(userId, assignRole);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -186,6 +220,38 @@ export async function registerRoutes(
       res.json({ user: userWithoutPassword });
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to approve user" });
+    }
+  });
+
+  // Admin: Deny user
+  app.post("/api/admin/deny-user/:id", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      
+      // Get user before updating for email
+      const userBefore = await storage.getUser(userId);
+      if (!userBefore) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Update denial count and date
+      const user = await storage.denyUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "Failed to deny user" });
+      }
+
+      // Send denial email
+      sendDenialEmail({
+        firstName: userBefore.firstName,
+        email: userBefore.email,
+      });
+
+      // Delete the user from pending list (they can re-apply later if under limit)
+      await storage.deleteUser(userId);
+
+      res.json({ message: "User denied and removed from pending list" });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to deny user" });
     }
   });
 
