@@ -489,5 +489,152 @@ export async function registerRoutes(
     }
   });
 
+  // Published Documents Directory
+  const PUBLISHED_DIR = path.join(process.cwd(), "published_documents");
+  if (!fs.existsSync(PUBLISHED_DIR)) {
+    fs.mkdirSync(PUBLISHED_DIR, { recursive: true });
+  }
+
+  const publishedStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, PUBLISHED_DIR);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const ext = path.extname(file.originalname);
+      cb(null, `${uniqueSuffix}${ext}`);
+    },
+  });
+
+  const publishedUpload = multer({
+    storage: publishedStorage,
+    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype === "application/pdf") {
+        cb(null, true);
+      } else {
+        cb(new Error("Only PDF files are allowed"));
+      }
+    },
+  });
+
+  const publishDocumentSchema = z.object({
+    title: z.string().min(1, "Title is required"),
+    category: z.enum(["letter", "legal"]),
+    publishDate: z.string().optional(),
+  });
+
+  // Admin: Publish a new document (letter or fund document)
+  app.post("/api/admin/publish-document", requireAdmin, publishedUpload.single("file"), async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const parseResult = publishDocumentSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ error: parseResult.error.errors[0]?.message || "Invalid request" });
+      }
+
+      const { title, category, publishDate } = parseResult.data;
+
+      const doc = await storage.createPublishedDocument({
+        title,
+        fileName: req.file.originalname,
+        storedPath: req.file.filename,
+        category,
+        publishDate: publishDate ? new Date(publishDate) : new Date(),
+      });
+
+      res.json({ document: doc });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to publish document" });
+    }
+  });
+
+  // Get published documents by category (authenticated users)
+  app.get("/api/documents/:category", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const category = req.params.category;
+      if (category !== "letter" && category !== "legal") {
+        return res.status(400).json({ error: "Invalid category" });
+      }
+      
+      const documents = await storage.getPublishedDocumentsByCategory(category);
+      res.json({ documents });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch documents" });
+    }
+  });
+
+  // Get recent investor letters (authenticated users)
+  app.get("/api/documents/letters/recent", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 4;
+      const documents = await storage.getRecentLetters(limit);
+      res.json({ documents });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch recent letters" });
+    }
+  });
+
+  // Download published document (authenticated users)
+  app.get("/api/documents/download/:id", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const document = await storage.getPublishedDocument(docId);
+      
+      if (!document) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+
+      const filePath = path.join(PUBLISHED_DIR, document.storedPath);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "File not found on server" });
+      }
+
+      res.download(filePath, document.fileName);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to download document" });
+    }
+  });
+
+  // Admin: Delete a published document (fund documents only)
+  app.delete("/api/admin/documents/:id", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const document = await storage.getPublishedDocument(docId);
+      
+      if (!document) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+
+      // Delete the file from disk
+      const filePath = path.join(PUBLISHED_DIR, document.storedPath);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+
+      // Delete from database
+      await storage.deletePublishedDocument(docId);
+
+      res.json({ message: "Document deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to delete document" });
+    }
+  });
+
+  // Admin: Get all published documents (for admin management)
+  app.get("/api/admin/published-documents", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const letters = await storage.getPublishedDocumentsByCategory("letter");
+      const fundDocs = await storage.getPublishedDocumentsByCategory("legal");
+      res.json({ letters, fundDocs });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch published documents" });
+    }
+  });
+
   return httpServer;
 }
