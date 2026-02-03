@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User } from "@shared/schema";
-import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown, MoreVertical } from "lucide-react";
+import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown, MoreVertical, Upload, Trash2, Calendar, Loader2 } from "lucide-react";
 
 type UserWithoutPassword = Omit<User, "password">;
 
@@ -13,6 +13,16 @@ interface DocumentUpload {
   uploadDate: string;
   investorName: string;
   investorEmail: string;
+}
+
+interface PublishedDocument {
+  id: string;
+  title: string;
+  fileName: string;
+  storedPath: string;
+  category: string;
+  publishDate: string;
+  createdAt: string;
 }
 
 export default function Approvals() {
@@ -39,6 +49,18 @@ export default function Approvals() {
   const [editRole, setEditRole] = useState("user");
   const [editProcessing, setEditProcessing] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [publishedLetters, setPublishedLetters] = useState<PublishedDocument[]>([]);
+  const [publishedFundDocs, setPublishedFundDocs] = useState<PublishedDocument[]>([]);
+  const [letterTitle, setLetterTitle] = useState("");
+  const [letterDate, setLetterDate] = useState("");
+  const [letterFile, setLetterFile] = useState<File | null>(null);
+  const [letterPublishing, setLetterPublishing] = useState(false);
+  const [fundDocTitle, setFundDocTitle] = useState("");
+  const [fundDocFile, setFundDocFile] = useState<File | null>(null);
+  const [fundDocPublishing, setFundDocPublishing] = useState(false);
+  const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
+  const letterFileRef = useRef<HTMLInputElement>(null);
+  const fundDocFileRef = useRef<HTMLInputElement>(null);
 
   const sortedFilteredUsers = useMemo(() => {
     let filtered = approvedUsers;
@@ -168,7 +190,122 @@ export default function Approvals() {
     fetchPendingUsers();
     fetchDocuments();
     fetchApprovedUsers();
+    fetchPublishedDocuments();
   }, []);
+
+  const fetchPublishedDocuments = async () => {
+    try {
+      const response = await fetch("/api/admin/published-documents", { credentials: "include" });
+      if (response.ok) {
+        const data = await response.json();
+        setPublishedLetters(data.letters);
+        setPublishedFundDocs(data.fundDocs);
+      }
+    } catch (err) {
+      console.error("Failed to fetch published documents:", err);
+    }
+  };
+
+  const handlePublishLetter = async () => {
+    if (!letterTitle.trim() || !letterFile) return;
+    
+    setLetterPublishing(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", letterFile);
+      formData.append("title", letterTitle.trim());
+      formData.append("category", "letter");
+      if (letterDate) {
+        formData.append("publishDate", letterDate);
+      }
+
+      const response = await fetch("/api/admin/publish-document", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPublishedLetters(prev => [data.document, ...prev]);
+        setLetterTitle("");
+        setLetterDate("");
+        setLetterFile(null);
+        if (letterFileRef.current) letterFileRef.current.value = "";
+        showToast("Investor letter published successfully", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to publish letter", "error");
+      }
+    } catch (err) {
+      showToast("Failed to publish letter", "error");
+    } finally {
+      setLetterPublishing(false);
+    }
+  };
+
+  const handlePublishFundDoc = async () => {
+    if (!fundDocTitle.trim() || !fundDocFile) return;
+    
+    setFundDocPublishing(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", fundDocFile);
+      formData.append("title", fundDocTitle.trim());
+      formData.append("category", "legal");
+
+      const response = await fetch("/api/admin/publish-document", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPublishedFundDocs(prev => [data.document, ...prev]);
+        setFundDocTitle("");
+        setFundDocFile(null);
+        if (fundDocFileRef.current) fundDocFileRef.current.value = "";
+        showToast("Fund document published successfully", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to publish document", "error");
+      }
+    } catch (err) {
+      showToast("Failed to publish document", "error");
+    } finally {
+      setFundDocPublishing(false);
+    }
+  };
+
+  const handleDeleteFundDoc = async (docId: string) => {
+    setDeletingDocId(docId);
+    try {
+      const response = await fetch(`/api/admin/documents/${docId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setPublishedFundDocs(prev => prev.filter(d => d.id !== docId));
+        showToast("Document deleted successfully", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to delete document", "error");
+      }
+    } catch (err) {
+      showToast("Failed to delete document", "error");
+    } finally {
+      setDeletingDocId(null);
+    }
+  };
+
+  const formatPublishDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    });
+  };
 
   const fetchApprovedUsers = async () => {
     try {
@@ -673,6 +810,213 @@ export default function Approvals() {
                 </table>
               </div>
             )}
+          </section>
+
+          <section className="mt-16" data-testid="section-document-publishing">
+            <h2 className="font-display text-3xl text-primary tracking-tight border-b-4 border-secondary pb-3 inline-block mb-8">
+              DOCUMENT PUBLISHING
+            </h2>
+
+            <div className="grid lg:grid-cols-2 gap-8">
+              <div className="bg-primary text-primary-foreground p-6 border border-secondary/30" data-testid="section-publish-letter">
+                <h3 className="font-display text-xl mb-6">Publish Quarterly Letter</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                      Letter Title
+                    </label>
+                    <input
+                      type="text"
+                      value={letterTitle}
+                      onChange={(e) => setLetterTitle(e.target.value)}
+                      placeholder="e.g., Q4 2025 Investor Letter"
+                      className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                      data-testid="input-letter-title"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                      Publish Date (Optional)
+                    </label>
+                    <div className="relative">
+                      <Calendar size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      <input
+                        type="date"
+                        value={letterDate}
+                        onChange={(e) => setLetterDate(e.target.value)}
+                        className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 pl-10 text-sm focus:outline-none focus:border-secondary"
+                        data-testid="input-letter-date"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                      PDF File
+                    </label>
+                    <input
+                      ref={letterFileRef}
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => setLetterFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                      id="letter-file-input"
+                      data-testid="input-letter-file"
+                    />
+                    <label
+                      htmlFor="letter-file-input"
+                      className="block w-full border-2 border-dashed border-secondary/50 p-4 text-center cursor-pointer hover:border-secondary transition-colors"
+                    >
+                      <Upload size={24} className="mx-auto mb-2 text-secondary" />
+                      <span className="text-sm text-primary-foreground/70">
+                        {letterFile ? letterFile.name : "Click to select PDF"}
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <button
+                    onClick={handlePublishLetter}
+                    disabled={!letterTitle.trim() || !letterFile || letterPublishing}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
+                    data-testid="button-publish-letter"
+                  >
+                    {letterPublishing ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Publishing...
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={16} />
+                        Publish Letter
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {publishedLetters.length > 0 && (
+                  <div className="mt-6 pt-6 border-t border-secondary/30">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
+                      Published Letters ({publishedLetters.length})
+                    </h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {publishedLetters.map((letter) => (
+                        <div
+                          key={letter.id}
+                          className="flex items-center justify-between p-2 bg-primary-foreground/5 text-sm"
+                          data-testid={`published-letter-${letter.id}`}
+                        >
+                          <div>
+                            <div className="text-primary-foreground">{letter.title}</div>
+                            <div className="text-xs text-primary-foreground/50">{formatPublishDate(letter.publishDate)}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="bg-white p-6 border border-border" data-testid="section-manage-fund-docs">
+                <h3 className="font-display text-xl text-primary mb-6">Manage Fund Documents</h3>
+                
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                      Document Title
+                    </label>
+                    <input
+                      type="text"
+                      value={fundDocTitle}
+                      onChange={(e) => setFundDocTitle(e.target.value)}
+                      placeholder="e.g., Private Placement Memorandum"
+                      className="w-full border border-border p-3 text-sm focus:outline-none focus:border-secondary"
+                      data-testid="input-funddoc-title"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                      PDF File
+                    </label>
+                    <input
+                      ref={fundDocFileRef}
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => setFundDocFile(e.target.files?.[0] || null)}
+                      className="hidden"
+                      id="funddoc-file-input"
+                      data-testid="input-funddoc-file"
+                    />
+                    <label
+                      htmlFor="funddoc-file-input"
+                      className="block w-full border-2 border-dashed border-secondary/50 p-4 text-center cursor-pointer hover:border-secondary transition-colors"
+                    >
+                      <Upload size={24} className="mx-auto mb-2 text-secondary" />
+                      <span className="text-sm text-muted-foreground">
+                        {fundDocFile ? fundDocFile.name : "Click to select PDF"}
+                      </span>
+                    </label>
+                  </div>
+                  
+                  <button
+                    onClick={handlePublishFundDoc}
+                    disabled={!fundDocTitle.trim() || !fundDocFile || fundDocPublishing}
+                    className="w-full inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
+                    data-testid="button-publish-funddoc"
+                  >
+                    {fundDocPublishing ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Publishing...
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={16} />
+                        Add Document
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {publishedFundDocs.length > 0 && (
+                  <div className="pt-6 border-t border-border">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
+                      Current Fund Documents ({publishedFundDocs.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {publishedFundDocs.map((doc) => (
+                        <div
+                          key={doc.id}
+                          className="flex items-center justify-between p-3 bg-muted/30 border border-border"
+                          data-testid={`fund-doc-${doc.id}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <FileText size={18} className="text-secondary" />
+                            <span className="text-sm text-primary">{doc.title}</span>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteFundDoc(doc.id)}
+                            disabled={deletingDocId === doc.id}
+                            className="text-red-500 hover:text-red-700 transition-colors p-1 disabled:opacity-50"
+                            title="Delete document"
+                            data-testid={`button-delete-funddoc-${doc.id}`}
+                          >
+                            {deletingDocId === doc.id ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <Trash2 size={16} />
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </section>
         </div>
       </main>

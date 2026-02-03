@@ -552,22 +552,7 @@ export async function registerRoutes(
     }
   });
 
-  // Get published documents by category (authenticated users)
-  app.get("/api/documents/:category", requireAuth, async (req: AuthRequest, res: Response) => {
-    try {
-      const category = req.params.category;
-      if (category !== "letter" && category !== "legal") {
-        return res.status(400).json({ error: "Invalid category" });
-      }
-      
-      const documents = await storage.getPublishedDocumentsByCategory(category);
-      res.json({ documents });
-    } catch (error: any) {
-      res.status(500).json({ error: error.message || "Failed to fetch documents" });
-    }
-  });
-
-  // Get recent investor letters (authenticated users)
+  // Get recent investor letters (authenticated users) - MUST be before :category route
   app.get("/api/documents/letters/recent", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
       const limit = parseInt(req.query.limit as string) || 4;
@@ -578,7 +563,7 @@ export async function registerRoutes(
     }
   });
 
-  // Download published document (authenticated users)
+  // Download published document (authenticated users) - MUST be before :category route
   app.get("/api/documents/download/:id", requireAuth, async (req: AuthRequest, res: Response) => {
     try {
       const docId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
@@ -597,6 +582,21 @@ export async function registerRoutes(
       res.download(filePath, document.fileName);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to download document" });
+    }
+  });
+
+  // Get published documents by category (authenticated users)
+  app.get("/api/documents/:category", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const category = req.params.category;
+      if (category !== "letter" && category !== "legal") {
+        return res.status(400).json({ error: "Invalid category" });
+      }
+      
+      const documents = await storage.getPublishedDocumentsByCategory(category);
+      res.json({ documents });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch documents" });
     }
   });
 
