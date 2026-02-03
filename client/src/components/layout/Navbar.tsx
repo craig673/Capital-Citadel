@@ -99,7 +99,7 @@ export function Navbar() {
           ))}
 
           <Link
-            href="/login"
+            href="/auth/login"
             className="bg-primary text-primary-foreground px-5 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
             data-testid="button-client-login"
           >
@@ -152,7 +152,7 @@ export function Navbar() {
             </Link>
           ))}
           <Link
-            href="/login"
+            href="/auth/login"
             className="text-lg font-medium text-secondary"
             onClick={() => setIsOpen(false)}
             data-testid="mobile-link-login"
