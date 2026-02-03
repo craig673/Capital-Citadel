@@ -1,9 +1,48 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Download, FileText, ChevronRight } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useEffect, useState } from "react";
+
+interface User {
+  id: string;
+  email: string;
+  role: string;
+  isApproved: boolean;
+}
 
 export default function Dashboard() {
+  const [, setLocation] = useLocation();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/me", { credentials: "include" });
+        if (!response.ok) {
+          setLocation("/auth/login");
+          return;
+        }
+        const data = await response.json();
+        setUser(data.user);
+      } catch {
+        setLocation("/auth/login");
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, [setLocation]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
   const documents = [
     { title: "Monthly Performance Report - Dec 2025", type: "PDF", size: "2.4 MB" },
     { title: "Q4 2025 Investor Letter", type: "PDF", size: "1.8 MB" },
@@ -25,7 +64,7 @@ export default function Dashboard() {
             <span data-testid="text-dashboard-breadcrumb-current">Portal</span>
           </div>
           <h1 className="text-3xl font-display">Investor Dashboard</h1>
-          <p className="text-primary-foreground/60 mt-2">Welcome, Institutional Partner.</p>
+          <p className="text-primary-foreground/60 mt-2">Welcome back, {user?.email}</p>
         </div>
       </div>
       

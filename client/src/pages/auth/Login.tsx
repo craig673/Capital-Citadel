@@ -30,7 +30,12 @@ export default function Login() {
         return;
       }
 
-      setLocation("/");
+      // Redirect based on user role
+      if (data.user?.role === "admin") {
+        setLocation("/admin/approvals");
+      } else {
+        setLocation("/dashboard");
+      }
     } catch (err) {
       setError("An unexpected error occurred");
       setLoading(false);

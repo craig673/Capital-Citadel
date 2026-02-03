@@ -1,8 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { ChevronDown, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, Menu, X, LogOut, User } from "lucide-react";
+import { useState, useEffect } from "react";
 import logo from "@assets/10k_logo_no_words_1768927881066.png";
+
+interface AuthUser {
+  id: string;
+  email: string;
+  role: string;
+  isApproved: boolean;
+}
 
 const aboutItems = [
   { href: "/about/what-we-do", label: "What We Do" },
@@ -12,8 +19,37 @@ const aboutItems = [
 ];
 
 export function Navbar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/me", { credentials: "include" });
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+        }
+      } catch (error) {
+        // Not logged in
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, [location]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+      setUser(null);
+      setLocation("/");
+    } catch (error) {
+      console.error("Logout failed");
+    }
+  };
 
   const links = [
     { href: "/philosophy", label: "Our Philosophy" },
@@ -98,13 +134,36 @@ export function Navbar() {
             </Link>
           ))}
 
-          <Link
-            href="/auth/login"
-            className="bg-primary text-primary-foreground px-5 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
-            data-testid="button-client-login"
-          >
-            Client Login
-          </Link>
+          {!checkingAuth && (
+            user ? (
+              <div className="flex items-center gap-4" data-testid="nav-user-menu">
+                <Link
+                  href={user.role === "admin" ? "/admin/approvals" : "/dashboard"}
+                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-secondary transition-colors"
+                  data-testid="link-user-portal"
+                >
+                  <User size={16} />
+                  <span className="hidden lg:inline">{user.email}</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
+                  data-testid="button-logout"
+                >
+                  <LogOut size={14} />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="bg-primary text-primary-foreground px-5 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
+                data-testid="button-client-login"
+              >
+                Client Login
+              </Link>
+            )
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -151,14 +210,41 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/auth/login"
-            className="text-lg font-medium text-secondary"
-            onClick={() => setIsOpen(false)}
-            data-testid="mobile-link-login"
-          >
-            Client Login
-          </Link>
+          {user ? (
+            <div className="flex flex-col gap-3 pt-2 border-t border-border/40">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <User size={16} />
+                {user.email}
+              </div>
+              <Link
+                href={user.role === "admin" ? "/admin/approvals" : "/dashboard"}
+                className="text-lg font-medium text-secondary"
+                onClick={() => setIsOpen(false)}
+                data-testid="mobile-link-portal"
+              >
+                {user.role === "admin" ? "Admin Dashboard" : "Client Portal"}
+              </Link>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }}
+                className="text-lg font-medium text-primary hover:text-secondary text-left"
+                data-testid="mobile-button-logout"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/auth/login"
+              className="text-lg font-medium text-secondary"
+              onClick={() => setIsOpen(false)}
+              data-testid="mobile-link-login"
+            >
+              Client Login
+            </Link>
+          )}
         </div>
       )}
     </nav>
