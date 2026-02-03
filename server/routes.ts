@@ -9,6 +9,7 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import { insertUserSchema } from "@shared/schema";
+import { z } from "zod";
 import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail } from "./email";
 
 const UPLOAD_DIR = path.join(process.cwd(), "private_uploads");
@@ -459,14 +460,22 @@ export async function registerRoutes(
   });
 
   // Admin: Update user details
+  const updateUserSchema = z.object({
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    role: z.enum(["user", "admin"]).optional(),
+  });
+
   app.patch("/api/admin/users/:id", requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
       const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-      const { firstName, lastName, role } = req.body;
-
-      if (role && !["user", "admin"].includes(role)) {
-        return res.status(400).json({ error: "Invalid role. Must be 'user' or 'admin'" });
+      
+      const parseResult = updateUserSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        return res.status(400).json({ error: "Invalid request body" });
       }
+      
+      const { firstName, lastName, role } = parseResult.data;
 
       const user = await storage.updateUser(userId, { firstName, lastName, role });
       if (!user) {
