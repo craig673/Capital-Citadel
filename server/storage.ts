@@ -1,6 +1,6 @@
 import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import pg from "pg";
 
 const { Pool } = pg;
@@ -20,6 +20,9 @@ export interface IStorage {
   denyUser(id: string): Promise<User | undefined>;
   deleteUser(id: string): Promise<void>;
   getAllUsers(): Promise<User[]>;
+  getApprovedUsers(): Promise<User[]>;
+  banUser(id: string, reason: string): Promise<User | undefined>;
+  reactivateUser(id: string): Promise<User | undefined>;
   createDocumentUpload(upload: InsertDocumentUpload): Promise<DocumentUpload>;
   getAllDocumentUploads(): Promise<(DocumentUpload & { user: User })[]>;
   getDocumentUpload(id: string): Promise<DocumentUpload | undefined>;
@@ -82,6 +85,28 @@ export class DrizzleStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(users);
+  }
+
+  async getApprovedUsers(): Promise<User[]> {
+    return await db.select().from(users).where(eq(users.isApproved, true));
+  }
+
+  async banUser(id: string, reason: string): Promise<User | undefined> {
+    const result = await db
+      .update(users)
+      .set({ accountStatus: "banned", banReason: reason })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async reactivateUser(id: string): Promise<User | undefined> {
+    const result = await db
+      .update(users)
+      .set({ accountStatus: "active", banReason: null })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
   }
 
   async createDocumentUpload(upload: InsertDocumentUpload): Promise<DocumentUpload> {

@@ -13,12 +13,16 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("user"),
   denialCount: integer("denial_count").notNull().default(0),
   lastDenialDate: timestamp("last_denial_date"),
+  accountStatus: text("account_status").notNull().default("active"),
+  banReason: text("ban_reason"),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   denialCount: true,
   lastDenialDate: true,
+  accountStatus: true,
+  banReason: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
