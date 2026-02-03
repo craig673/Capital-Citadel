@@ -300,6 +300,32 @@ export default function Approvals() {
     }
   };
 
+  const handleDeleteLetter = async (docId: string) => {
+    if (!window.confirm("Are you sure you want to delete this letter? This action cannot be undone.")) {
+      return;
+    }
+    
+    setDeletingDocId(docId);
+    try {
+      const response = await fetch(`/api/admin/documents/${docId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        setPublishedLetters(prev => prev.filter(d => d.id !== docId));
+        showToast("Letter deleted successfully", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to delete letter", "error");
+      }
+    } catch (err) {
+      showToast("Failed to delete letter", "error");
+    } finally {
+      setDeletingDocId(null);
+    }
+  };
+
   const formatPublishDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "long",
@@ -912,6 +938,19 @@ export default function Approvals() {
                             <div className="text-primary-foreground">{letter.title}</div>
                             <div className="text-xs text-primary-foreground/50">{formatPublishDate(letter.publishDate)}</div>
                           </div>
+                          <button
+                            onClick={() => handleDeleteLetter(letter.id)}
+                            disabled={deletingDocId === letter.id}
+                            className="text-red-500 hover:text-red-700 transition-colors p-1 disabled:opacity-50"
+                            title="Delete letter"
+                            data-testid={`button-delete-letter-${letter.id}`}
+                          >
+                            {deletingDocId === letter.id ? (
+                              <Loader2 size={16} className="animate-spin" />
+                            ) : (
+                              <Trash2 size={16} />
+                            )}
+                          </button>
                         </div>
                       ))}
                     </div>
