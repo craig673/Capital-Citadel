@@ -3,7 +3,7 @@ import { useLocation, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User } from "@shared/schema";
-import { ExternalLink, Download, FileText } from "lucide-react";
+import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck } from "lucide-react";
 
 type UserWithoutPassword = Omit<User, "password">;
 
@@ -24,11 +24,93 @@ export default function Approvals() {
   const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
   const [documents, setDocuments] = useState<DocumentUpload[]>([]);
   const [documentsLoading, setDocumentsLoading] = useState(true);
+  const [approvedUsers, setApprovedUsers] = useState<UserWithoutPassword[]>([]);
+  const [approvedUsersLoading, setApprovedUsersLoading] = useState(true);
+  const [banModalOpen, setBanModalOpen] = useState(false);
+  const [banTarget, setBanTarget] = useState<UserWithoutPassword | null>(null);
+  const [banReason, setBanReason] = useState("");
+  const [banProcessing, setBanProcessing] = useState(false);
 
   useEffect(() => {
     fetchPendingUsers();
     fetchDocuments();
+    fetchApprovedUsers();
   }, []);
+
+  const fetchApprovedUsers = async () => {
+    try {
+      const response = await fetch("/api/admin/approved-users", { credentials: "include" });
+      if (response.ok) {
+        const data = await response.json();
+        setApprovedUsers(data.users);
+      }
+    } catch (err) {
+      console.error("Failed to fetch approved users:", err);
+    } finally {
+      setApprovedUsersLoading(false);
+    }
+  };
+
+  const openBanModal = (user: UserWithoutPassword) => {
+    setBanTarget(user);
+    setBanReason("");
+    setBanModalOpen(true);
+  };
+
+  const closeBanModal = () => {
+    setBanModalOpen(false);
+    setBanTarget(null);
+    setBanReason("");
+  };
+
+  const handleBan = async () => {
+    if (!banTarget || !banReason.trim()) return;
+    
+    setBanProcessing(true);
+    try {
+      const response = await fetch(`/api/admin/ban-user/${banTarget.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ reason: banReason.trim() }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setApprovedUsers(prev => prev.map(u => u.id === banTarget.id ? data.user : u));
+        closeBanModal();
+      } else {
+        const data = await response.json();
+        setError(data.error || "Failed to ban user");
+      }
+    } catch (err) {
+      setError("Failed to ban user");
+    } finally {
+      setBanProcessing(false);
+    }
+  };
+
+  const handleReactivate = async (userId: string) => {
+    setProcessing(userId);
+    try {
+      const response = await fetch(`/api/admin/reactivate-user/${userId}`, {
+        method: "POST",
+        credentials: "include",
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setApprovedUsers(prev => prev.map(u => u.id === userId ? data.user : u));
+      } else {
+        const data = await response.json();
+        setError(data.error || "Failed to reactivate user");
+      }
+    } catch (err) {
+      setError("Failed to reactivate user");
+    } finally {
+      setProcessing(null);
+    }
+  };
 
   const fetchDocuments = async () => {
     try {
@@ -315,8 +397,147 @@ export default function Approvals() {
               </div>
             )}
           </section>
+
+          <section className="mt-16" data-testid="section-active-users">
+            <h2 className="font-display text-3xl text-primary tracking-tight border-b-4 border-secondary pb-3 inline-block mb-8">
+              ACTIVE USERS
+            </h2>
+            
+            {approvedUsersLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+              </div>
+            ) : approvedUsers.length === 0 ? (
+              <div className="bg-primary border border-secondary/30 p-8 text-center" data-testid="section-no-active-users">
+                <p className="text-muted-foreground">No active users found.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full" data-testid="table-active-users">
+                  <thead>
+                    <tr className="border-b border-secondary/30">
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">User</th>
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Role</th>
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Status</th>
+                      <th className="text-right text-xs font-bold uppercase tracking-widest text-secondary py-3">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {approvedUsers.map((user, idx) => (
+                      <tr
+                        key={user.id}
+                        className={`border-b border-border/50 transition-colors ${user.accountStatus === "banned" ? "opacity-60 bg-red-500/5" : "hover:bg-primary/5"}`}
+                        data-testid={`row-user-${idx}`}
+                      >
+                        <td className="py-4 pr-4">
+                          <div className="text-sm font-medium text-primary">{getFullName(user)}</div>
+                          <div className="text-xs text-muted-foreground">{user.email}</div>
+                          {user.banReason && (
+                            <div className="text-xs italic text-red-400 mt-1">Note: {user.banReason}</div>
+                          )}
+                        </td>
+                        <td className="py-4 pr-4">
+                          <span className={`text-xs font-semibold uppercase px-2 py-1 ${user.role === "admin" ? "bg-secondary/20 text-secondary" : "bg-muted text-muted-foreground"}`}>
+                            {user.role}
+                          </span>
+                        </td>
+                        <td className="py-4 pr-4">
+                          {user.accountStatus === "banned" ? (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold uppercase text-red-500 bg-red-500/10 px-2 py-1">
+                              <AlertTriangle size={12} />
+                              BANNED
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 text-xs font-bold uppercase text-green-600 bg-green-500/10 px-2 py-1">
+                              <UserCheck size={12} />
+                              Active
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 text-right">
+                          {user.accountStatus === "banned" ? (
+                            <button
+                              onClick={() => handleReactivate(user.id)}
+                              disabled={processing === user.id}
+                              className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-green-700 transition-colors disabled:opacity-50"
+                              data-testid={`button-reactivate-${idx}`}
+                            >
+                              {processing === user.id ? "..." : "Reactivate"}
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => openBanModal(user)}
+                              className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-red-700 transition-colors"
+                              data-testid={`button-ban-${idx}`}
+                            >
+                              Ban
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         </div>
       </main>
+
+      {banModalOpen && banTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" data-testid="modal-ban-overlay">
+          <div className="bg-white max-w-md w-full shadow-xl" data-testid="modal-ban">
+            <div className="bg-primary text-primary-foreground p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-xl">Deactivate User Access</h3>
+                <button
+                  onClick={closeBanModal}
+                  className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                  data-testid="button-modal-close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-muted-foreground mb-4">
+                You are about to deactivate access for <strong className="text-primary">{getFullName(banTarget)}</strong> ({banTarget.email}).
+              </p>
+              <div className="mb-4">
+                <label htmlFor="ban-reason" className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                  Reason for banning (Internal Note)
+                </label>
+                <textarea
+                  id="ban-reason"
+                  value={banReason}
+                  onChange={(e) => setBanReason(e.target.value)}
+                  placeholder="e.g., Left the firm - Jan 2026"
+                  className="w-full border border-border p-3 text-sm resize-none h-24 focus:outline-none focus:border-secondary"
+                  data-testid="input-ban-reason"
+                />
+              </div>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={closeBanModal}
+                  className="px-5 py-2 text-sm font-semibold uppercase tracking-widest border border-border hover:bg-muted transition-colors"
+                  data-testid="button-modal-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleBan}
+                  disabled={!banReason.trim() || banProcessing}
+                  className="px-5 py-2 text-sm font-semibold uppercase tracking-widest bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="button-modal-confirm-ban"
+                >
+                  {banProcessing ? "Processing..." : "Confirm Ban"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
