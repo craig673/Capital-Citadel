@@ -188,6 +188,10 @@ export async function registerRoutes(
         return res.status(403).json({ error: "Your account is still pending approval." });
       }
 
+      if (user.accountStatus === "banned") {
+        return res.status(403).json({ error: "Your account has been deactivated. Please contact the administrator." });
+      }
+
       req.session.userId = user.id;
       
       const { password: _, ...userWithoutPassword } = user;
@@ -393,6 +397,64 @@ export async function registerRoutes(
       res.download(filePath, document.fileName);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to download document" });
+    }
+  });
+
+  // Admin: Get approved users
+  app.get("/api/admin/approved-users", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const approvedUsers = await storage.getApprovedUsers();
+      const usersWithoutPassword = approvedUsers.map(user => {
+        const { password: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+      });
+      res.json({ users: usersWithoutPassword });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch approved users" });
+    }
+  });
+
+  // Admin: Ban user
+  app.post("/api/admin/ban-user/:id", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const { reason } = req.body;
+
+      if (!reason || reason.trim() === "") {
+        return res.status(400).json({ error: "Ban reason is required" });
+      }
+
+      // Prevent admin from banning themselves
+      if (userId === req.user!.id) {
+        return res.status(400).json({ error: "You cannot ban yourself" });
+      }
+
+      const user = await storage.banUser(userId, reason.trim());
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to ban user" });
+    }
+  });
+
+  // Admin: Reactivate user
+  app.post("/api/admin/reactivate-user/:id", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+
+      const user = await storage.reactivateUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to reactivate user" });
     }
   });
 
