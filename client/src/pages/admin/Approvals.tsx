@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User } from "@shared/schema";
-import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck } from "lucide-react";
+import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown } from "lucide-react";
 
 type UserWithoutPassword = Omit<User, "password">;
 
@@ -30,6 +30,63 @@ export default function Approvals() {
   const [banTarget, setBanTarget] = useState<UserWithoutPassword | null>(null);
   const [banReason, setBanReason] = useState("");
   const [banProcessing, setBanProcessing] = useState(false);
+  const [userSearch, setUserSearch] = useState("");
+
+  const sortedFilteredUsers = useMemo(() => {
+    let filtered = approvedUsers;
+    
+    if (userSearch.trim()) {
+      const searchLower = userSearch.toLowerCase();
+      filtered = approvedUsers.filter(user => {
+        const fullName = `${user.firstName || ""} ${user.lastName || ""}`.toLowerCase();
+        const reverseName = `${user.lastName || ""} ${user.firstName || ""}`.toLowerCase();
+        return fullName.includes(searchLower) || 
+               reverseName.includes(searchLower) || 
+               user.email.toLowerCase().includes(searchLower);
+      });
+    }
+    
+    return filtered.sort((a, b) => {
+      const lastNameA = (a.lastName || "").toLowerCase();
+      const lastNameB = (b.lastName || "").toLowerCase();
+      if (lastNameA !== lastNameB) return lastNameA.localeCompare(lastNameB);
+      const firstNameA = (a.firstName || "").toLowerCase();
+      const firstNameB = (b.firstName || "").toLowerCase();
+      return firstNameA.localeCompare(firstNameB);
+    });
+  }, [approvedUsers, userSearch]);
+
+  const getDisplayName = (user: UserWithoutPassword) => {
+    if (user.lastName && user.firstName) {
+      return `${user.lastName}, ${user.firstName}`;
+    }
+    if (user.lastName) return user.lastName;
+    if (user.firstName) return user.firstName;
+    return "—";
+  };
+
+  const exportToCSV = () => {
+    const headers = ["First Name", "Last Name", "Email", "Role", "Status"];
+    const rows = sortedFilteredUsers.map(user => [
+      user.firstName || "",
+      user.lastName || "",
+      user.email,
+      user.role,
+      user.accountStatus === "banned" ? "Deactivated" : "Active"
+    ]);
+    
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `active-users-${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
 
   useEffect(() => {
     fetchPendingUsers();
@@ -399,38 +456,65 @@ export default function Approvals() {
           </section>
 
           <section className="mt-16" data-testid="section-active-users">
-            <h2 className="font-display text-3xl text-primary tracking-tight border-b-4 border-secondary pb-3 inline-block mb-8">
-              ACTIVE USERS
-            </h2>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+              <h2 className="font-display text-3xl text-primary tracking-tight border-b-4 border-secondary pb-3 inline-block">
+                ACTIVE USERS
+              </h2>
+              <button
+                onClick={exportToCSV}
+                className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-5 py-2 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                data-testid="button-export-csv"
+              >
+                <FileDown size={16} />
+                Export List
+              </button>
+            </div>
+
+            <div className="mb-6">
+              <div className="relative max-w-md">
+                <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <input
+                  type="text"
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  placeholder="Search by name or email..."
+                  className="w-full pl-10 pr-4 py-3 border border-border bg-background text-sm focus:outline-none focus:border-secondary"
+                  data-testid="input-user-search"
+                />
+              </div>
+            </div>
             
             {approvedUsersLoading ? (
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
               </div>
-            ) : approvedUsers.length === 0 ? (
+            ) : sortedFilteredUsers.length === 0 ? (
               <div className="bg-primary border border-secondary/30 p-8 text-center" data-testid="section-no-active-users">
-                <p className="text-muted-foreground">No active users found.</p>
+                <p className="text-muted-foreground">
+                  {userSearch.trim() ? "No users match your search." : "No active users found."}
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full" data-testid="table-active-users">
                   <thead>
                     <tr className="border-b border-secondary/30">
-                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">User</th>
-                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Role</th>
-                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Status</th>
-                      <th className="text-right text-xs font-bold uppercase tracking-widest text-secondary py-3">Action</th>
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4 w-[30%]">User</th>
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4 w-[12%]">Role</th>
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4 w-[15%]">Status</th>
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4 w-[20%]">Access</th>
+                      <th className="text-right text-xs font-bold uppercase tracking-widest text-secondary py-3 w-[23%]">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {approvedUsers.map((user, idx) => (
+                    {sortedFilteredUsers.map((user, idx) => (
                       <tr
                         key={user.id}
-                        className={`border-b border-border/50 transition-colors ${user.accountStatus === "banned" ? "opacity-60 bg-red-500/5" : "hover:bg-primary/5"}`}
+                        className={`border-b border-border/50 transition-colors ${user.accountStatus === "banned" ? "opacity-70 bg-red-500/5" : "hover:bg-primary/5"}`}
                         data-testid={`row-user-${idx}`}
                       >
                         <td className="py-4 pr-4">
-                          <div className="text-sm font-medium text-primary">{getFullName(user)}</div>
+                          <div className="text-sm font-medium text-primary">{getDisplayName(user)}</div>
                           <div className="text-xs text-muted-foreground">{user.email}</div>
                           {user.banReason && (
                             <div className="text-xs italic text-red-400 mt-1">Note: {user.banReason}</div>
@@ -445,7 +529,7 @@ export default function Approvals() {
                           {user.accountStatus === "banned" ? (
                             <span className="inline-flex items-center gap-1 text-xs font-bold uppercase text-red-500 bg-red-500/10 px-2 py-1">
                               <AlertTriangle size={12} />
-                              BANNED
+                              Deactivated
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 text-xs font-bold uppercase text-green-600 bg-green-500/10 px-2 py-1">
@@ -454,7 +538,7 @@ export default function Approvals() {
                             </span>
                           )}
                         </td>
-                        <td className="py-4 text-right">
+                        <td className="py-4 pr-4">
                           {user.accountStatus === "banned" ? (
                             <button
                               onClick={() => handleReactivate(user.id)}
@@ -467,12 +551,15 @@ export default function Approvals() {
                           ) : (
                             <button
                               onClick={() => openBanModal(user)}
-                              className="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-red-700 transition-colors"
-                              data-testid={`button-ban-${idx}`}
+                              className="inline-flex items-center gap-2 bg-orange-500 text-white px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-orange-600 transition-colors"
+                              data-testid={`button-deactivate-${idx}`}
                             >
-                              Ban
+                              Deactivate
                             </button>
                           )}
+                        </td>
+                        <td className="py-4 text-right">
+                          <span className="text-xs text-muted-foreground">—</span>
                         </td>
                       </tr>
                     ))}
@@ -501,11 +588,11 @@ export default function Approvals() {
             </div>
             <div className="p-6">
               <p className="text-sm text-muted-foreground mb-4">
-                You are about to deactivate access for <strong className="text-primary">{getFullName(banTarget)}</strong> ({banTarget.email}).
+                You are about to deactivate access for <strong className="text-primary">{getDisplayName(banTarget)}</strong> ({banTarget.email}).
               </p>
               <div className="mb-4">
                 <label htmlFor="ban-reason" className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
-                  Reason for banning (Internal Note)
+                  Reason for deactivating (Internal Note)
                 </label>
                 <textarea
                   id="ban-reason"
@@ -530,7 +617,7 @@ export default function Approvals() {
                   className="px-5 py-2 text-sm font-semibold uppercase tracking-widest bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   data-testid="button-modal-confirm-ban"
                 >
-                  {banProcessing ? "Processing..." : "Confirm Ban"}
+                  {banProcessing ? "Processing..." : "Confirm Deactivation"}
                 </button>
               </div>
             </div>
