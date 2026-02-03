@@ -1,6 +1,6 @@
-import { type User, type InsertUser, users } from "@shared/schema";
+import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import pg from "pg";
 
 const { Pool } = pg;
@@ -20,6 +20,9 @@ export interface IStorage {
   denyUser(id: string): Promise<User | undefined>;
   deleteUser(id: string): Promise<void>;
   getAllUsers(): Promise<User[]>;
+  createDocumentUpload(upload: InsertDocumentUpload): Promise<DocumentUpload>;
+  getAllDocumentUploads(): Promise<(DocumentUpload & { user: User })[]>;
+  getDocumentUpload(id: string): Promise<DocumentUpload | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -79,6 +82,29 @@ export class DrizzleStorage implements IStorage {
 
   async getAllUsers(): Promise<User[]> {
     return await db.select().from(users);
+  }
+
+  async createDocumentUpload(upload: InsertDocumentUpload): Promise<DocumentUpload> {
+    const result = await db.insert(documentUploads).values(upload).returning();
+    return result[0];
+  }
+
+  async getAllDocumentUploads(): Promise<(DocumentUpload & { user: User })[]> {
+    const uploads = await db
+      .select()
+      .from(documentUploads)
+      .innerJoin(users, eq(documentUploads.userId, users.id))
+      .orderBy(desc(documentUploads.uploadDate));
+    
+    return uploads.map(row => ({
+      ...row.document_uploads,
+      user: row.users,
+    }));
+  }
+
+  async getDocumentUpload(id: string): Promise<DocumentUpload | undefined> {
+    const result = await db.select().from(documentUploads).where(eq(documentUploads.id, id));
+    return result[0];
   }
 }
 

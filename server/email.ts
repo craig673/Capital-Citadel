@@ -15,6 +15,46 @@ const transporter = nodemailer.createTransport({
 const ADMIN_EMAIL = "craig@10000daysfund.com";
 const FROM_EMAIL = process.env.SMTP_FROM || "noreply@10000dayscapital.com";
 
+export async function sendDocumentUploadEmail(user: {
+  firstName: string | null;
+  lastName: string | null;
+}, fileName: string) {
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || "Unknown Investor";
+  
+  try {
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
+      subject: `New Document Uploaded by ${fullName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #001F3F;">New Document Upload</h2>
+          <p>A new document has been uploaded to the 10,000 Days Capital portal.</p>
+          <table style="border-collapse: collapse; margin-top: 20px; width: 100%;">
+            <tr>
+              <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; background: #f5f5f5;">Investor</td>
+              <td style="padding: 12px; border: 1px solid #ddd;">${fullName}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; background: #f5f5f5;">File Name</td>
+              <td style="padding: 12px; border: 1px solid #ddd;">${fileName}</td>
+            </tr>
+          </table>
+          <p style="margin-top: 20px;">
+            <a href="${process.env.APP_URL || 'https://10000dayscapital.com'}/admin/approvals" 
+               style="background-color: #001F3F; color: white; padding: 12px 24px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
+              View Uploads
+            </a>
+          </p>
+        </div>
+      `,
+    });
+    console.log(`[email] Document upload notification sent for ${fileName}`);
+  } catch (error) {
+    console.error("[email] Failed to send document upload notification:", error);
+  }
+}
+
 export async function sendNewAccessRequestEmail(user: {
   firstName: string | null;
   lastName: string | null;

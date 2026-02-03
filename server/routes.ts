@@ -5,8 +5,40 @@ import bcrypt from "bcrypt";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import pg from "pg";
+import path from "path";
+import fs from "fs";
+import multer from "multer";
 import { insertUserSchema } from "@shared/schema";
-import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail } from "./email";
+import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail } from "./email";
+
+const UPLOAD_DIR = path.join(process.cwd(), "private_uploads");
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
+const uploadStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, UPLOAD_DIR);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname);
+    cb(null, `${uniqueSuffix}${ext}`);
+  },
+});
+
+const upload = multer({
+  storage: uploadStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/gif"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only PDF and image files are allowed"));
+    }
+  },
+});
 
 const { Pool } = pg;
 const PgSession = connectPgSimple(session);
@@ -268,6 +300,99 @@ export async function registerRoutes(
       res.json({ message: "User denied and removed from pending list" });
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to deny user" });
+    }
+  });
+
+  // Document Upload (authenticated users only)
+  app.post("/api/documents/upload", requireAuth, upload.single("file"), async (req: AuthRequest, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const user = await storage.getUser(req.user!.id);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const documentUpload = await storage.createDocumentUpload({
+        userId: req.user!.id,
+        fileName: req.file.originalname,
+        storedPath: req.file.filename,
+      });
+
+      // Send notification email to admin
+      sendDocumentUploadEmail(
+        { firstName: user.firstName, lastName: user.lastName },
+        req.file.originalname
+      );
+
+      res.json({ 
+        message: "Document uploaded successfully",
+        document: {
+          id: documentUpload.id,
+          fileName: documentUpload.fileName,
+          uploadDate: documentUpload.uploadDate,
+        }
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to upload document" });
+    }
+  });
+
+  // Get user's own uploads
+  app.get("/api/documents/my-uploads", requireAuth, async (req: AuthRequest, res: Response) => {
+    try {
+      const allUploads = await storage.getAllDocumentUploads();
+      const userUploads = allUploads
+        .filter(upload => upload.userId === req.user!.id)
+        .map(upload => ({
+          id: upload.id,
+          fileName: upload.fileName,
+          uploadDate: upload.uploadDate,
+        }));
+      res.json({ uploads: userUploads });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch uploads" });
+    }
+  });
+
+  // Admin: Get all document uploads
+  app.get("/api/admin/documents", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const uploads = await storage.getAllDocumentUploads();
+      const uploadsWithUserInfo = uploads.map(upload => ({
+        id: upload.id,
+        fileName: upload.fileName,
+        uploadDate: upload.uploadDate,
+        investorName: [upload.user.firstName, upload.user.lastName].filter(Boolean).join(" ") || upload.user.email,
+        investorEmail: upload.user.email,
+      }));
+      res.json({ uploads: uploadsWithUserInfo });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch documents" });
+    }
+  });
+
+  // Admin: Download document
+  app.get("/api/admin/documents/:id/download", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const documentId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const document = await storage.getDocumentUpload(documentId);
+      
+      if (!document) {
+        return res.status(404).json({ error: "Document not found" });
+      }
+
+      const filePath = path.join(UPLOAD_DIR, document.storedPath);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "File not found on server" });
+      }
+
+      res.download(filePath, document.fileName);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to download document" });
     }
   });
 
