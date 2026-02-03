@@ -24,6 +24,7 @@ import AboutWhatWeDo from "@/pages/about/WhatWeDo";
 import AboutOurValues from "@/pages/about/OurValues";
 import AboutLeadership from "@/pages/about/Leadership";
 import AboutLocations from "@/pages/about/Locations";
+import Letters from "@/pages/Letters";
 
 function Router() {
   return (
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/auth/request-access" component={AuthRequestAccess} />
       <Route path="/admin/approvals" component={AdminApprovals} />
       <Route path="/dashboard" component={Dashboard} />
+      <Route path="/letters" component={Letters} />
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/philosophy" component={Philosophy} />

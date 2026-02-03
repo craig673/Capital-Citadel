@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Download, FileText, ChevronRight, Mail, Phone, User as UserIcon, ArrowLeft, Upload, Check, Loader2 } from "lucide-react";
+import { Download, FileText, ChevronRight, Mail, Phone, User as UserIcon, ArrowLeft, Upload, Check, Loader2, ArrowRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState, useRef } from "react";
 
@@ -13,18 +13,15 @@ interface User {
   isApproved: boolean;
 }
 
-const investorLetters = [
-  { title: "Q4 2025 Investor Letter", date: "January 2026", href: "#" },
-  { title: "Q3 2025 Investor Letter", date: "October 2025", href: "#" },
-  { title: "Q2 2025 Investor Letter", date: "July 2025", href: "#" },
-  { title: "Q1 2025 Investor Letter", date: "April 2025", href: "#" },
-];
-
-const fundDocuments = [
-  { title: "Private Placement Memorandum (PPM)", type: "PDF", href: "#" },
-  { title: "Subscription Agreement", type: "PDF", href: "#" },
-  { title: "Limited Partnership Agreement", type: "PDF", href: "#" },
-];
+interface PublishedDocument {
+  id: string;
+  title: string;
+  fileName: string;
+  storedPath: string;
+  category: string;
+  publishDate: string;
+  createdAt: string;
+}
 
 export default function Dashboard() {
   const [, setLocation] = useLocation();
@@ -34,6 +31,8 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [recentLetters, setRecentLetters] = useState<PublishedDocument[]>([]);
+  const [fundDocuments, setFundDocuments] = useState<PublishedDocument[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -98,6 +97,38 @@ export default function Dashboard() {
     checkAuth();
   }, [setLocation]);
 
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const [lettersRes, fundDocsRes] = await Promise.all([
+          fetch("/api/documents/letters/recent?limit=4", { credentials: "include" }),
+          fetch("/api/documents/legal", { credentials: "include" }),
+        ]);
+        
+        if (lettersRes.ok) {
+          const lettersData = await lettersRes.json();
+          setRecentLetters(lettersData.documents);
+        }
+        
+        if (fundDocsRes.ok) {
+          const fundDocsData = await fundDocsRes.json();
+          setFundDocuments(fundDocsData.documents);
+        }
+      } catch (err) {
+        console.error("Failed to fetch documents:", err);
+      }
+    };
+    
+    if (user) {
+      fetchDocuments();
+    }
+  }, [user]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -146,86 +177,110 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-8">
-              <section data-testid="section-latest-insight">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-secondary mb-4">
-                  Latest Insight
-                </h2>
-                <div className="bg-primary text-primary-foreground p-8 border border-secondary/30 shadow-[0_0_0_1px_rgba(197,160,89,0.10)]">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                    <div>
-                      <div className="text-xs text-secondary uppercase tracking-widest mb-2">
-                        Quarterly Letter
+              {recentLetters.length > 0 && (
+                <section data-testid="section-latest-insight">
+                  <h2 className="text-sm font-bold uppercase tracking-widest text-secondary mb-4">
+                    Latest Insight
+                  </h2>
+                  <div className="bg-primary text-primary-foreground p-8 border border-secondary/30 shadow-[0_0_0_1px_rgba(197,160,89,0.10)]">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                      <div>
+                        <div className="text-xs text-secondary uppercase tracking-widest mb-2">
+                          Quarterly Letter
+                        </div>
+                        <h3 className="font-display text-2xl mb-2">{recentLetters[0].title}</h3>
+                        <p className="text-primary-foreground/60 text-sm">
+                          Published {formatDate(recentLetters[0].publishDate)}
+                        </p>
                       </div>
-                      <h3 className="font-display text-2xl mb-2">Q4 2025 Investor Letter</h3>
-                      <p className="text-primary-foreground/60 text-sm">
-                        A comprehensive review of our Q4 performance, market outlook, and portfolio positioning for 2026.
-                      </p>
+                      <a
+                        href={`/api/documents/download/${recentLetters[0].id}`}
+                        className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] whitespace-nowrap"
+                        data-testid="button-download-quarterly"
+                      >
+                        <Download size={16} />
+                        Download PDF
+                      </a>
                     </div>
-                    <a
-                      href="#"
-                      className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] whitespace-nowrap"
-                      data-testid="button-download-quarterly"
-                    >
-                      <Download size={16} />
-                      Download PDF
-                    </a>
                   </div>
-                </div>
-              </section>
+                </section>
+              )}
 
               <section data-testid="section-investor-letters">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-secondary mb-4">
-                  Investor Letters
-                </h2>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {investorLetters.map((letter, idx) => (
-                    <a
-                      key={idx}
-                      href={letter.href}
-                      className="group bg-white border border-border p-5 hover:border-secondary/50 transition-colors flex items-center justify-between"
-                      data-testid={`card-letter-${idx}`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="bg-primary/10 p-2 rounded">
-                          <FileText size={20} className="text-primary" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-primary group-hover:text-secondary transition-colors">
-                            {letter.title}
-                          </div>
-                          <div className="text-xs text-muted-foreground">{letter.date}</div>
-                        </div>
-                      </div>
-                      <Download size={16} className="text-muted-foreground group-hover:text-secondary transition-colors" />
-                    </a>
-                  ))}
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-sm font-bold uppercase tracking-widest text-secondary">
+                    Investor Letters
+                  </h2>
+                  <Link
+                    href="/letters"
+                    className="inline-flex items-center gap-1 text-xs text-secondary hover:underline font-medium uppercase tracking-widest"
+                    data-testid="link-view-all-letters"
+                  >
+                    View All
+                    <ArrowRight size={12} />
+                  </Link>
                 </div>
+                {recentLetters.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-border rounded" data-testid="text-no-letters">
+                    No investor letters have been published yet.
+                  </div>
+                ) : (
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {recentLetters.map((letter) => (
+                      <a
+                        key={letter.id}
+                        href={`/api/documents/download/${letter.id}`}
+                        className="group bg-white border border-border p-5 hover:border-secondary/50 transition-colors flex items-center justify-between"
+                        data-testid={`card-letter-${letter.id}`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="bg-primary/10 p-2 rounded">
+                            <FileText size={20} className="text-primary" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-primary group-hover:text-secondary transition-colors">
+                              {letter.title}
+                            </div>
+                            <div className="text-xs text-muted-foreground">{formatDate(letter.publishDate)}</div>
+                          </div>
+                        </div>
+                        <Download size={16} className="text-muted-foreground group-hover:text-secondary transition-colors" />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </section>
 
               <section data-testid="section-fund-documents">
                 <h2 className="text-sm font-bold uppercase tracking-widest text-secondary mb-4">
                   Fund Documents
                 </h2>
-                <div className="space-y-3">
-                  {fundDocuments.map((doc, idx) => (
-                    <a
-                      key={idx}
-                      href={doc.href}
-                      className="group bg-white border border-border p-5 hover:border-secondary/50 transition-colors flex items-center justify-between"
-                      data-testid={`card-document-${idx}`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="bg-muted p-2 rounded text-xs font-bold text-muted-foreground uppercase">
-                          {doc.type}
+                {fundDocuments.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-border rounded" data-testid="text-no-fund-docs">
+                    No fund documents have been published yet.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {fundDocuments.map((doc) => (
+                      <a
+                        key={doc.id}
+                        href={`/api/documents/download/${doc.id}`}
+                        className="group bg-white border border-border p-5 hover:border-secondary/50 transition-colors flex items-center justify-between"
+                        data-testid={`card-document-${doc.id}`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="bg-muted p-2 rounded text-xs font-bold text-muted-foreground uppercase">
+                            PDF
+                          </div>
+                          <div className="text-sm font-medium text-primary group-hover:text-secondary transition-colors">
+                            {doc.title}
+                          </div>
                         </div>
-                        <div className="text-sm font-medium text-primary group-hover:text-secondary transition-colors">
-                          {doc.title}
-                        </div>
-                      </div>
-                      <Download size={16} className="text-muted-foreground group-hover:text-secondary transition-colors" />
-                    </a>
-                  ))}
-                </div>
+                        <Download size={16} className="text-muted-foreground group-hover:text-secondary transition-colors" />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </section>
             </div>
 
