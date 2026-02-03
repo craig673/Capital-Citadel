@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User } from "@shared/schema";
+import { ExternalLink } from "lucide-react";
 
 type UserWithoutPassword = Omit<User, "password">;
 
@@ -103,18 +104,30 @@ export default function Approvals() {
       <main className="flex-grow pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-6">
           <section className="mb-14" data-testid="section-approvals-hero">
-            <h1
-              className="font-display text-5xl md:text-6xl text-primary tracking-tight border-b-4 border-secondary pb-4 inline-block"
-              data-testid="text-approvals-hero-title"
-            >
-              ADMIN DASHBOARD
-            </h1>
-            <p
-              className="mt-6 max-w-3xl text-muted-foreground text-lg leading-relaxed"
-              data-testid="text-approvals-hero-subtext"
-            >
-              Review and approve pending access requests from prospective clients.
-            </p>
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+              <div>
+                <h1
+                  className="font-display text-5xl md:text-6xl text-primary tracking-tight border-b-4 border-secondary pb-4 inline-block"
+                  data-testid="text-approvals-hero-title"
+                >
+                  ADMIN DASHBOARD
+                </h1>
+                <p
+                  className="mt-6 max-w-3xl text-muted-foreground text-lg leading-relaxed"
+                  data-testid="text-approvals-hero-subtext"
+                >
+                  Review and approve pending access requests from prospective clients.
+                </p>
+              </div>
+              <Link
+                href="/dashboard"
+                className="inline-flex items-center gap-2 border-2 border-secondary text-secondary px-5 py-3 text-sm font-semibold uppercase tracking-widest hover:bg-secondary hover:text-secondary-foreground transition-colors mt-4 md:mt-0"
+                data-testid="button-view-client-portal"
+              >
+                <ExternalLink size={16} />
+                View Client Portal
+              </Link>
+            </div>
           </section>
 
           {loading && (
