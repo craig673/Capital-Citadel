@@ -26,6 +26,13 @@ const documents = [
   },
   {
     date: "OCTOBER 2025",
+    title: "Value Investing Meets Revolution Technology",
+    summary:
+      "A detailed look at how we blend classic value discipline with Revolution Investing: rigorous financial modeling, long-horizon profitability assumptions, and valuation work that goes far beyond headline P/E ratios. Bryce explains how we estimate five-year return potential by pairing a company\u2019s role in a Tech Revolution with management quality, margin structure, and realistic multiples. The framework is designed to keep us concentrated in the most Revolutionary platform builders while avoiding the drawdowns that come from chasing every shiny object.",
+    href: "/assets/Value-Investing-Meets-Revolution-Technology.pdf",
+  },
+  {
+    date: "OCTOBER 2025",
     title: "Robotics Supply Chain Inflection Point",
     summary:
       "A sector update outlining why robotics is poised for an acceleration as AI shifts machines from programmed automation to learned behavior. We highlight the investable opportunity in the humanoid and broader robotics supply chain, where differentiated component makers can benefit regardless of which OEMs ultimately scale. We also frame key risks\u2014vertical integration and low-cost competition\u2014against the durability of Western, high-trust components.",
