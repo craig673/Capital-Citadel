@@ -24,6 +24,13 @@ const documents = [
       "A sector update outlining why robotics is poised for an acceleration as AI shifts machines from programmed automation to learned behavior. We highlight the investable opportunity in the humanoid and broader robotics supply chain, where differentiated component makers can benefit regardless of which OEMs ultimately scale. We also frame key risks\u2014vertical integration and low-cost competition\u2014against the durability of Western, high-trust components.",
     href: "/assets/Robotics-Supply-Chain-Inflection-Point.pdf",
   },
+  {
+    date: "AUGUST 2025",
+    title: "Revolution Investing Valuations",
+    summary:
+      "A deep dive into why valuation discipline remains central to our Revolution Investing framework, even amidst rapid technological shifts. We contrast historic P/E ratios from the App Revolution era against today\u2019s AI-driven market, explaining why higher multiples for dominant, high-margin platforms like Apple and Nvidia are justified by their unprecedented scale and durability. At the same time, we caution against the 'hype-ful' overvaluation of unproven theme stocks, emphasizing our focus on profitable winners over speculative FOMO.",
+    href: "/assets/Revolution-Investing-Valuations.pdf",
+  },
 ];
 
 export default function Commentary() {
