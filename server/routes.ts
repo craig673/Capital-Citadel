@@ -6,7 +6,7 @@ import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import pg from "pg";
 import { insertUserSchema } from "@shared/schema";
-import { sendNewAccessRequestEmail, sendDenialEmail } from "./email";
+import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail } from "./email";
 
 const { Pool } = pg;
 const PgSession = connectPgSimple(session);
@@ -220,6 +220,16 @@ export async function registerRoutes(
       res.json({ user: userWithoutPassword });
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to approve user" });
+    }
+  });
+
+  // Admin: Test email
+  app.post("/api/admin/test-email", requireAdmin, async (req: AuthRequest, res: Response) => {
+    const result = await sendTestEmail();
+    if (result.success) {
+      res.json(result);
+    } else {
+      res.status(500).json(result);
     }
   });
 

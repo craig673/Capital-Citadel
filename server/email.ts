@@ -75,3 +75,26 @@ export async function sendDenialEmail(user: {
     console.error("[email] Failed to send denial email:", error);
   }
 }
+
+export async function sendTestEmail(): Promise<{ success: boolean; message: string }> {
+  try {
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
+      subject: "10,000 Days Capital - Email System Test",
+      html: `
+        <h2 style="color: #001F3F;">Email System Test Successful</h2>
+        <p>This is a test email from the 10,000 Days Capital portal.</p>
+        <p>If you received this email, your email notification system is configured correctly.</p>
+        <p style="margin-top: 20px; color: #666;">
+          Sent at: ${new Date().toLocaleString()}
+        </p>
+      `,
+    });
+    console.log(`[email] Test email sent successfully to ${ADMIN_EMAIL}`);
+    return { success: true, message: `Test email sent to ${ADMIN_EMAIL}` };
+  } catch (error: any) {
+    console.error("[email] Failed to send test email:", error);
+    return { success: false, message: error.message || "Failed to send test email" };
+  }
+}
