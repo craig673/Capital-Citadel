@@ -43,3 +43,21 @@ export const insertDocumentUploadSchema = createInsertSchema(documentUploads).om
 
 export type InsertDocumentUpload = z.infer<typeof insertDocumentUploadSchema>;
 export type DocumentUpload = typeof documentUploads.$inferSelect;
+
+export const publishedDocuments = pgTable("published_documents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  fileName: text("file_name").notNull(),
+  storedPath: text("stored_path").notNull(),
+  category: text("category").notNull(),
+  publishDate: timestamp("publish_date").notNull().default(sql`now()`),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+export const insertPublishedDocumentSchema = createInsertSchema(publishedDocuments).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPublishedDocument = z.infer<typeof insertPublishedDocumentSchema>;
+export type PublishedDocument = typeof publishedDocuments.$inferSelect;
