@@ -6,7 +6,7 @@ import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import pg from "pg";
 import { insertUserSchema } from "@shared/schema";
-import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail } from "./email";
+import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail } from "./email";
 
 const { Pool } = pg;
 const PgSession = connectPgSimple(session);
@@ -215,6 +215,12 @@ export async function registerRoutes(
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
+
+      // Send welcome email (fail-open: don't block approval if email fails)
+      sendWelcomeEmail({
+        firstName: user.firstName,
+        email: user.email,
+      });
 
       const { password: _, ...userWithoutPassword } = user;
       res.json({ user: userWithoutPassword });

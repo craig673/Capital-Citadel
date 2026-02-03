@@ -78,6 +78,45 @@ export async function sendDenialEmail(user: {
   }
 }
 
+export async function sendWelcomeEmail(user: {
+  firstName: string | null;
+  email: string;
+}) {
+  const firstName = user.firstName || "Investor";
+  const loginUrl = `${process.env.APP_URL || 'https://10000dayscapital.com'}/auth/login`;
+  
+  try {
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: user.email,
+      subject: "Welcome to 10,000 Days Capital – Access Granted",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <p>Dear ${firstName},</p>
+          
+          <p>We are pleased to inform you that your account has been approved and is now ready for use.</p>
+          
+          <p>You can now access the 10,000 Days Capital investor portal using the email and password you created during registration.</p>
+          
+          <p style="margin: 30px 0; text-align: center;">
+            <a href="${loginUrl}" 
+               style="background-color: #001F3F; color: white; padding: 14px 28px; text-decoration: none; display: inline-block; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+              Client Login
+            </a>
+          </p>
+          
+          <p>If you have any questions or need assistance, please don't hesitate to reach out to your designated contact at 10,000 Days Capital.</p>
+          
+          <p>Sincerely,<br>The 10,000 Days Capital Team</p>
+        </div>
+      `,
+    });
+    console.log(`[email] Welcome email sent to ${user.email}`);
+  } catch (error) {
+    console.error("[email] Failed to send welcome email:", error);
+  }
+}
+
 export async function sendTestEmail(): Promise<{ success: boolean; message: string }> {
   try {
     await transporter.sendMail({
