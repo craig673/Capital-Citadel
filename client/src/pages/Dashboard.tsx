@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Download, FileText, ChevronRight, Mail, Phone, User as UserIcon } from "lucide-react";
+import { Download, FileText, ChevronRight, Mail, Phone, User as UserIcon, ArrowLeft } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useEffect, useState } from "react";
 
@@ -66,12 +66,24 @@ export default function Dashboard() {
       
       <div className="bg-primary text-primary-foreground pt-32 pb-12 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-2 text-xs text-secondary uppercase tracking-widest mb-4">
-            <Link href="/" className="hover:underline" data-testid="link-dashboard-breadcrumb-home">
-              Home
-            </Link>
-            <ChevronRight size={10} />
-            <span data-testid="text-dashboard-breadcrumb-current">Investor Portal</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2 text-xs text-secondary uppercase tracking-widest">
+              <Link href="/" className="hover:underline" data-testid="link-dashboard-breadcrumb-home">
+                Home
+              </Link>
+              <ChevronRight size={10} />
+              <span data-testid="text-dashboard-breadcrumb-current">Investor Portal</span>
+            </div>
+            {user?.role === "admin" && (
+              <Link
+                href="/admin/approvals"
+                className="inline-flex items-center gap-2 border-2 border-secondary text-secondary px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-secondary hover:text-secondary-foreground transition-colors"
+                data-testid="button-back-to-admin"
+              >
+                <ArrowLeft size={14} />
+                Back to Admin Dashboard
+              </Link>
+            )}
           </div>
           <h1 className="text-4xl md:text-5xl font-display border-b-4 border-secondary pb-4 inline-block" data-testid="text-dashboard-title">
             INVESTOR PORTAL
