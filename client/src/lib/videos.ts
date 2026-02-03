@@ -20,7 +20,7 @@ export const videos: Video[] = [
   {
     id: "nUvMkLI3eXM",
     title: "AI as a Market Force",
-    date: "2024-09-12",
+    date: "2025-09-15",
     description:
       "Cody discusses why the AI shift is larger than geopolitical tensions and how it reshapes labor and capital.",
     series: "interviews",
@@ -28,14 +28,14 @@ export const videos: Video[] = [
   {
     id: "uJauiCLefj8",
     title: "The Energy & Automation Supercycle",
-    date: "2024-08-27",
+    date: "2025-03-25",
     description: "A deep dive into why Tesla, AI, and the Middle East are just getting started.",
     series: "interviews",
   },
   {
     id: "ORgT7lZtazE",
     title: "Live Q&A: Navigating Volatility",
-    date: "2024-08-05",
+    date: "2023-11-01",
     description:
       "Unscripted analysis of Bitcoin, Gold, and the tech sector during market drawdowns.",
     series: "interviews",
