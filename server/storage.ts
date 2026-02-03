@@ -91,14 +91,25 @@ export class DrizzleStorage implements IStorage {
 
   async getAllDocumentUploads(): Promise<(DocumentUpload & { user: User })[]> {
     const uploads = await db
-      .select()
+      .select({
+        id: documentUploads.id,
+        userId: documentUploads.userId,
+        fileName: documentUploads.fileName,
+        storedPath: documentUploads.storedPath,
+        uploadDate: documentUploads.uploadDate,
+        user: users,
+      })
       .from(documentUploads)
       .innerJoin(users, eq(documentUploads.userId, users.id))
       .orderBy(desc(documentUploads.uploadDate));
     
     return uploads.map(row => ({
-      ...row.document_uploads,
-      user: row.users,
+      id: row.id,
+      userId: row.userId,
+      fileName: row.fileName,
+      storedPath: row.storedPath,
+      uploadDate: row.uploadDate,
+      user: row.user,
     }));
   }
 

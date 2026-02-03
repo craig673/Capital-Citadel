@@ -3,9 +3,17 @@ import { useLocation, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User } from "@shared/schema";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Download, FileText } from "lucide-react";
 
 type UserWithoutPassword = Omit<User, "password">;
+
+interface DocumentUpload {
+  id: string;
+  fileName: string;
+  uploadDate: string;
+  investorName: string;
+  investorEmail: string;
+}
 
 export default function Approvals() {
   const [, setLocation] = useLocation();
@@ -14,10 +22,41 @@ export default function Approvals() {
   const [error, setError] = useState("");
   const [processing, setProcessing] = useState<string | null>(null);
   const [selectedRoles, setSelectedRoles] = useState<Record<string, string>>({});
+  const [documents, setDocuments] = useState<DocumentUpload[]>([]);
+  const [documentsLoading, setDocumentsLoading] = useState(true);
 
   useEffect(() => {
     fetchPendingUsers();
+    fetchDocuments();
   }, []);
+
+  const fetchDocuments = async () => {
+    try {
+      const response = await fetch("/api/admin/documents", { credentials: "include" });
+      if (response.ok) {
+        const data = await response.json();
+        setDocuments(data.uploads);
+      }
+    } catch (err) {
+      console.error("Failed to fetch documents:", err);
+    } finally {
+      setDocumentsLoading(false);
+    }
+  };
+
+  const handleDownload = (documentId: string) => {
+    window.open(`/api/admin/documents/${documentId}/download`, "_blank");
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const fetchPendingUsers = async () => {
     try {
@@ -215,6 +254,67 @@ export default function Approvals() {
               ))}
             </div>
           )}
+
+          <section className="mt-16" data-testid="section-client-uploads">
+            <h2 className="font-display text-3xl text-primary tracking-tight border-b-4 border-secondary pb-3 inline-block mb-8">
+              CLIENT UPLOADS
+            </h2>
+            
+            {documentsLoading ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+              </div>
+            ) : documents.length === 0 ? (
+              <div className="bg-primary border border-secondary/30 p-8 text-center" data-testid="section-no-documents">
+                <FileText size={32} className="mx-auto mb-3 text-secondary/50" />
+                <p className="text-muted-foreground">No client documents have been uploaded yet.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full" data-testid="table-client-uploads">
+                  <thead>
+                    <tr className="border-b border-secondary/30">
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Date</th>
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Investor</th>
+                      <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">File Name</th>
+                      <th className="text-right text-xs font-bold uppercase tracking-widest text-secondary py-3">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {documents.map((doc, idx) => (
+                      <tr
+                        key={doc.id}
+                        className="border-b border-border/50 hover:bg-primary/5 transition-colors"
+                        data-testid={`row-document-${idx}`}
+                      >
+                        <td className="py-4 pr-4 text-sm text-muted-foreground">{formatDate(doc.uploadDate)}</td>
+                        <td className="py-4 pr-4">
+                          <div className="text-sm font-medium text-primary">{doc.investorName}</div>
+                          <div className="text-xs text-muted-foreground">{doc.investorEmail}</div>
+                        </td>
+                        <td className="py-4 pr-4">
+                          <div className="flex items-center gap-2">
+                            <FileText size={16} className="text-secondary" />
+                            <span className="text-sm text-primary">{doc.fileName}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 text-right">
+                          <button
+                            onClick={() => handleDownload(doc.id)}
+                            className="inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                            data-testid={`button-download-${idx}`}
+                          >
+                            <Download size={14} />
+                            Download
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
         </div>
       </main>
       <Footer />
