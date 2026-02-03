@@ -1,8 +1,8 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Download, FileText, ChevronRight, Mail, Phone, User as UserIcon, ArrowLeft } from "lucide-react";
+import { Download, FileText, ChevronRight, Mail, Phone, User as UserIcon, ArrowLeft, Upload, Check, Loader2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface User {
   id: string;
@@ -30,6 +30,54 @@ export default function Dashboard() {
   const [, setLocation] = useLocation();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setUploadSuccess(false);
+      setUploadError("");
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) return;
+    
+    setUploading(true);
+    setUploadError("");
+    setUploadSuccess(false);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      const response = await fetch("/api/documents/upload", {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Upload failed");
+      }
+
+      setUploadSuccess(true);
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (err: any) {
+      setUploadError(err.message || "Failed to upload document");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -234,6 +282,72 @@ export default function Dashboard() {
                         Active
                       </div>
                     </div>
+                  </div>
+                </div>
+              </section>
+
+              <section data-testid="section-document-upload">
+                <h2 className="text-sm font-bold uppercase tracking-widest text-secondary mb-4">
+                  Secure Document Upload
+                </h2>
+                <div className="bg-primary text-primary-foreground p-6 border border-secondary/30">
+                  <p className="text-sm text-primary-foreground/70 mb-4">
+                    Securely upload documents for review by your investment team.
+                  </p>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.gif"
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        id="file-upload"
+                        data-testid="input-file-upload"
+                      />
+                      <label
+                        htmlFor="file-upload"
+                        className="block w-full border-2 border-dashed border-secondary/50 p-4 text-center cursor-pointer hover:border-secondary transition-colors"
+                      >
+                        <Upload size={24} className="mx-auto mb-2 text-secondary" />
+                        <span className="text-sm text-primary-foreground/70">
+                          {selectedFile ? selectedFile.name : "Click to select PDF or image"}
+                        </span>
+                      </label>
+                    </div>
+
+                    <button
+                      onClick={handleUpload}
+                      disabled={!selectedFile || uploading}
+                      className="w-full inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
+                      data-testid="button-upload-document"
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={16} />
+                          Upload Document
+                        </>
+                      )}
+                    </button>
+
+                    {uploadSuccess && (
+                      <div className="flex items-center gap-2 text-green-400 text-sm" data-testid="text-upload-success">
+                        <Check size={16} />
+                        Document uploaded successfully
+                      </div>
+                    )}
+
+                    {uploadError && (
+                      <div className="text-red-400 text-sm" data-testid="text-upload-error">
+                        {uploadError}
+                      </div>
+                    )}
                   </div>
                 </div>
               </section>
