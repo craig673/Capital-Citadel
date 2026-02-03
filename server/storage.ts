@@ -1,4 +1,4 @@
-import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads } from "@shared/schema";
+import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads, type PublishedDocument, type InsertPublishedDocument, publishedDocuments } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, desc, and } from "drizzle-orm";
 import pg from "pg";
@@ -27,6 +27,11 @@ export interface IStorage {
   createDocumentUpload(upload: InsertDocumentUpload): Promise<DocumentUpload>;
   getAllDocumentUploads(): Promise<(DocumentUpload & { user: User })[]>;
   getDocumentUpload(id: string): Promise<DocumentUpload | undefined>;
+  createPublishedDocument(doc: InsertPublishedDocument): Promise<PublishedDocument>;
+  getPublishedDocumentsByCategory(category: string): Promise<PublishedDocument[]>;
+  getRecentLetters(limit: number): Promise<PublishedDocument[]>;
+  deletePublishedDocument(id: string): Promise<void>;
+  getPublishedDocument(id: string): Promise<PublishedDocument | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -159,6 +164,37 @@ export class DrizzleStorage implements IStorage {
 
   async getDocumentUpload(id: string): Promise<DocumentUpload | undefined> {
     const result = await db.select().from(documentUploads).where(eq(documentUploads.id, id));
+    return result[0];
+  }
+
+  async createPublishedDocument(doc: InsertPublishedDocument): Promise<PublishedDocument> {
+    const result = await db.insert(publishedDocuments).values(doc).returning();
+    return result[0];
+  }
+
+  async getPublishedDocumentsByCategory(category: string): Promise<PublishedDocument[]> {
+    return await db
+      .select()
+      .from(publishedDocuments)
+      .where(eq(publishedDocuments.category, category))
+      .orderBy(desc(publishedDocuments.publishDate));
+  }
+
+  async getRecentLetters(limit: number): Promise<PublishedDocument[]> {
+    return await db
+      .select()
+      .from(publishedDocuments)
+      .where(eq(publishedDocuments.category, "letter"))
+      .orderBy(desc(publishedDocuments.publishDate))
+      .limit(limit);
+  }
+
+  async deletePublishedDocument(id: string): Promise<void> {
+    await db.delete(publishedDocuments).where(eq(publishedDocuments.id, id));
+  }
+
+  async getPublishedDocument(id: string): Promise<PublishedDocument | undefined> {
+    const result = await db.select().from(publishedDocuments).where(eq(publishedDocuments.id, id));
     return result[0];
   }
 }
