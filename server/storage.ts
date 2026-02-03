@@ -23,6 +23,7 @@ export interface IStorage {
   getApprovedUsers(): Promise<User[]>;
   banUser(id: string, reason: string): Promise<User | undefined>;
   reactivateUser(id: string): Promise<User | undefined>;
+  updateUser(id: string, data: { firstName?: string; lastName?: string; role?: string }): Promise<User | undefined>;
   createDocumentUpload(upload: InsertDocumentUpload): Promise<DocumentUpload>;
   getAllDocumentUploads(): Promise<(DocumentUpload & { user: User })[]>;
   getDocumentUpload(id: string): Promise<DocumentUpload | undefined>;
@@ -104,6 +105,24 @@ export class DrizzleStorage implements IStorage {
     const result = await db
       .update(users)
       .set({ accountStatus: "active", banReason: null })
+      .where(eq(users.id, id))
+      .returning();
+    return result[0];
+  }
+
+  async updateUser(id: string, data: { firstName?: string; lastName?: string; role?: string }): Promise<User | undefined> {
+    const updateData: Partial<{ firstName: string; lastName: string; role: string }> = {};
+    if (data.firstName !== undefined) updateData.firstName = data.firstName;
+    if (data.lastName !== undefined) updateData.lastName = data.lastName;
+    if (data.role !== undefined) updateData.role = data.role;
+    
+    if (Object.keys(updateData).length === 0) {
+      return await this.getUser(id);
+    }
+    
+    const result = await db
+      .update(users)
+      .set(updateData)
       .where(eq(users.id, id))
       .returning();
     return result[0];

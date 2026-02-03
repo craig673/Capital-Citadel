@@ -458,5 +458,27 @@ export async function registerRoutes(
     }
   });
 
+  // Admin: Update user details
+  app.patch("/api/admin/users/:id", requireAdmin, async (req: AuthRequest, res: Response) => {
+    try {
+      const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const { firstName, lastName, role } = req.body;
+
+      if (role && !["user", "admin"].includes(role)) {
+        return res.status(400).json({ error: "Invalid role. Must be 'user' or 'admin'" });
+      }
+
+      const user = await storage.updateUser(userId, { firstName, lastName, role });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to update user" });
+    }
+  });
+
   return httpServer;
 }
