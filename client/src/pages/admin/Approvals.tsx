@@ -32,6 +32,13 @@ export default function Approvals() {
   const [banProcessing, setBanProcessing] = useState(false);
   const [userSearch, setUserSearch] = useState("");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<UserWithoutPassword | null>(null);
+  const [editFirstName, setEditFirstName] = useState("");
+  const [editLastName, setEditLastName] = useState("");
+  const [editRole, setEditRole] = useState("user");
+  const [editProcessing, setEditProcessing] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
 
   const sortedFilteredUsers = useMemo(() => {
     let filtered = approvedUsers;
@@ -76,7 +83,62 @@ export default function Approvals() {
       openBanModal(user);
     } else if (action === "reactivate") {
       handleReactivate(user.id);
+    } else if (action === "edit") {
+      openEditModal(user);
     }
+  };
+
+  const openEditModal = (user: UserWithoutPassword) => {
+    setEditTarget(user);
+    setEditFirstName(user.firstName || "");
+    setEditLastName(user.lastName || "");
+    setEditRole(user.role);
+    setEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setEditModalOpen(false);
+    setEditTarget(null);
+    setEditFirstName("");
+    setEditLastName("");
+    setEditRole("user");
+  };
+
+  const handleEditSave = async () => {
+    if (!editTarget) return;
+    
+    setEditProcessing(true);
+    try {
+      const response = await fetch(`/api/admin/users/${editTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          firstName: editFirstName.trim(),
+          lastName: editLastName.trim(),
+          role: editRole,
+        }),
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setApprovedUsers(prev => prev.map(u => u.id === editTarget.id ? data.user : u));
+        closeEditModal();
+        showToast("User updated successfully", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to update user", "error");
+      }
+    } catch (err) {
+      showToast("Failed to update user", "error");
+    } finally {
+      setEditProcessing(false);
+    }
+  };
+
+  const showToast = (message: string, type: "success" | "error") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
   };
 
   const exportToCSV = () => {
@@ -577,7 +639,7 @@ export default function Approvals() {
                                   <div className="absolute right-0 top-full mt-1 z-50 bg-white border border-border shadow-lg rounded min-w-[160px]" data-testid={`menu-dropdown-${idx}`}>
                                     <button
                                       className="w-full text-left px-4 py-2.5 text-sm text-muted-foreground hover:bg-muted transition-colors"
-                                      onClick={() => setOpenMenuId(null)}
+                                      onClick={() => handleMenuAction("edit", user)}
                                       data-testid={`menu-edit-${idx}`}
                                     >
                                       Edit Details
@@ -666,6 +728,98 @@ export default function Approvals() {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {editModalOpen && editTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" data-testid="modal-edit-overlay">
+          <div className="bg-white max-w-md w-full shadow-xl" data-testid="modal-edit">
+            <div className="bg-primary text-primary-foreground p-6">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-xl">Edit User</h3>
+                <button
+                  onClick={closeEditModal}
+                  className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                  data-testid="button-edit-modal-close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="edit-firstName" className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    First Name
+                  </label>
+                  <input
+                    id="edit-firstName"
+                    type="text"
+                    value={editFirstName}
+                    onChange={(e) => setEditFirstName(e.target.value)}
+                    className="w-full border border-border p-3 text-sm focus:outline-none focus:border-secondary"
+                    data-testid="input-edit-firstName"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="edit-lastName" className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    id="edit-lastName"
+                    type="text"
+                    value={editLastName}
+                    onChange={(e) => setEditLastName(e.target.value)}
+                    className="w-full border border-border p-3 text-sm focus:outline-none focus:border-secondary"
+                    data-testid="input-edit-lastName"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="edit-role" className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    Role
+                  </label>
+                  <select
+                    id="edit-role"
+                    value={editRole}
+                    onChange={(e) => setEditRole(e.target.value)}
+                    className="w-full border border-border p-3 text-sm focus:outline-none focus:border-secondary bg-white"
+                    data-testid="select-edit-role"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex gap-3 justify-end mt-6">
+                <button
+                  onClick={closeEditModal}
+                  className="px-5 py-2 text-sm font-semibold uppercase tracking-widest border border-border hover:bg-muted transition-colors"
+                  data-testid="button-edit-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleEditSave}
+                  disabled={editProcessing}
+                  className="px-5 py-2 text-sm font-semibold uppercase tracking-widest bg-secondary text-secondary-foreground hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="button-edit-save"
+                >
+                  {editProcessing ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div 
+          className={`fixed bottom-6 right-6 z-50 px-6 py-4 shadow-lg ${
+            toast.type === "success" ? "bg-green-600 text-white" : "bg-red-600 text-white"
+          }`}
+          data-testid="toast-notification"
+        >
+          {toast.message}
         </div>
       )}
 
