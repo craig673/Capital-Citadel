@@ -25,6 +25,13 @@ const documents = [
     href: "/assets/Our-2026-Predictions.pdf",
   },
   {
+    date: "SEPTEMBER 2025",
+    title: "Why We Stick to the Revolution Investing Playbook",
+    summary:
+      "A candid explanation of why we stay disciplined with a process that has worked: owning truly Revolutionary platform leaders while maintaining rigorous valuation work and cycle awareness to manage downside risk. Bryce contrasts our approach with the common investor traps of speculative thematic chasing, passive indexing, or avoiding tech altogether, outlining how we bridge the gap with deep diligence, long-horizon modeling, and active management. The result is a repeatable framework built for compounding through volatility rather than reacting to it.",
+    href: "/assets/Why-We-Stick-to-the-Revolution-Investing-Playbook.pdf",
+  },
+  {
     date: "OCTOBER 2025",
     title: "Value Investing Meets Revolution Technology",
     summary:
