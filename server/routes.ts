@@ -176,7 +176,8 @@ export async function registerRoutes(
   // Admin: Approve user
   app.post("/api/admin/approve-user/:id", requireAdmin, async (req: AuthRequest, res: Response) => {
     try {
-      const user = await storage.approveUser(req.params.id);
+      const userId = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+      const user = await storage.approveUser(userId);
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }

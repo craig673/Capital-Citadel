@@ -13,7 +13,9 @@ import InsightsCommentary from "@/pages/insights/Commentary";
 import InsightsVideos from "@/pages/insights/Videos";
 import InsightsCurated from "@/pages/insights/Curated";
 import InsightsAiRevolution from "@/pages/insights/AiRevolution";
-import Login from "@/pages/Login";
+import AuthLogin from "@/pages/auth/Login";
+import AuthRequestAccess from "@/pages/auth/RequestAccess";
+import AdminApprovals from "@/pages/admin/Approvals";
 import Dashboard from "@/pages/Dashboard";
 import Terms from "@/pages/Terms";
 import Privacy from "@/pages/Privacy";
@@ -35,7 +37,9 @@ function Router() {
       <Route path="/insights/videos" component={InsightsVideos} />
       <Route path="/insights/ai-revolution" component={InsightsAiRevolution} />
       <Route path="/insights/curated" component={InsightsCurated} />
-      <Route path="/login" component={Login} />
+      <Route path="/auth/login" component={AuthLogin} />
+      <Route path="/auth/request-access" component={AuthRequestAccess} />
+      <Route path="/admin/approvals" component={AdminApprovals} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/terms" component={Terms} />
       <Route path="/privacy" component={Privacy} />
