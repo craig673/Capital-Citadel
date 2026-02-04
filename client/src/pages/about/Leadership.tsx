@@ -122,7 +122,7 @@ export default function Leadership() {
                   <ul className="mt-10 space-y-6 text-muted-foreground" data-testid="list-leadership-highlights">
                     {[
                       "Started career on Wall Street in 1996.",
-                      "Worked his way from Starbucks barista to Oppenheimer analyst and became the first partner to famed stockbroker Andrew Lanj.",
+                      "Worked his way from Starbucks barista to Oppenheimer analyst and became the first partner to Famed Investment Manager Andrew Lanyi.",
                       "Multifaceted career spanning hedge fund management, tech/finance analysis, media, and real estate.",
                       "Former national TV anchor; co-host of Fox Business Happy Hour and on-air partner to Larry Kudlow on CNBC.",
                       "Former adjunct professor at Seton Hall University where he taught Revolutionomics.",
