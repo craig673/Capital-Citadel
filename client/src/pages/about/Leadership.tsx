@@ -93,9 +93,7 @@ export default function Leadership() {
                         management, tech/finance analysis, and media.
                       </p>
                       <p>
-                        He is a former national television anchor and has served as an adjunct
-                        professor, teaching Revolutionomics. He is also the author of
-                        <span className="text-primary font-semibold"> Trading with Cody</span>.
+                        Cody is also the investment advisor to the USVIP Fund, which was seeded by the Mubadala Sovereign Wealth Fund.
                       </p>
                     </div>
                   </div>
