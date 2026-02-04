@@ -94,7 +94,7 @@ export default function Leadership() {
                       </p>
                       <p>
                         He is a former national television anchor and has served as an adjunct
-                        professor, teaching \"Revolutionomics.\" He is also the author of
+                        professor, teaching Revolutionomics. He is also the author of
                         <span className="text-primary font-semibold"> Trading with Cody</span>.
                       </p>
                     </div>
@@ -127,7 +127,7 @@ export default function Leadership() {
                       "Worked his way from Starbucks barista to Oppenheimer analyst and became the first partner to famed stockbroker Andrew Lanj.",
                       "Multifaceted career spanning hedge fund management, tech/finance analysis, media, and real estate.",
                       "Former national TV anchor; co-host of Fox Business Happy Hour and on-air partner to Larry Kudlow on CNBC.",
-                      "Former adjunct professor at Seton Hall University where he taught \"Revolutionomics.\"",
+                      "Former adjunct professor at Seton Hall University where he taught Revolutionomics.",
                       "Publisher of TradingWithCody.com and author of the #1 Amazon best-seller Everything You Need to Know About Investing.",
                       "Also managed a $20 million \"long-only fund\" seeded by an Abu Dhabi sovereign wealth fund.",
                       "Holds a BA in Economics from the University of New Mexico.",
