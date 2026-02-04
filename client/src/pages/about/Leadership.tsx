@@ -93,7 +93,7 @@ export default function Leadership() {
                         management, tech/finance analysis, and media.
                       </p>
                       <p>
-                        Cody is also the investment advisor to the USVIP Fund, which was seeded by the Mubadala Sovereign Wealth Fund.
+                        In addition to being the Portfolio Manager of 10,000 Days Capital, Cody is also the investment advisor to the USVIP Fund, which was seeded by the Mubadala Sovereign Wealth Fund.
                       </p>
                     </div>
                   </div>
