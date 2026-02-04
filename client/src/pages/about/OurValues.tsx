@@ -84,7 +84,7 @@ export default function OurValues() {
                 className="text-muted-foreground leading-relaxed mb-10"
                 data-testid="text-values-pillars-summary"
               >
-                At 10,000 Days Capital, we do not chase cycles; we anticipate Revolutions. Our framework is built upon three non-negotiable pillars: the Vision to see opportunity, the Discipline to manage it with integrity, and the Patience to let compounding work its magic. We operate at the intersection of fundamental insight and generational time horizons.
+                At 10,000 Days Capital, we do not chase cycles; we anticipate Revolutions. Our framework is built upon three non-negotiable pillars: the Vision to see opportunity, the Discipline to manage it with integrity, and the Patience to believe in our Revolution Investing philosophy. We operate at the intersection of fundamental insight and generational time horizons.
               </p>
 
               <div className="space-y-6" data-testid="list-values-pillars">
