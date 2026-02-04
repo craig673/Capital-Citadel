@@ -5,31 +5,24 @@ import { motion } from "framer-motion";
 const pillars = [
   {
     number: "01",
-    title: "Radical Alignment",
-    subtitle: "The “Investor First” Standard.",
+    title: "Vision",
+    subtitle: "The Intuition to Identify Revolution.",
     body:
-      "Our investors are not simply clients but Limited Partners, and the team proudly invests alongside them. We succeed only when you succeed. We operate with absolute transparency and ethical rigidity because we are stewards of your trust, not just your capital.",
+      "We possess the fundamental understanding and raw intuition required to find Revolutionary companies. In our pursuit of the next Great Revolution, we look beyond the data to see the structural shifts that will define the future.",
   },
   {
     number: "02",
-    title: "The Synthesis of Truth",
-    subtitle: "Fundamental Insight + Quantitative Rigor.",
+    title: "Discipline",
+    subtitle: 'The "Investor First" Standard.',
     body:
-      "We reject the false choice between human intuition and machine precision. We believe true alpha is found at their intersection. We use proprietary algorithms to stress-test our fundamental theses, stripping away bias to reveal the raw reality of an investment. We let the data challenge our convictions, ensuring our decisions are based on evidence, not ego.",
+      "Discipline is the resolve to make the hard decisions: to hold when conviction is high, to trim when the market gets frothy, and to ensure our investors' interests are always first. We operate with the ethical rigidity required to be true stewards of capital.",
   },
   {
     number: "03",
-    title: "Intellectual Courage",
-    subtitle: "The Anti-Consensus Mindset.",
+    title: "Patience",
+    subtitle: "The 10,000 Days Virtue.",
     body:
-      "Consensus is priced in; opportunity is not. We foster a culture where dissenting views are encouraged and conventional wisdom is interrogated. To capture the upside of a Revolution, one must have the courage to stand apart from the crowd and the discipline to hold that ground when the market disagrees.",
-  },
-  {
-    number: "04",
-    title: "Generational Discipline",
-    subtitle: "The 10,000 Days Horizon.",
-    body:
-      "Speed is a commodity; patience is an edge. We refuse to sacrifice long-term compounding for short-term optics. We build portfolios designed to weather the volatility of the moment and capture the structural growth of the decade. We are not racing for the quarter; we are building for the era.",
+      "Patience keeps us from bailing when markets fluctuate. It is the virtue that ensures we stick to our philosophy of investing for the next 10,000 days. We aren't racing for the quarter; we are building for the era.",
   },
 ];
 
@@ -71,7 +64,7 @@ export default function OurValues() {
           </div>
         </section>
 
-        {/* Four Pillars */}
+        {/* Three Pillars */}
         <section className="py-20 border-t border-border">
           <div className="max-w-7xl mx-auto px-6">
             <div className="max-w-5xl">
@@ -79,20 +72,26 @@ export default function OurValues() {
                 className="text-secondary font-bold uppercase tracking-widest mb-4 text-sm"
                 data-testid="text-values-pillars-kicker"
               >
-                The Four Pillars
+                The Three Pillars
               </div>
               <h2
-                className="font-display text-3xl md:text-4xl text-primary mb-10"
+                className="font-display text-3xl md:text-4xl text-primary mb-4"
                 data-testid="text-values-pillars-title"
               >
                 How we operate.
               </h2>
+              <p
+                className="text-muted-foreground leading-relaxed mb-10"
+                data-testid="text-values-pillars-summary"
+              >
+                At 10,000 Days Capital, we do not chase cycles; we anticipate Revolutions. Our framework is built upon three non-negotiable pillars: the Vision to see opportunity, the Discipline to manage it with integrity, and the Patience to let compounding work its magic. We operate at the intersection of fundamental insight and generational time horizons.
+              </p>
 
               <div className="space-y-6" data-testid="list-values-pillars">
                 {pillars.map((p) => (
                   <div
                     key={p.number}
-                    className="bg-white border border-border p-8"
+                    className="bg-white border border-border p-8 transition-all duration-300 ease-out hover:shadow-lg hover:-translate-y-1 hover:border-secondary/50"
                     data-testid={`card-values-pillar-${p.number}`}
                   >
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
