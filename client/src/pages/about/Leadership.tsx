@@ -88,12 +88,12 @@ export default function Leadership() {
 
                     <div className="mt-8 space-y-4 text-muted-foreground leading-relaxed" data-testid="text-leadership-cody-summary">
                       <p>
-                        Cody Willard is the Portfolio Manager of 10,000 Days Capital Management.
+                        Cody Willard is the Portfolio Manager of 10,000 Days Capital.
                         His career began on Wall Street in 1996 and has spanned hedge fund
                         management, tech/finance analysis, and media.
                       </p>
                       <p>
-                        In addition to being the Portfolio Manager of 10,000 Days Capital, Cody is also the investment advisor to the USVIP Fund, which was seeded by the Mubadala Sovereign Wealth Fund.
+                        Cody is also the investment advisor to the USVIP Fund, which was seeded by the Mubadala Sovereign Wealth Fund in 2025.
                       </p>
                     </div>
                   </div>
