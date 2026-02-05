@@ -5,15 +5,29 @@ import pg from "pg";
 const { Pool } = pg;
 
 async function seedProductionAdmins() {
+  // Check for command-line argument first, then fall back to environment variable
+  const connectionString = process.argv[2] || process.env.DATABASE_URL;
+
+  if (!connectionString) {
+    console.error("\n✗ Error: No database connection string provided.");
+    console.error("\nUsage:");
+    console.error("  npx tsx scripts/seed-production-admins.ts <PRODUCTION_DATABASE_URL>");
+    console.error("\nExample:");
+    console.error('  npx tsx scripts/seed-production-admins.ts "postgresql://user:pass@host:5432/db"');
+    console.error("\nYou can find your production DATABASE_URL in the Secrets tab under 'production' environment.");
+    process.exit(1);
+  }
+
+  console.log("\n=== Seeding Production Admin Users ===");
+  console.log(`Connecting to: ${connectionString.replace(/:[^:@]+@/, ":****@")}\n`);
+
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
   });
 
   const db = drizzle(pool);
 
   try {
-    console.log("\n=== Seeding Production Admin Users ===\n");
-
     const adminsToCreate = [
       {
         email: "craig@10000daysfund.com",
