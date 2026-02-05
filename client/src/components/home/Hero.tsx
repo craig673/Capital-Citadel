@@ -1,4 +1,4 @@
-import heroVideo from "@assets/generated_videos/space_data_center.mp4";
+import heroVideo from "@assets/generated_videos/space_data_center_v2.mp4";
 import { motion } from "framer-motion";
 
 export function Hero() {
