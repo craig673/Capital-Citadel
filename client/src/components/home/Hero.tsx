@@ -33,7 +33,6 @@ export function Hero() {
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto font-light leading-relaxed mb-10 uppercase tracking-widest">
             Vision. Discipline. Patience.
           </p>
-          <div className="h-16 w-[1px] bg-secondary mx-auto mt-12 animate-pulse" />
         </motion.div>
       </div>
     </section>
