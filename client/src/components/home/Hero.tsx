@@ -1,20 +1,27 @@
-import heroVideo from "@assets/generated_videos/space_data_center_v2.mp4";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export function Hero() {
+  const [videoError, setVideoError] = useState(false);
+
   return (
     <section className="relative h-screen min-h-[700px] flex items-center justify-center overflow-hidden">
       {/* Background Video with Overlay */}
       <div className="absolute inset-0 z-0">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="w-full h-full object-cover"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
+        {!videoError ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+            onError={() => setVideoError(true)}
+          >
+            <source src="/videos/hero-background.mp4" type="video/mp4" />
+          </video>
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-primary via-primary/90 to-primary/80" />
+        )}
         <div className="absolute inset-0 bg-primary/60 mix-blend-multiply" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-90" />
       </div>
