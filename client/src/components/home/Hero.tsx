@@ -1,4 +1,4 @@
-import heroVideo from "@assets/generated_videos/starship_v3_launch.mp4";
+import heroVideo from "@assets/generated_videos/starship_v3_launch_v2.mp4";
 import { motion } from "framer-motion";
 
 export function Hero() {
