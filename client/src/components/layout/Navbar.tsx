@@ -13,8 +13,9 @@ interface AuthUser {
 
 const aboutItems = [
   { href: "/about/what-we-do", label: "What We Do" },
-  { href: "/about/values", label: "Our Values" },
   { href: "/about/leadership", label: "Leadership" },
+  { href: "/team", label: "Our Team" },
+  { href: "/about/values", label: "Our Values" },
   { href: "/about/locations", label: "Locations" },
 ];
 
@@ -53,7 +54,6 @@ export function Navbar() {
 
   const links = [
     { href: "/philosophy", label: "Our Philosophy" },
-    { href: "/team", label: "Our Team" },
     { href: "/insights", label: "Insights" },
   ];
 
