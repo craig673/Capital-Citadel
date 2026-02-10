@@ -13,9 +13,9 @@ interface AuthUser {
 
 const aboutItems = [
   { href: "/about/what-we-do", label: "What We Do" },
-  { href: "/about/leadership", label: "Leadership" },
-  { href: "/team", label: "Our Team" },
   { href: "/about/values", label: "Our Values" },
+  { href: "/team", label: "Our Team" },
+  { href: "/about/leadership", label: "Leadership" },
   { href: "/about/locations", label: "Locations" },
 ];
 
