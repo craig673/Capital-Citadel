@@ -3,18 +3,33 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
 
+const revealVariants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.9,
+      delay: i * 0.15,
+      ease: [0.25, 0.1, 0.25, 1],
+    },
+  }),
+};
+
 function AIRSCard({
   kicker,
   title,
   description,
   videoSrc,
   testId,
+  index,
 }: {
   kicker: string;
   title: string;
   description: string;
   videoSrc: string;
   testId: string;
+  index: number;
 }) {
   const [hovered, setHovered] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -30,7 +45,12 @@ function AIRSCard({
   };
 
   return (
-    <div
+    <motion.div
+      variants={revealVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+      custom={index}
       className="relative overflow-hidden border border-border p-8 transition-transform duration-300 ease-out cursor-default"
       style={{ transform: hovered ? "scale(1.05)" : "scale(1)" }}
       onMouseEnter={handleMouseEnter}
@@ -72,7 +92,7 @@ function AIRSCard({
           {hovered && <span>{description}</span>}
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -103,37 +123,58 @@ export default function Philosophy() {
         {/* Hero */}
         <section className="pt-20 pb-16">
           <div className="max-w-7xl mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="max-w-4xl"
-            >
-              <div
-                className="text-secondary font-bold uppercase tracking-widest mb-5 text-sm"
-                data-testid="text-philosophy-hero-kicker"
+            <div className="max-w-4xl">
+              <motion.div
+                variants={revealVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                custom={0}
               >
-                Philosophy
-              </div>
-              <h1
+                <div
+                  className="text-secondary font-bold uppercase tracking-widest mb-5 text-sm"
+                  data-testid="text-philosophy-hero-kicker"
+                >
+                  Philosophy
+                </div>
+              </motion.div>
+
+              <motion.h1
+                variants={revealVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                custom={1}
                 className="font-display text-4xl md:text-6xl text-primary leading-tight"
                 data-testid="text-philosophy-hero-title"
               >
                 We do not chase trends.
                 <br />
                 We map the future.
-              </h1>
-              <p
+              </motion.h1>
+
+              <motion.p
+                variants={revealVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                custom={2}
                 className="mt-8 text-lg text-muted-foreground leading-relaxed"
                 data-testid="text-philosophy-hero-subtext-1"
               >
                 Innovation is insufficient. True progress does not come from iterating on the
                 status quo; it comes from breaking it. BlackBerry was an innovator, but the
                 Smartphone Revolution reshaped how humanity connects. Automakers innovated for
-                a century, but the transition to “robots on wheels” redefined the very concept
+                a century, but the transition to "robots on wheels" redefined the very concept
                 of movement.
-              </p>
-              <p
+              </motion.p>
+
+              <motion.p
+                variants={revealVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-40px" }}
+                custom={3}
                 className="mt-6 text-lg text-muted-foreground leading-relaxed"
                 data-testid="text-philosophy-hero-subtext-2"
               >
@@ -142,8 +183,8 @@ export default function Philosophy() {
                 economy and the human experience over the next 27.4 years. We look past the
                 noise of the moment to find the signal of the future. We are students of the
                 paradigm shift. We are focused on <span className="font-semibold text-primary">Revolutions.</span>
-              </p>
-            </motion.div>
+              </motion.p>
+            </div>
           </div>
         </section>
 
@@ -151,15 +192,29 @@ export default function Philosophy() {
         <section className="py-20 border-t border-border">
           <div className="max-w-7xl mx-auto px-6">
             <div className="max-w-5xl">
-              <SectionTitle kicker="The Convergence" title="The AIRS Revolution" />
-              <p
+              <motion.div
+                variants={revealVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-60px" }}
+                custom={0}
+              >
+                <SectionTitle kicker="The Convergence" title="The AIRS Revolution" />
+              </motion.div>
+
+              <motion.p
+                variants={revealVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-60px" }}
+                custom={1}
                 className="text-lg text-muted-foreground leading-relaxed mb-12"
                 data-testid="text-philosophy-airs-intro"
               >
                 We stand at the precipice of a convergence unlike any in history. Three distinct
                 yet interconnected forces are accelerating simultaneously to alter the fabric of
                 society.
-              </p>
+              </motion.p>
 
               <div className="grid lg:grid-cols-3 gap-10">
                 <AIRSCard
@@ -168,6 +223,7 @@ export default function Philosophy() {
                   description="Artificial Intelligence is not just software; it is the decoupling of intelligence from biological constraints. It is the revolution of logic, creativity, and efficiency. We are moving from an era of static computation to one of generative reasoning, where machines do not just execute commands but solve problems. This revolution will redefine the value of human labor and the speed of scientific discovery."
                   videoSrc="/videos/airs-ai-bg.mp4"
                   testId="card-airs-ai"
+                  index={0}
                 />
 
                 <AIRSCard
@@ -176,6 +232,7 @@ export default function Philosophy() {
                   description="While AI transforms the digital world, Robotics reclaims the physical one. From autonomous logistics to humanoid assistants, we are witnessing the automation of the tangible. This is not just about manufacturing; it is about liberating humanity from dangerous and repetitive toil, allowing the physical world to move and adapt with the speed of software."
                   videoSrc="/videos/airs-robotics-bg.mp4"
                   testId="card-airs-robotics"
+                  index={1}
                 />
 
                 <AIRSCard
@@ -184,6 +241,7 @@ export default function Philosophy() {
                   description="For all of human history, our economy has been earthbound. That era is ending. The Space Revolution is not merely about exploration; it is about expansion. It is the industrialization of orbit, the harvesting of infinite resources, and the creation of a multi-planetary civilization. We view the stars not as a destination, but as the new frontier of economic and societal necessity."
                   videoSrc="/videos/airs-space-bg.mp4"
                   testId="card-airs-space"
+                  index={2}
                 />
               </div>
             </div>
@@ -194,10 +252,25 @@ export default function Philosophy() {
         <section className="py-20 border-t border-border">
           <div className="max-w-7xl mx-auto px-6">
             <div className="max-w-4xl">
-              <SectionTitle kicker="Our Discipline" title="How We See the Future" />
+              <motion.div
+                variants={revealVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-60px" }}
+                custom={0}
+              >
+                <SectionTitle kicker="Our Discipline" title="How We See the Future" />
+              </motion.div>
 
               <div className="space-y-12 text-muted-foreground leading-relaxed">
-                <section data-testid="section-discipline-1">
+                <motion.section
+                  variants={revealVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-60px" }}
+                  custom={0}
+                  data-testid="section-discipline-1"
+                >
                   <h3 className="font-display text-2xl text-primary mb-3">
                     1. The Discipline of 10,000 Days
                   </h3>
@@ -205,12 +278,19 @@ export default function Philosophy() {
                     Civilization is built on long horizons. While the world reacts to the
                     volatility of the hour, we operate on a timeline of 10,000 days. We model the
                     future not by quarters, but by decades. This long-term discipline allows us
-                    to see past the “froth” of hype cycles and identify the enduring technologies
+                    to see past the "froth" of hype cycles and identify the enduring technologies
                     that will thrive long after the bubbles burst.
                   </p>
-                </section>
+                </motion.section>
 
-                <section data-testid="section-discipline-2">
+                <motion.section
+                  variants={revealVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-60px" }}
+                  custom={1}
+                  data-testid="section-discipline-2"
+                >
                   <h3 className="font-display text-2xl text-primary mb-3">
                     2. The Contrarian Mindset
                   </h3>
@@ -221,9 +301,16 @@ export default function Philosophy() {
                     world sees euphoria, we see caution. We strip away emotional bias to view the
                     mechanics of society with absolute clarity.
                   </p>
-                </section>
+                </motion.section>
 
-                <section data-testid="section-discipline-3">
+                <motion.section
+                  variants={revealVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-60px" }}
+                  custom={2}
+                  data-testid="section-discipline-3"
+                >
                   <h3 className="font-display text-2xl text-primary mb-3">
                     3. The Proprietary Lens
                   </h3>
@@ -243,12 +330,20 @@ export default function Philosophy() {
                     </li>
                   </ul>
                   <p className="mt-5">
-                    By quantifying factors like “Inflection Points” and “Scalability” through our
+                    By quantifying factors like "Inflection Points" and "Scalability" through our
                     proprietary models, we turn abstract visions into measurable data.
                   </p>
-                </section>
+                </motion.section>
 
-                <section data-testid="section-discipline-4" className="border-t border-border pt-10">
+                <motion.section
+                  variants={revealVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-60px" }}
+                  custom={3}
+                  data-testid="section-discipline-4"
+                  className="border-t border-border pt-10"
+                >
                   <h3 className="font-display text-2xl text-primary mb-3">
                     4. The Human Element
                   </h3>
@@ -257,7 +352,7 @@ export default function Philosophy() {
                     by a collective of thinkers, engineers, and analysts united by a single
                     ambition: to be on the right side of history.
                   </p>
-                </section>
+                </motion.section>
               </div>
             </div>
           </div>
