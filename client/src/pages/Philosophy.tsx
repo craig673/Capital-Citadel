@@ -125,15 +125,17 @@ function DisciplineScrollytelling() {
   });
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const segmentSize = 1 / (totalPoints + 1);
-    const idx = Math.floor(v / segmentSize) - 1;
-    const clamped = Math.max(-1, Math.min(totalPoints - 1, idx));
+    const leadIn = 0.08;
+    const remaining = 1 - leadIn;
+    const segmentSize = remaining / totalPoints;
+    const idx = Math.floor((v - leadIn) / segmentSize);
+    const clamped = v < leadIn ? -1 : Math.min(totalPoints - 1, idx);
     setActiveIndex(clamped);
     setSphereRotation(v * 120);
   });
 
   return (
-    <div ref={containerRef} style={{ height: `${(totalPoints + 2) * 100}vh` }}>
+    <div ref={containerRef} style={{ height: `${(totalPoints + 1) * 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden" style={{ backgroundColor: "#0A0A0F" }}>
         <div
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
