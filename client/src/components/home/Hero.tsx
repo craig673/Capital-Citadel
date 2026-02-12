@@ -37,7 +37,7 @@ export function Hero() {
             The Engine of Prosperity is <br />
             <span className="text-white/90 font-light italic">Driven by <span className="font-bold text-secondary">Tech Revolutions</span></span>
           </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto font-light leading-relaxed mb-10 uppercase tracking-widest">
+          <p className="text-xl md:text-2xl text-white/80 max-w-2xl mx-auto font-light leading-relaxed mb-10 uppercase tracking-widest">
             Vision. Discipline. Patience.
           </p>
         </motion.div>
