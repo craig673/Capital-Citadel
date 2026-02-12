@@ -1,8 +1,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion } from "framer-motion";
-import { Upload, X, FileText, CheckCircle, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Upload, X, FileText, CheckCircle, Loader2, ChevronDown } from "lucide-react";
 import type { Job } from "@shared/schema";
 
 const fadeUp = {
@@ -25,6 +25,7 @@ export default function Careers() {
   const [openJobs, setOpenJobs] = useState<Job[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [jobsLoading, setJobsLoading] = useState(true);
+  const [expandedJobs, setExpandedJobs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetch("/api/jobs/open")
@@ -88,6 +89,15 @@ export default function Careers() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const toggleJob = (jobId: string) => {
+    setExpandedJobs((prev) => {
+      const next = new Set(prev);
+      if (next.has(jobId)) next.delete(jobId);
+      else next.add(jobId);
+      return next;
+    });
   };
 
   const handleApplyForRole = (jobId: string) => {
@@ -170,36 +180,79 @@ export default function Careers() {
               </p>
             </motion.div>
           ) : (
-            <div className="mt-12 space-y-6" data-testid="list-open-jobs">
+            <div className="mt-12 space-y-4" data-testid="list-open-jobs">
               {openJobs.map((job, index) => (
                 <motion.div
                   key={job.id}
-                  className="rounded-xl border border-slate-200 bg-white p-6 md:p-8 hover:shadow-lg transition-shadow"
+                  className="rounded-xl border border-slate-200 bg-white overflow-hidden"
                   {...fadeUp}
                   transition={{ ...fadeUp.transition, delay: 0.1 + index * 0.1 }}
                   data-testid={`card-job-${job.id}`}
                 >
-                  <h3 className="font-display text-xl text-slate-900" data-testid={`text-job-title-${job.id}`}>
-                    {job.title}
-                  </h3>
-                  <p className="mt-3 text-slate-600 leading-relaxed" data-testid={`text-job-description-${job.id}`}>
-                    {job.description}
-                  </p>
-                  {job.requirements && (
-                    <ul className="mt-4 space-y-1.5 list-disc list-inside text-slate-600 text-sm" data-testid={`list-job-requirements-${job.id}`}>
-                      {job.requirements.split("\n").filter(Boolean).map((req, i) => (
-                        <li key={i}>{req.trim()}</li>
-                      ))}
-                    </ul>
-                  )}
                   <button
                     type="button"
-                    onClick={() => handleApplyForRole(job.id)}
-                    className="mt-6 inline-flex items-center gap-2 rounded-lg bg-secondary px-5 py-2.5 text-primary font-bold uppercase tracking-wider text-sm hover:bg-secondary/90 transition-colors"
-                    data-testid={`button-apply-${job.id}`}
+                    onClick={() => toggleJob(job.id)}
+                    className="w-full flex items-center justify-between px-6 py-5 md:px-8 md:py-6 text-left hover:bg-slate-50 transition-colors"
+                    data-testid={`button-toggle-${job.id}`}
                   >
-                    Apply for this Role
+                    <h3 className="font-display text-xl text-slate-900" data-testid={`text-job-title-${job.id}`}>
+                      {job.title}
+                    </h3>
+                    <ChevronDown
+                      className={`w-5 h-5 text-slate-400 flex-shrink-0 ml-4 transition-transform duration-300 ${expandedJobs.has(job.id) ? "rotate-180" : ""}`}
+                    />
                   </button>
+
+                  <AnimatePresence initial={false}>
+                    {expandedJobs.has(job.id) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: [0.0, 0.0, 0.2, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="px-6 pb-6 md:px-8 md:pb-8 border-t border-slate-100 pt-6">
+                          <h4 className="font-display text-2xl text-slate-900">{job.title}</h4>
+                          <div className="mt-3 h-px w-20 bg-secondary" aria-hidden="true" />
+
+                          <div className="mt-8">
+                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">About the Role</p>
+                            <p className="text-slate-600 leading-relaxed" data-testid={`text-job-description-${job.id}`}>
+                              {job.description}
+                            </p>
+                          </div>
+
+                          <div className="mt-8">
+                            <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">Why 10,000 Days</p>
+                            <p className="text-slate-600 leading-relaxed">
+                              10,000 Days Capital is a Revolutionary investment firm operating at the intersection of deep fundamental research and cutting-edge Artificial Intelligence. We believe in thinking in decades — not quarters — and our long-term horizon means we pursue opportunities that others overlook. As part of the AIRS Revolution, you will be at the forefront of how capital is allocated and managed in the 21st century. We offer a culture of intellectual curiosity, disciplined thinking, and the conviction that the greatest returns come from patience and vision.
+                            </p>
+                          </div>
+
+                          {job.requirements && (
+                            <div className="mt-8">
+                              <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">Requirements</p>
+                              <ul className="space-y-1.5 list-disc list-inside text-slate-600 leading-relaxed" data-testid={`list-job-requirements-${job.id}`}>
+                                {job.requirements.split("\n").filter(Boolean).map((req, i) => (
+                                  <li key={i}>{req.trim()}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => handleApplyForRole(job.id)}
+                            className="mt-8 inline-flex items-center gap-2 rounded-lg bg-secondary px-5 py-2.5 text-primary font-bold uppercase tracking-wider text-sm hover:bg-secondary/90 transition-colors"
+                            data-testid={`button-apply-${job.id}`}
+                          >
+                            Apply for this Role
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </motion.div>
               ))}
             </div>
