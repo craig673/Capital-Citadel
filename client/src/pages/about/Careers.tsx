@@ -134,7 +134,7 @@ export default function Careers() {
           >
             <p className="text-slate-900 text-lg leading-relaxed font-medium" data-testid="text-no-roles-message">
               We currently have no open roles, but if you are interested in joining the team,
-              please upload your resume here and click send.
+              please upload your resume below and click send.
             </p>
           </motion.div>
         </div>
