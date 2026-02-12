@@ -117,22 +117,22 @@ export default function Careers() {
         </div>
       </section>
 
-      <section className="py-20 md:py-28 bg-background" data-testid="section-open-roles">
+      <section className="py-20 md:py-28 bg-white" data-testid="section-open-roles">
         <div className="max-w-4xl mx-auto px-6">
           <motion.div className="text-center" {...fadeUp}>
-            <h2 className="font-display text-3xl md:text-4xl text-white" data-testid="text-open-roles-title">
+            <h2 className="font-display text-3xl md:text-4xl text-slate-900" data-testid="text-open-roles-title">
               Open Roles
             </h2>
             <div className="mt-3 h-px w-16 bg-secondary mx-auto" aria-hidden="true" />
           </motion.div>
 
           <motion.div
-            className="mt-12 rounded-xl border border-border bg-card p-8 md:p-12 text-center"
+            className="mt-12 rounded-xl border border-slate-200 bg-slate-50 p-8 md:p-12 text-center"
             {...fadeUp}
             transition={{ ...fadeUp.transition, delay: 0.15 }}
             data-testid="card-no-open-roles"
           >
-            <p className="text-white/70 text-lg leading-relaxed" data-testid="text-no-roles-message">
+            <p className="text-slate-900 text-lg leading-relaxed font-medium" data-testid="text-no-roles-message">
               We currently have no open roles, but if you are interested in joining the team,
               please upload your resume here and click send.
             </p>
