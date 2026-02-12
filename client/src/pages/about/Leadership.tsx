@@ -93,7 +93,7 @@ export default function Leadership() {
                         management, tech/finance analysis, and media.
                       </p>
                       <p>
-                        Cody is also the investment advisor to the USVIP Fund, which was seeded by the Mubadala Sovereign Wealth Fund in 2025.
+                        Cody is also the investment advisor to the USVIP Fund, which was seeded by a UAE Sovereign Wealth Fund in 2025.
                       </p>
                     </div>
                   </div>
