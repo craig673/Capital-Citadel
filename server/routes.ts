@@ -855,9 +855,13 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Name and email are required" });
       }
 
-      const recentApp = await storage.getRecentApplicationByEmail(email.trim().toLowerCase(), 30);
-      if (recentApp) {
-        return res.status(429).json({ error: "You've already submitted documentation. We will be in contact soon." });
+      const adminUser = await storage.getUserByEmail(email.trim().toLowerCase());
+      const isAdmin = adminUser?.role === "admin";
+      if (!isAdmin) {
+        const recentApp = await storage.getRecentApplicationByEmail(email.trim().toLowerCase(), 30);
+        if (recentApp) {
+          return res.status(429).json({ error: "You've already submitted documentation. We will be in contact soon." });
+        }
       }
 
       const files = (req.files as Express.Multer.File[]) || [];

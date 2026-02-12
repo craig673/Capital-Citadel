@@ -21,6 +21,8 @@ export default function Careers() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
+  const pendingEvent = useRef<React.FormEvent | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [openJobs, setOpenJobs] = useState<Job[]>([]);
@@ -73,14 +75,19 @@ export default function Careers() {
     [addFiles]
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     if (!name.trim() || !email.trim()) {
       setError("Please fill in your name and email.");
       return;
     }
+    pendingEvent.current = e;
+    setShowConfirm(true);
+  };
 
+  const handleConfirmedSubmit = async () => {
+    setShowConfirm(false);
     setIsSubmitting(true);
     try {
       const formData = new FormData();
@@ -342,7 +349,7 @@ export default function Careers() {
             </motion.div>
           ) : (
             <motion.form
-              onSubmit={handleSubmit}
+              onSubmit={handleFormSubmit}
               className="mt-12 space-y-6"
               {...fadeUp}
               transition={{ ...fadeUp.transition, delay: 0.15 }}
@@ -464,6 +471,55 @@ export default function Careers() {
       </section>
 
       <Footer />
+
+      <AnimatePresence>
+        {showConfirm && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowConfirm(false)}
+            data-testid="modal-confirm-overlay"
+          >
+            <motion.div
+              className="relative w-full max-w-md bg-primary border border-secondary/30 p-8 shadow-2xl"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.25 }}
+              onClick={(e) => e.stopPropagation()}
+              data-testid="modal-confirm-dialog"
+            >
+              <div className="w-10 h-10 mx-auto mb-5 rounded-full bg-secondary/15 flex items-center justify-center">
+                <Upload className="w-5 h-5 text-secondary" />
+              </div>
+              <h3 className="font-display text-xl text-white text-center mb-4">Confirm Submission</h3>
+              <p className="text-white/70 text-sm leading-relaxed text-center mb-8">
+                Please be sure you have uploaded any and all documentation you'd like to submit before sending. Are you sure you want to Send?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(false)}
+                  className="flex-1 rounded-lg border border-white/20 px-4 py-3 text-white/70 text-sm font-semibold uppercase tracking-wider hover:border-white/40 hover:text-white transition-colors"
+                  data-testid="button-confirm-cancel"
+                >
+                  Go Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmedSubmit}
+                  className="flex-1 rounded-lg bg-secondary px-4 py-3 text-primary text-sm font-bold uppercase tracking-wider hover:bg-secondary/90 transition-colors"
+                  data-testid="button-confirm-send"
+                >
+                  Yes, Send
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
