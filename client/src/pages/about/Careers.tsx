@@ -225,12 +225,19 @@ export default function Careers() {
                       >
                         <div className="px-6 pb-6 md:px-8 md:pb-8 border-t border-slate-100 pt-6">
                           <h4 className="font-display text-2xl text-slate-900">{job.title}</h4>
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <span className="inline-block rounded bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600" data-testid={`badge-location-${job.id}`}>{job.location}</span>
+                            <span className="inline-block rounded bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600" data-testid={`badge-type-${job.id}`}>{job.employmentType}</span>
+                            {job.internshipStartDate && job.internshipEndDate && (
+                              <span className="inline-block rounded bg-slate-100 px-2.5 py-0.5 text-xs text-slate-600" data-testid={`badge-dates-${job.id}`}>{job.internshipStartDate} – {job.internshipEndDate}</span>
+                            )}
+                          </div>
                           <div className="mt-3 h-px w-20 bg-secondary" aria-hidden="true" />
 
                           <div className="mt-8">
                             <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">About the Role</p>
                             <p className="text-slate-600 leading-relaxed" data-testid={`text-job-description-${job.id}`}>
-                              {job.description}
+                              {job.roleDescription}
                             </p>
                           </div>
 
@@ -241,12 +248,34 @@ export default function Careers() {
                             </p>
                           </div>
 
-                          {job.requirements && (
+                          {(job.responsibilities || []).length > 0 && (
+                            <div className="mt-8">
+                              <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">Responsibilities</p>
+                              <ul className="space-y-1.5 list-disc list-inside text-slate-600 leading-relaxed" data-testid={`list-job-responsibilities-${job.id}`}>
+                                {(job.responsibilities || []).map((item, i) => (
+                                  <li key={i}>{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {(job.requirements || []).length > 0 && (
                             <div className="mt-8">
                               <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">Requirements</p>
                               <ul className="space-y-1.5 list-disc list-inside text-slate-600 leading-relaxed" data-testid={`list-job-requirements-${job.id}`}>
-                                {job.requirements.split("\n").filter(Boolean).map((req, i) => (
-                                  <li key={i}>{req.trim()}</li>
+                                {(job.requirements || []).map((item, i) => (
+                                  <li key={i}>{item}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {(job.whatWeOffer || []).length > 0 && (
+                            <div className="mt-8">
+                              <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">What We Offer</p>
+                              <ul className="space-y-1.5 list-disc list-inside text-slate-600 leading-relaxed" data-testid={`list-job-offer-${job.id}`}>
+                                {(job.whatWeOffer || []).map((item, i) => (
+                                  <li key={i}>{item}</li>
                                 ))}
                               </ul>
                             </div>

@@ -680,11 +680,22 @@ export async function registerRoutes(
   // Admin: Create a new job posting
   app.post("/api/admin/jobs", requireAdmin, async (req: Request, res: Response) => {
     try {
-      const { title, description, requirements } = req.body;
-      if (!title || !description || !requirements) {
-        return res.status(400).json({ error: "Title, description, and requirements are required" });
+      const { title, location, employmentType, internshipStartDate, internshipEndDate, roleDescription, responsibilities, requirements, whatWeOffer } = req.body;
+      if (!title) {
+        return res.status(400).json({ error: "Title is required" });
       }
-      const job = await storage.createJob({ title, description, requirements, status: "open" });
+      const job = await storage.createJob({
+        title,
+        location: location || "Remote",
+        employmentType: employmentType || "Full Time",
+        internshipStartDate: internshipStartDate || null,
+        internshipEndDate: internshipEndDate || null,
+        roleDescription: roleDescription || "",
+        responsibilities: Array.isArray(responsibilities) ? responsibilities : [],
+        requirements: Array.isArray(requirements) ? requirements : [],
+        whatWeOffer: Array.isArray(whatWeOffer) ? whatWeOffer : [],
+        status: "open",
+      });
       res.json(job);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to create job" });

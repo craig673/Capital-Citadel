@@ -42,7 +42,7 @@ export interface IStorage {
   getApplicationsByJobId(jobId: string): Promise<Application[]>;
   getAllApplications(): Promise<Application[]>;
   updateApplicationStatus(id: string, reviewStatus: string): Promise<Application | undefined>;
-  updateJob(id: string, data: { title?: string; description?: string; requirements?: string }): Promise<Job | undefined>;
+  updateJob(id: string, data: Partial<InsertJob>): Promise<Job | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -261,13 +261,9 @@ export class DrizzleStorage implements IStorage {
     return result[0];
   }
 
-  async updateJob(id: string, data: { title?: string; description?: string; requirements?: string }): Promise<Job | undefined> {
-    const updateData: Partial<{ title: string; description: string; requirements: string }> = {};
-    if (data.title !== undefined) updateData.title = data.title;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.requirements !== undefined) updateData.requirements = data.requirements;
-    if (Object.keys(updateData).length === 0) return await this.getJob(id);
-    const result = await db.update(jobs).set(updateData).where(eq(jobs.id, id)).returning();
+  async updateJob(id: string, data: Partial<InsertJob>): Promise<Job | undefined> {
+    if (Object.keys(data).length === 0) return await this.getJob(id);
+    const result = await db.update(jobs).set(data).where(eq(jobs.id, id)).returning();
     return result[0];
   }
   async deleteJob(id: string): Promise<void> {

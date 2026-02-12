@@ -61,11 +61,20 @@ export default function Approvals() {
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
   const letterFileRef = useRef<HTMLInputElement>(null);
   const fundDocFileRef = useRef<HTMLInputElement>(null);
-  const [jobsData, setJobsData] = useState<{id: string; title: string; description: string; requirements: string; status: string; createdAt: string}[]>([]);
+  const [jobsData, setJobsData] = useState<{id: string; title: string; location: string; employmentType: string; internshipStartDate: string | null; internshipEndDate: string | null; roleDescription: string; responsibilities: string[]; requirements: string[]; whatWeOffer: string[]; status: string; createdAt: string}[]>([]);
   const [jobsLoading, setJobsLoading] = useState(true);
   const [newJobTitle, setNewJobTitle] = useState("");
-  const [newJobDescription, setNewJobDescription] = useState("");
-  const [newJobRequirements, setNewJobRequirements] = useState("");
+  const [newJobLocation, setNewJobLocation] = useState("Remote");
+  const [newJobEmploymentType, setNewJobEmploymentType] = useState("Full Time");
+  const [newJobInternshipStart, setNewJobInternshipStart] = useState("");
+  const [newJobInternshipEnd, setNewJobInternshipEnd] = useState("");
+  const [newJobRoleDescription, setNewJobRoleDescription] = useState("");
+  const [newJobResponsibilities, setNewJobResponsibilities] = useState<string[]>([]);
+  const [newJobRequirementsList, setNewJobRequirementsList] = useState<string[]>([]);
+  const [newJobWhatWeOffer, setNewJobWhatWeOffer] = useState<string[]>([]);
+  const [tempResponsibility, setTempResponsibility] = useState("");
+  const [tempRequirement, setTempRequirement] = useState("");
+  const [tempOffer, setTempOffer] = useState("");
   const [jobCreating, setJobCreating] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [applicants, setApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; reviewStatus: string; submittedAt: string}[]>([]);
@@ -214,7 +223,7 @@ export default function Approvals() {
   };
 
   const handleCreateJob = async () => {
-    if (!newJobTitle.trim() || !newJobDescription.trim() || !newJobRequirements.trim()) return;
+    if (!newJobTitle.trim()) return;
     setJobCreating(true);
     try {
       const response = await fetch("/api/admin/jobs", {
@@ -223,16 +232,31 @@ export default function Approvals() {
         credentials: "include",
         body: JSON.stringify({
           title: newJobTitle.trim(),
-          description: newJobDescription.trim(),
-          requirements: newJobRequirements.trim(),
+          location: newJobLocation,
+          employmentType: newJobEmploymentType,
+          internshipStartDate: newJobEmploymentType === "Internship" ? newJobInternshipStart || null : null,
+          internshipEndDate: newJobEmploymentType === "Internship" ? newJobInternshipEnd || null : null,
+          roleDescription: newJobRoleDescription.trim(),
+          responsibilities: newJobResponsibilities,
+          requirements: newJobRequirementsList,
+          whatWeOffer: newJobWhatWeOffer,
         }),
       });
       if (response.ok) {
         const job = await response.json();
         setJobsData(prev => [job, ...prev]);
         setNewJobTitle("");
-        setNewJobDescription("");
-        setNewJobRequirements("");
+        setNewJobLocation("Remote");
+        setNewJobEmploymentType("Full Time");
+        setNewJobInternshipStart("");
+        setNewJobInternshipEnd("");
+        setNewJobRoleDescription("");
+        setNewJobResponsibilities([]);
+        setNewJobRequirementsList([]);
+        setNewJobWhatWeOffer([]);
+        setTempResponsibility("");
+        setTempRequirement("");
+        setTempOffer("");
         showToast("Job posting created successfully", "success");
       } else {
         const data = await response.json();
@@ -1225,34 +1249,234 @@ export default function Approvals() {
                 </div>
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
-                    About the Role
+                    Location
+                  </label>
+                  <select
+                    value={newJobLocation}
+                    onChange={(e) => setNewJobLocation(e.target.value)}
+                    className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                    data-testid="select-job-location"
+                  >
+                    <option value="Remote">Remote</option>
+                    <option value="New York">New York</option>
+                    <option value="Chicago">Chicago</option>
+                    <option value="San Francisco">San Francisco</option>
+                    <option value="Boston">Boston</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    Employment Type
+                  </label>
+                  <select
+                    value={newJobEmploymentType}
+                    onChange={(e) => setNewJobEmploymentType(e.target.value)}
+                    className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                    data-testid="select-job-employment-type"
+                  >
+                    <option value="Full Time">Full Time</option>
+                    <option value="Part Time">Part Time</option>
+                    <option value="Internship">Internship</option>
+                  </select>
+                </div>
+                {newJobEmploymentType === "Internship" && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                        Internship Start Date
+                      </label>
+                      <input
+                        type="date"
+                        value={newJobInternshipStart}
+                        onChange={(e) => setNewJobInternshipStart(e.target.value)}
+                        className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                        data-testid="input-job-internship-start"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                        Internship End Date
+                      </label>
+                      <input
+                        type="date"
+                        value={newJobInternshipEnd}
+                        onChange={(e) => setNewJobInternshipEnd(e.target.value)}
+                        className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                        data-testid="input-job-internship-end"
+                      />
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    Role Description
                   </label>
                   <textarea
-                    value={newJobDescription}
-                    onChange={(e) => setNewJobDescription(e.target.value)}
-                    placeholder="Describe the role and responsibilities..."
+                    value={newJobRoleDescription}
+                    onChange={(e) => setNewJobRoleDescription(e.target.value)}
+                    placeholder="Describe the role..."
                     rows={4}
                     className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary resize-vertical"
-                    data-testid="input-job-description"
+                    data-testid="input-job-role-description"
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    Responsibilities
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={tempResponsibility}
+                      onChange={(e) => setTempResponsibility(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && tempResponsibility.trim()) {
+                          setNewJobResponsibilities(prev => [...prev, tempResponsibility.trim()]);
+                          setTempResponsibility("");
+                        }
+                      }}
+                      placeholder="Add a responsibility..."
+                      className="flex-1 bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                      data-testid="input-job-responsibility"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (tempResponsibility.trim()) {
+                          setNewJobResponsibilities(prev => [...prev, tempResponsibility.trim()]);
+                          setTempResponsibility("");
+                        }
+                      }}
+                      className="bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                      data-testid="button-add-responsibility"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {newJobResponsibilities.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {newJobResponsibilities.map((item, idx) => (
+                        <span key={idx} className="inline-flex items-center gap-1 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-1 text-sm">
+                          {item}
+                          <button
+                            type="button"
+                            onClick={() => setNewJobResponsibilities(prev => prev.filter((_, i) => i !== idx))}
+                            className="text-secondary hover:text-primary-foreground ml-1"
+                            data-testid={`button-remove-responsibility-${idx}`}
+                          >
+                            <X size={14} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
                     Requirements
                   </label>
-                  <textarea
-                    value={newJobRequirements}
-                    onChange={(e) => setNewJobRequirements(e.target.value)}
-                    placeholder="Enter each requirement on a new line"
-                    rows={4}
-                    className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary resize-vertical"
-                    data-testid="input-job-requirements"
-                  />
-                  <p className="text-primary-foreground/40 text-xs mt-1">Enter each requirement on its own line. These will appear as bullet points on the listing.</p>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={tempRequirement}
+                      onChange={(e) => setTempRequirement(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && tempRequirement.trim()) {
+                          setNewJobRequirementsList(prev => [...prev, tempRequirement.trim()]);
+                          setTempRequirement("");
+                        }
+                      }}
+                      placeholder="Add a requirement..."
+                      className="flex-1 bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                      data-testid="input-job-requirement"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (tempRequirement.trim()) {
+                          setNewJobRequirementsList(prev => [...prev, tempRequirement.trim()]);
+                          setTempRequirement("");
+                        }
+                      }}
+                      className="bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                      data-testid="button-add-requirement"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {newJobRequirementsList.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {newJobRequirementsList.map((item, idx) => (
+                        <span key={idx} className="inline-flex items-center gap-1 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-1 text-sm">
+                          {item}
+                          <button
+                            type="button"
+                            onClick={() => setNewJobRequirementsList(prev => prev.filter((_, i) => i !== idx))}
+                            className="text-secondary hover:text-primary-foreground ml-1"
+                            data-testid={`button-remove-requirement-${idx}`}
+                          >
+                            <X size={14} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    What We Offer
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={tempOffer}
+                      onChange={(e) => setTempOffer(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && tempOffer.trim()) {
+                          setNewJobWhatWeOffer(prev => [...prev, tempOffer.trim()]);
+                          setTempOffer("");
+                        }
+                      }}
+                      placeholder="Add a benefit..."
+                      className="flex-1 bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                      data-testid="input-job-offer"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (tempOffer.trim()) {
+                          setNewJobWhatWeOffer(prev => [...prev, tempOffer.trim()]);
+                          setTempOffer("");
+                        }
+                      }}
+                      className="bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                      data-testid="button-add-offer"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  {newJobWhatWeOffer.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {newJobWhatWeOffer.map((item, idx) => (
+                        <span key={idx} className="inline-flex items-center gap-1 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-1 text-sm">
+                          {item}
+                          <button
+                            type="button"
+                            onClick={() => setNewJobWhatWeOffer(prev => prev.filter((_, i) => i !== idx))}
+                            className="text-secondary hover:text-primary-foreground ml-1"
+                            data-testid={`button-remove-offer-${idx}`}
+                          >
+                            <X size={14} />
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <button
                   onClick={handleCreateJob}
-                  disabled={!newJobTitle.trim() || !newJobDescription.trim() || !newJobRequirements.trim() || jobCreating}
+                  disabled={!newJobTitle.trim() || jobCreating}
                   className="w-full inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
                   data-testid="button-create-job"
                 >
