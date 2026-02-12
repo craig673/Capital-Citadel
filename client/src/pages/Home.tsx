@@ -26,7 +26,7 @@ export default function Home() {
               </div>
               <div>
                 <h2 className="text-3xl md:text-4xl font-display text-primary mb-6">
-                  Optimized by <span className="text-secondary">Algorithmic Scoring</span>
+                  Optimized by<br /><span className="text-secondary">Algorithmic Scoring</span>
                 </h2>
                 <p className="text-muted-foreground text-lg leading-relaxed">
                   We apply our proprietary Revolution Factor and WiNR Ratio algorithms to every opportunity, providing a disciplined quantitative overlay to our fundamental research. This data-driven approach dictates our active portfolio construction, allowing us to build positions strategically in tranches to capitalize on market dislocations.
