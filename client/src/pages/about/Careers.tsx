@@ -138,7 +138,7 @@ export default function Careers() {
             transition={{ ...fadeUp.transition, delay: 0.1 }}
             data-testid="text-careers-title"
           >
-            Join the Revolution
+            Join The Revolution
           </motion.h1>
           <motion.div
             className="mt-8 space-y-5 text-white/75 text-lg md:text-xl leading-relaxed max-w-3xl mx-auto"
