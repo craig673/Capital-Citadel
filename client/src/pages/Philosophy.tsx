@@ -11,7 +11,7 @@ function ConvergenceSVG() {
       preserveAspectRatio="xMidYMid slice"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ opacity: 0.10 }}
+      style={{ opacity: 0.12 }}
     >
       <defs>
         <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
@@ -274,7 +274,7 @@ export default function Philosophy() {
         </section>
 
         {/* AIRS */}
-        <section className="py-20 border-t border-border">
+        <section className="py-20 border-t border-border overflow-visible">
           <div className="max-w-7xl mx-auto px-6">
             <div className="max-w-5xl">
               <motion.div
@@ -301,11 +301,11 @@ export default function Philosophy() {
                 society.
               </motion.p>
 
-              <div className="relative">
-                <div className="absolute inset-0 -z-10 -m-8 hidden lg:block" aria-hidden="true">
+              <div className="relative" style={{ isolation: "isolate" }}>
+                <div className="absolute -inset-12 z-0 hidden lg:block pointer-events-none" aria-hidden="true">
                   <ConvergenceSVG />
                 </div>
-              <div className="grid lg:grid-cols-3 gap-10">
+              <div className="relative z-10 grid lg:grid-cols-3 gap-10">
                 <AIRSCard
                   kicker="1. The AI Revolution"
                   title="The Cognitive Shift"
