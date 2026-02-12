@@ -125,8 +125,8 @@ function ScrollytellingSection() {
           </div>
         ))}
 
-        <div className="relative z-10 h-full flex items-center">
-          <div className="max-w-4xl mx-auto px-6 w-full">
+        <div className="relative z-10 h-full flex items-center justify-center">
+          <div className="w-full flex items-center justify-center px-6" style={{ maxWidth: "65%" }}>
             {sections.map((section, i) => (
               <motion.div
                 key={section.id}
@@ -136,9 +136,10 @@ function ScrollytellingSection() {
                   y: i === activeIndex ? 0 : 40,
                 }}
                 transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
-                className="absolute max-w-4xl px-6"
+                className="absolute text-center"
                 style={{
                   pointerEvents: i === activeIndex ? "auto" : "none",
+                  maxWidth: "65%",
                 }}
               >
                 <div className="text-secondary font-bold uppercase tracking-widest mb-5 text-sm">
@@ -148,10 +149,10 @@ function ScrollytellingSection() {
                   {section.title}
                 </h2>
                 <div
-                  className="max-w-2xl rounded-sm p-6"
+                  className="inline-block rounded-sm p-8"
                   style={{ backgroundColor: "rgba(0, 0, 0, 0.3)", backdropFilter: "blur(12px)" }}
                 >
-                  <p className="text-lg leading-relaxed" style={{ color: "rgba(255, 255, 255, 0.8)" }}>
+                  <p className="text-xl leading-relaxed" style={{ color: "rgba(255, 255, 255, 0.8)" }}>
                     {section.body}
                   </p>
                 </div>
