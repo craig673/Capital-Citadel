@@ -3,20 +3,6 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
 
-function ConvergenceThread() {
-  return (
-    <div
-      className="absolute left-0 right-0 pointer-events-none"
-      style={{
-        top: "50%",
-        transform: "translateY(-50%)",
-        height: "1px",
-        background: "linear-gradient(to right, transparent 0%, #C5A059 15%, #C5A059 85%, transparent 100%)",
-      }}
-    />
-  );
-}
-
 const revealVariants = {
   hidden: { opacity: 0, y: 40 },
   visible: (i: number) => ({
@@ -238,9 +224,7 @@ export default function Philosophy() {
                 society.
               </motion.p>
 
-              <div className="relative overflow-visible">
-                <ConvergenceThread />
-              <div className="relative grid lg:grid-cols-3 gap-10">
+              <div className="grid lg:grid-cols-3 gap-10">
                 <AIRSCard
                   kicker="1. The AI Revolution"
                   title="The Cognitive Shift"
@@ -267,7 +251,6 @@ export default function Philosophy() {
                   testId="card-airs-space"
                   index={2}
                 />
-              </div>
               </div>
             </div>
           </div>
