@@ -3,17 +3,15 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
 
-function ConvergenceGlow() {
+function ConvergenceThread() {
   return (
     <div
-      className="absolute pointer-events-none"
+      className="absolute left-0 right-0 pointer-events-none"
       style={{
         top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: "140%",
-        height: "180%",
-        background: "radial-gradient(ellipse at center, rgba(197, 160, 89, 0.18) 0%, rgba(197, 160, 89, 0.10) 35%, rgba(197, 160, 89, 0.04) 55%, transparent 75%)",
+        transform: "translateY(-50%)",
+        height: "1px",
+        background: "linear-gradient(to right, transparent 0%, #C5A059 15%, #C5A059 85%, transparent 100%)",
       }}
     />
   );
@@ -241,7 +239,7 @@ export default function Philosophy() {
               </motion.p>
 
               <div className="relative overflow-visible">
-                <ConvergenceGlow />
+                <ConvergenceThread />
               <div className="relative grid lg:grid-cols-3 gap-10">
                 <AIRSCard
                   kicker="1. The AI Revolution"
