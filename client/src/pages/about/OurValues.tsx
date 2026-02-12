@@ -48,6 +48,9 @@ function PillarCard({
   index: number;
 }) {
   const [hovered, setHovered] = useState(false);
+  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
+  const [glare, setGlare] = useState({ x: 50, y: 50 });
+  const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleMouseEnter = () => {
@@ -58,57 +61,89 @@ function PillarCard({
   const handleMouseLeave = () => {
     setHovered(false);
     videoRef.current?.pause();
+    setTilt({ rotateX: 0, rotateY: 0 });
+    setGlare({ x: 50, y: 50 });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    const rotateY = (x - 0.5) * 20;
+    const rotateX = (0.5 - y) * 20;
+    setTilt({ rotateX, rotateY });
+    setGlare({ x: x * 100, y: y * 100 });
   };
 
   return (
-    <motion.div
-      variants={revealVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-60px" }}
-      custom={index}
-      className="relative overflow-hidden border border-border p-8 transition-transform duration-300 ease-out cursor-default"
-      style={{ transform: hovered ? "scale(1.05)" : "scale(1)" }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      data-testid={`card-values-pillar-${pillar.number}`}
-    >
-      <div
-        className="absolute inset-0 transition-opacity duration-500"
-        style={{ opacity: hovered ? 1 : 0 }}
+    <div style={{ perspective: "800px" }}>
+      <motion.div
+        ref={cardRef}
+        variants={revealVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-60px" }}
+        custom={index}
+        className="relative overflow-hidden border border-border p-8 cursor-default"
+        style={{
+          transform: `scale(${hovered ? 1.05 : 1}) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
+          transition: "transform 0.15s ease-out, box-shadow 0.3s ease-out",
+          boxShadow: hovered
+            ? `0 ${20 + Math.abs(tilt.rotateX)}px ${40 + Math.abs(tilt.rotateX)}px rgba(0,0,0,0.25)`
+            : "0 1px 3px rgba(0,0,0,0.08)",
+          transformStyle: "preserve-3d",
+        }}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onMouseMove={handleMouseMove}
+        data-testid={`card-values-pillar-${pillar.number}`}
       >
-        <video
-          ref={videoRef}
-          src={pillar.videoSrc}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-primary/80" />
-      </div>
-
-      <div className="relative z-10">
-        <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
-          {pillar.number} — {pillar.title}
+        <div
+          className="absolute inset-0 transition-opacity duration-500"
+          style={{ opacity: hovered ? 1 : 0 }}
+        >
+          <video
+            ref={videoRef}
+            src={pillar.videoSrc}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-primary/80" />
         </div>
-        <h3
-          className="font-display text-xl mb-2 transition-colors duration-300"
-          style={{ color: hovered ? "#ffffff" : "" }}
-        >
-          {!hovered && <span className="text-primary">{pillar.subtitle}</span>}
-          {hovered && <span>{pillar.subtitle}</span>}
-        </h3>
-        <p
-          className="leading-relaxed transition-colors duration-300"
-          style={{ color: hovered ? "rgba(255,255,255,0.85)" : "" }}
-        >
-          {!hovered && <span className="text-muted-foreground">{pillar.body}</span>}
-          {hovered && <span>{pillar.body}</span>}
-        </p>
-      </div>
-    </motion.div>
+
+        <div
+          className="absolute inset-0 pointer-events-none transition-opacity duration-300"
+          style={{
+            opacity: hovered ? 0.15 : 0,
+            background: `radial-gradient(circle at ${glare.x}% ${glare.y}%, rgba(255,255,255,0.8) 0%, transparent 60%)`,
+          }}
+        />
+
+        <div className="relative z-10">
+          <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
+            {pillar.number} — {pillar.title}
+          </div>
+          <h3
+            className="font-display text-xl mb-2 transition-colors duration-300"
+            style={{ color: hovered ? "#ffffff" : "" }}
+          >
+            {!hovered && <span className="text-primary">{pillar.subtitle}</span>}
+            {hovered && <span>{pillar.subtitle}</span>}
+          </h3>
+          <p
+            className="leading-relaxed transition-colors duration-300"
+            style={{ color: hovered ? "rgba(255,255,255,0.85)" : "" }}
+          >
+            {!hovered && <span className="text-muted-foreground">{pillar.body}</span>}
+            {hovered && <span>{pillar.body}</span>}
+          </p>
+        </div>
+      </motion.div>
+    </div>
   );
 }
 
