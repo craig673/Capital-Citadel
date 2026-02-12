@@ -150,7 +150,15 @@ export default function Philosophy() {
               >
                 We do not chase trends.
                 <br />
-                We map the future.
+                <span
+                  className="inline-block bg-clip-text text-transparent animate-shimmer"
+                  style={{
+                    backgroundImage: "linear-gradient(110deg, #C5A059 0%, #E8D5A3 30%, #C5A059 50%, #A8843C 70%, #C5A059 100%)",
+                    backgroundSize: "300% 100%",
+                  }}
+                >
+                  We map the future.
+                </span>
               </motion.h1>
 
               <motion.p
