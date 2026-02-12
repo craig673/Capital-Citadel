@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, boolean, integer, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, boolean, integer, timestamp, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -65,8 +65,14 @@ export type PublishedDocument = typeof publishedDocuments.$inferSelect;
 export const jobs = pgTable("jobs", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
-  description: text("description").notNull(),
-  requirements: text("requirements").notNull(),
+  location: text("location").notNull().default("Remote"),
+  employmentType: text("employment_type").notNull().default("Full Time"),
+  internshipStartDate: text("internship_start_date"),
+  internshipEndDate: text("internship_end_date"),
+  roleDescription: text("role_description").notNull().default(""),
+  responsibilities: json("responsibilities").$type<string[]>().notNull().default([]),
+  requirements: json("requirements").$type<string[]>().notNull().default([]),
+  whatWeOffer: json("what_we_offer").$type<string[]>().notNull().default([]),
   status: text("status").notNull().default("open"),
   createdAt: timestamp("created_at").notNull().default(sql`now()`),
 });
