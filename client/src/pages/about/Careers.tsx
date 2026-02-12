@@ -307,6 +307,11 @@ export default function Careers() {
             <h2 className="font-display text-3xl md:text-4xl text-white" data-testid="text-application-title">
               {selectedJob ? `Apply for ${selectedJob.title}` : "Send Us Your Resume"}
             </h2>
+            {!selectedJob && (
+              <p className="text-center text-gray-400 max-w-2xl mx-auto mb-8 mt-4 leading-relaxed">
+                Don't see the specific role you're looking for? We are always searching for exceptional talent to join us in navigating the AIRS Revolution. If you have the conviction and curiosity to contribute to our long-term mission, please submit your resume and a brief note describing how you can add value to the team.
+              </p>
+            )}
             {selectedJob && (
               <button
                 type="button"
