@@ -92,12 +92,16 @@ export const applications = pgTable("applications", {
   jobId: varchar("job_id").references(() => jobs.id),
   resumePaths: text("resume_paths"),
   reviewStatus: text("review_status").notNull().default("new"),
+  archived: boolean("archived").notNull().default(false),
   submittedAt: timestamp("submitted_at").notNull().default(sql`now()`),
+  updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
 });
 
 export const insertApplicationSchema = createInsertSchema(applications).omit({
   id: true,
+  archived: true,
   submittedAt: true,
+  updatedAt: true,
 });
 
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;
