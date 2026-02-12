@@ -10,30 +10,28 @@ function ParallaxImage({
   src,
   alt,
   testId,
-  className = "",
 }: {
   src: string;
   alt: string;
   testId: string;
-  className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
 
   return (
-    <div ref={ref} className={`overflow-hidden ${className}`}>
+    <div ref={ref} className="relative overflow-hidden">
       <motion.img
         src={src}
         alt={alt}
-        className="w-full h-auto"
+        className="w-full h-auto scale-[1.15]"
         style={{ y }}
         data-testid={testId}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
     </div>
   );
 }
@@ -41,25 +39,18 @@ function ParallaxImage({
 function GoldShimmerLine() {
   return (
     <motion.div
-      initial={{ backgroundPosition: "-200% 0" }}
-      whileInView={{ backgroundPosition: "200% 0" }}
+      initial={{ backgroundPosition: "200% 0" }}
+      whileInView={{ backgroundPosition: "-200% 0" }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 1.5, ease: "easeInOut" }}
-      className="h-[2px] w-20 mt-4"
+      transition={{ duration: 1.8, ease: "easeInOut" }}
+      className="h-[2px] w-20 mt-5 mb-1"
       style={{
-        backgroundImage: "linear-gradient(110deg, #C5A059 0%, #E8D5A3 40%, #ffffff 50%, #E8D5A3 60%, #C5A059 100%)",
+        backgroundImage: "linear-gradient(110deg, #C5A059 0%, #E8D5A3 35%, #ffffff 50%, #E8D5A3 65%, #C5A059 100%)",
         backgroundSize: "200% 100%",
       }}
     />
   );
 }
-
-const glassStyle = {
-  backgroundColor: "rgba(255, 255, 255, 0.55)",
-  backdropFilter: "blur(10px)",
-  WebkitBackdropFilter: "blur(10px)",
-  border: "1px solid rgba(255, 255, 255, 0.25)",
-};
 
 export default function Leadership() {
   return (
@@ -81,11 +72,10 @@ export default function Leadership() {
                 About
               </div>
               <h1
-                className="font-display text-4xl md:text-6xl leading-tight inline-block bg-clip-text text-transparent"
+                className="font-display text-4xl md:text-6xl leading-tight inline-block bg-clip-text text-transparent animate-shimmer"
                 style={{
                   backgroundImage: "linear-gradient(110deg, #C5A059 0%, #E8D5A3 30%, #C5A059 50%, #A8843C 70%, #C5A059 100%)",
                   backgroundSize: "300% 100%",
-                  animation: "shimmer 6s ease-in-out infinite",
                 }}
                 data-testid="text-leadership-hero-title"
               >
@@ -93,7 +83,7 @@ export default function Leadership() {
               </h1>
               <GoldShimmerLine />
               <p
-                className="mt-8 text-lg text-muted-foreground leading-relaxed"
+                className="mt-6 text-lg text-muted-foreground leading-relaxed"
                 data-testid="text-leadership-hero-subtext"
               >
                 Experience is a risk discipline. We lead with clarity, accountability, and a
@@ -107,7 +97,7 @@ export default function Leadership() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid lg:grid-cols-12 gap-12 items-start" data-testid="grid-leadership-profile">
               <div className="lg:col-span-5">
-                <div className="mb-4">
+                <div className="mb-6">
                   <div className="text-secondary text-xs font-bold uppercase tracking-widest" data-testid="text-leadership-cody-role">
                     Portfolio Manager
                   </div>
@@ -117,48 +107,54 @@ export default function Leadership() {
                   <GoldShimmerLine />
                 </div>
 
-                <div className="relative" data-testid="card-leadership-cody">
+                <div data-testid="card-leadership-cody">
                   <ParallaxImage
                     src={codyOnCnbc}
                     alt="Cody Willard on CNBC"
                     testId="img-leadership-cody-cnbc"
-                    className="relative"
                   />
-
-                  <div className="p-8" style={glassStyle} data-testid="card-leadership-cody-stats">
-                    <div className="grid grid-cols-2 gap-6" data-testid="grid-leadership-cody-stats">
-                      <div>
-                        <div className="text-xs font-bold uppercase tracking-widest text-secondary" data-testid="text-leadership-cody-statlabel-0">
-                          Experience
-                        </div>
-                        <div className="mt-2 font-display text-2xl text-primary" data-testid="text-leadership-cody-statvalue-0">
-                          30+ Years
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold uppercase tracking-widest text-secondary" data-testid="text-leadership-cody-statlabel-1">
-                          Focus
-                        </div>
-                        <div className="mt-2 font-display text-2xl text-primary" data-testid="text-leadership-cody-statvalue-1">
-                          Long-Horizon
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-8 space-y-4 text-muted-foreground leading-relaxed" data-testid="text-leadership-cody-summary">
-                      <p>
-                        Cody Willard is the Portfolio Manager of 10,000 Days Capital.
-                        His career began on Wall Street in 1996 and has spanned hedge fund
-                        management, tech/finance analysis, and media.
-                      </p>
-                      <p>
-                        Cody is also the investment advisor to the USVIP Fund, which was seeded by a UAE Sovereign Wealth Fund in 2025.
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
-                <div className="mt-10 bg-primary text-primary-foreground border border-secondary/20 p-8" data-testid="card-leadership-note">
+                <motion.div
+                  className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 shadow-2xl mt-6"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.7 }}
+                  data-testid="card-leadership-cody-stats"
+                >
+                  <div className="grid grid-cols-2 gap-6" data-testid="grid-leadership-cody-stats">
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-widest text-secondary" data-testid="text-leadership-cody-statlabel-0">
+                        Experience
+                      </div>
+                      <div className="mt-2 font-display text-2xl text-primary" data-testid="text-leadership-cody-statvalue-0">
+                        30+ Years
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs font-bold uppercase tracking-widest text-secondary" data-testid="text-leadership-cody-statlabel-1">
+                        Focus
+                      </div>
+                      <div className="mt-2 font-display text-2xl text-primary" data-testid="text-leadership-cody-statvalue-1">
+                        Long-Horizon
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-8 space-y-4 text-muted-foreground leading-relaxed" data-testid="text-leadership-cody-summary">
+                    <p>
+                      Cody Willard is the Portfolio Manager of 10,000 Days Capital.
+                      His career began on Wall Street in 1996 and has spanned hedge fund
+                      management, tech/finance analysis, and media.
+                    </p>
+                    <p>
+                      Cody is also the investment advisor to the USVIP Fund, which was seeded by a UAE Sovereign Wealth Fund in 2025.
+                    </p>
+                  </div>
+                </motion.div>
+
+                <div className="mt-10 bg-primary text-primary-foreground border border-secondary/20 p-8 rounded-xl" data-testid="card-leadership-note">
                   <div className="text-secondary text-xs font-bold uppercase tracking-widest" data-testid="text-leadership-note-kicker">
                     Partnership
                   </div>
@@ -170,7 +166,14 @@ export default function Leadership() {
               </div>
 
               <div className="lg:col-span-7">
-                <div className="p-10" style={glassStyle} data-testid="card-leadership-bio">
+                <motion.div
+                  className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-10 shadow-2xl"
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.7, delay: 0.1 }}
+                  data-testid="card-leadership-bio"
+                >
                   <div className="text-secondary font-bold uppercase tracking-widest text-sm" data-testid="text-leadership-bio-kicker">
                     Background
                   </div>
@@ -197,7 +200,7 @@ export default function Leadership() {
                     ))}
                   </ul>
 
-                  <div className="mt-12 border-t border-border/50 pt-10" data-testid="section-leadership-personal">
+                  <div className="mt-12 border-t border-border/30 pt-10" data-testid="section-leadership-personal">
                     <div className="grid md:grid-cols-12 gap-8 items-start">
                       <div className="md:col-span-5">
                         <div className="text-secondary font-bold uppercase tracking-widest text-sm" data-testid="text-leadership-personal-kicker">
@@ -217,12 +220,11 @@ export default function Leadership() {
                           src={codyFamily}
                           alt="Cody Willard with family"
                           testId="img-leadership-cody-family"
-                          className="relative"
                         />
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
           </div>
