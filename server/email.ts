@@ -245,6 +245,55 @@ export async function sendApplicationConfirmationEmail(
   }
 }
 
+export async function sendRejectionEmail(
+  applicant: { name: string; email: string }
+) {
+  try {
+    await transporter.sendMail({
+      from: `"10,000 Days Capital (No Reply)" <${process.env.SMTP_USER}>`,
+      to: applicant.email,
+      subject: "Update regarding your application to 10,000 Days Capital",
+      html: `
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #001F3F; color: #ffffff; border: 1px solid #C5A059;">
+          <div style="padding: 32px 40px 24px; text-align: center; border-bottom: 2px solid #C5A059;">
+            <h1 style="font-size: 22px; font-weight: 700; letter-spacing: 2px; margin: 0; color: #C5A059;">10,000 DAYS CAPITAL</h1>
+            <p style="font-size: 11px; letter-spacing: 3px; color: #C5A059; margin: 6px 0 0; text-transform: uppercase;">Management, LP</p>
+          </div>
+          <div style="padding: 36px 40px;">
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              Dear ${applicant.name},
+            </p>
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              Thank you for giving us the opportunity to review your background and interest in 10,000 Days Capital.
+            </p>
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              We have reviewed your qualifications in detail. After careful consideration, we have decided to move forward with other candidates who more closely align with our current specific needs for this role.
+            </p>
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              The AIRS Revolution&trade; attracts remarkable talent, and this decision was difficult given the high caliber of applications we received.
+            </p>
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              Please note that due to our recruitment policy and the volume of applications, we are unable to provide specific feedback on individual applications or respond to follow-up inquiries regarding this decision.
+            </p>
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 4px;">
+              We wish you the best in your future endeavors.
+            </p>
+          </div>
+          <div style="padding: 24px 40px; border-top: 1px solid rgba(197,160,89,0.3); text-align: center;">
+            <p style="font-size: 13px; color: #999; margin: 0; font-style: italic;">Regards,</p>
+            <p style="font-size: 12px; color: #666; margin: 12px 0 0; letter-spacing: 1px;">
+              10,000 Days Capital Management, LP
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    console.log(`[email] Rejection email sent to ${applicant.email}`);
+  } catch (error) {
+    console.error("[email] Failed to send rejection email:", error);
+  }
+}
+
 export async function sendTestEmail(): Promise<{ success: boolean; message: string }> {
   try {
     await transporter.sendMail({

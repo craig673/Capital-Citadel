@@ -10,7 +10,7 @@ import multer from "multer";
 import { randomUUID } from "crypto";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
-import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail, sendApplicationConfirmationEmail } from "./email";
+import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail, sendApplicationConfirmationEmail, sendRejectionEmail } from "./email";
 import { objectStorageClient } from "./replit_integrations/object_storage";
 
 function getPrivateObjectDir(): string {
@@ -796,6 +796,13 @@ export async function registerRoutes(
       }
       const updated = await storage.updateApplicationStatus(req.params.id as string, reviewStatus);
       if (!updated) return res.status(404).json({ error: "Application not found" });
+
+      if (reviewStatus === "rejected" && updated.name && updated.email) {
+        sendRejectionEmail({ name: updated.name, email: updated.email }).catch((err) =>
+          console.error("[applications] Rejection email failed (non-blocking):", err)
+        );
+      }
+
       res.json(updated);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to update application status" });

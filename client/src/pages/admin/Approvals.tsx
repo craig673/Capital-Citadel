@@ -85,6 +85,7 @@ export default function Approvals() {
   const [generalApplicantsLoading, setGeneralApplicantsLoading] = useState(true);
   const [togglingJobId, setTogglingJobId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [rejectConfirm, setRejectConfirm] = useState<{ appId: string; isGeneral: boolean } | null>(null);
 
   const sortedFilteredUsers = useMemo(() => {
     let filtered = approvedUsers;
@@ -1843,7 +1844,7 @@ export default function Approvals() {
                                         </button>
                                       )}
                                       <button
-                                        onClick={() => handleUpdateApplicantStatus(app.id, "rejected", false)}
+                                        onClick={() => setRejectConfirm({ appId: app.id, isGeneral: false })}
                                         className="inline-flex items-center gap-1 border border-red-500 text-red-500 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors"
                                         data-testid={`button-reject-${idx}`}
                                       >
@@ -2044,7 +2045,7 @@ export default function Approvals() {
                                       </button>
                                     )}
                                     <button
-                                      onClick={() => handleUpdateApplicantStatus(app.id, "rejected", true)}
+                                      onClick={() => setRejectConfirm({ appId: app.id, isGeneral: true })}
                                       className="inline-flex items-center gap-1 border border-red-500 text-red-500 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors"
                                       data-testid={`button-general-reject-${idx}`}
                                     >
@@ -2154,6 +2155,52 @@ export default function Approvals() {
           </section>
         </div>
       </main>
+
+      {rejectConfirm && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-testid="modal-reject-overlay">
+          <div className="bg-[#001F3F] max-w-md w-full shadow-2xl border border-[#C5A059]/40" data-testid="modal-reject">
+            <div className="p-6 border-b border-[#C5A059]/30">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-xl text-[#C5A059] tracking-wide">Confirm Rejection</h3>
+                <button
+                  onClick={() => setRejectConfirm(null)}
+                  className="text-[#C5A059]/60 hover:text-[#C5A059] transition-colors"
+                  data-testid="button-reject-modal-close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-white/80 mb-4 leading-relaxed">
+                This will reject the applicant and automatically send them a rejection email. This action cannot be undone.
+              </p>
+              <p className="text-xs text-white/50 mb-6 italic">
+                The rejection email follows our standard "polite no" template with no further contact provisions.
+              </p>
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setRejectConfirm(null)}
+                  className="px-5 py-2 text-sm font-semibold uppercase tracking-widest border border-[#C5A059]/40 text-[#C5A059]/80 hover:bg-[#C5A059]/10 transition-colors"
+                  data-testid="button-reject-modal-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    handleUpdateApplicantStatus(rejectConfirm.appId, "rejected", rejectConfirm.isGeneral);
+                    setRejectConfirm(null);
+                  }}
+                  className="px-5 py-2 text-sm font-semibold uppercase tracking-widest bg-red-600 text-white hover:bg-red-700 transition-colors"
+                  data-testid="button-reject-modal-confirm"
+                >
+                  Reject &amp; Send Email
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {banModalOpen && banTarget && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" data-testid="modal-ban-overlay">
