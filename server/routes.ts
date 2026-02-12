@@ -45,6 +45,9 @@ async function uploadToObjectStorage(buffer: Buffer, folder: string, originalNam
 }
 
 async function downloadFromObjectStorage(objectPath: string, res: Response, downloadName: string) {
+  if (!objectPath.includes("/")) {
+    return res.status(404).json({ error: "File not found — it was uploaded before cloud storage migration and needs to be re-uploaded" });
+  }
   const { bucketName, objectName } = parseObjectPath(objectPath);
   const bucket = objectStorageClient.bucket(bucketName);
   const file = bucket.file(objectName);
@@ -71,6 +74,9 @@ async function downloadFromObjectStorage(objectPath: string, res: Response, down
 }
 
 async function deleteFromObjectStorage(objectPath: string) {
+  if (!objectPath.includes("/")) {
+    return;
+  }
   const { bucketName, objectName } = parseObjectPath(objectPath);
   const bucket = objectStorageClient.bucket(bucketName);
   const file = bucket.file(objectName);
