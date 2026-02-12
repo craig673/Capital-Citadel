@@ -18,18 +18,18 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-16 mb-16">
               <div>
                 <h2 className="text-3xl md:text-4xl font-display text-primary mb-6">
-                  Driven by <span className="text-secondary">Culture</span>
+                  Grounded in <span className="text-secondary">Deep Fundamental Analysis</span>
                 </h2>
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  10,000 Days Capital is built on a foundation of unwavering dedication and collaborative excellence. We foster an environment where integrity, discipline, and long-term thinking are paramount to our shared success.
+                  We go beyond surface-level metrics by identifying non-commoditized tech revolutions at their market inflection points and stress-testing every potential investment against a rigorous core set of questions. Our team builds detailed, line-by-line financial models that project out as far as 15 years to fully understand long-term value creation.
                 </p>
               </div>
               <div>
                 <h2 className="text-3xl md:text-4xl font-display text-primary mb-6">
-                  Powered by <span className="text-secondary">Work Ethic</span>
+                  Optimized by <span className="text-secondary">Algorithmic Scoring</span>
                 </h2>
                 <p className="text-muted-foreground text-lg leading-relaxed">
-                  Our team is defined by relentless effort and intellectual rigor. We believe that sustained achievement is the result of continuous learning, deep focus, and a commitment to outworking the challenge.
+                  We apply our proprietary Revolution Factor and WiNR Ratio algorithms to every opportunity, providing a disciplined quantitative overlay to our fundamental research. This data-driven approach dictates our active portfolio construction, allowing us to build positions strategically in tranches to capitalize on market dislocations.
                 </p>
               </div>
             </div>
