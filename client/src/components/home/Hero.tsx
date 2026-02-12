@@ -33,7 +33,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
-          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-medium tracking-tight text-white mb-6 drop-shadow-2xl max-w-5xl mx-auto leading-tight">
+          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight text-white mb-6 drop-shadow-2xl max-w-5xl mx-auto leading-tight">
             The Engine of Prosperity is <br />
             <span className="text-white/90 font-light italic">Driven by <span className="font-bold text-secondary">Tech Revolutions</span></span>
           </h1>
