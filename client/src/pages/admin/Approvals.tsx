@@ -86,6 +86,7 @@ export default function Approvals() {
   const [togglingJobId, setTogglingJobId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [rejectConfirm, setRejectConfirm] = useState<{ appId: string; isGeneral: boolean } | null>(null);
+  const [viewingApplicant, setViewingApplicant] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; reviewStatus: string; archived: boolean; submittedAt: string} | null>(null);
 
   const sortedFilteredUsers = useMemo(() => {
     let filtered = approvedUsers;
@@ -393,6 +394,28 @@ export default function Approvals() {
       }
     } catch (err) {
       showToast("Failed to archive application", "error");
+    }
+  };
+
+  const handleUnarchiveApplication = async (appId: string, isGeneral: boolean) => {
+    try {
+      const response = await fetch(`/api/admin/applications/${appId}/unarchive`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      if (response.ok) {
+        if (isGeneral) {
+          setGeneralApplicants(prev => prev.map(a => a.id === appId ? { ...a, archived: false } : a));
+        } else {
+          setApplicants(prev => prev.map(a => a.id === appId ? { ...a, archived: false } : a));
+        }
+        showToast("Application restored to rejected list", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to restore", "error");
+      }
+    } catch (err) {
+      showToast("Failed to restore application", "error");
     }
   };
 
@@ -1977,28 +2000,77 @@ export default function Approvals() {
                     )}
 
                     {applicants.filter(a => a.archived).length > 0 && (
-                      <details className="mt-6 opacity-40" data-testid="section-archived-job-applicants">
-                        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-primary-foreground/30 hover:text-primary-foreground/50 transition-colors flex items-center gap-2 select-none">
+                      <details className="mt-6" data-testid="section-archived-job-applicants">
+                        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-slate-400 hover:text-slate-300 transition-colors flex items-center gap-2 select-none">
                           <ChevronDown size={12} />
                           Archived History ({applicants.filter(a => a.archived).length})
                         </summary>
                         <div className="overflow-x-auto mt-3">
                           <table className="w-full" data-testid="table-archived-job-applicants">
                             <thead>
-                              <tr className="border-b border-primary-foreground/10">
-                                <th className="text-left text-xs font-bold uppercase tracking-widest text-primary-foreground/20 py-2 pr-4">Name</th>
-                                <th className="text-left text-xs font-bold uppercase tracking-widest text-primary-foreground/20 py-2 pr-4">Email</th>
-                                <th className="text-left text-xs font-bold uppercase tracking-widest text-primary-foreground/20 py-2 pr-4">Date Applied</th>
+                              <tr className="border-b border-slate-600/30">
+                                <th className="text-left text-xs font-bold uppercase tracking-widest text-slate-500 py-2 pr-4">Name</th>
+                                <th className="text-left text-xs font-bold uppercase tracking-widest text-slate-500 py-2 pr-4">Email</th>
+                                <th className="text-left text-xs font-bold uppercase tracking-widest text-slate-500 py-2 pr-4">Date Applied</th>
+                                <th className="text-left text-xs font-bold uppercase tracking-widest text-slate-500 py-2 pr-4">Resume</th>
+                                <th className="text-right text-xs font-bold uppercase tracking-widest text-slate-500 py-2">Actions</th>
                               </tr>
                             </thead>
                             <tbody>
-                              {applicants.filter(a => a.archived).map((app, idx) => (
-                                <tr key={app.id} className="border-b border-primary-foreground/5" data-testid={`archived-job-applicant-row-${idx}`}>
-                                  <td className="py-2 pr-4 text-xs text-primary-foreground/30">{app.name}</td>
-                                  <td className="py-2 pr-4 text-xs text-primary-foreground/20">{app.email}</td>
-                                  <td className="py-2 pr-4 text-xs text-primary-foreground/20">{formatDate(app.submittedAt)}</td>
-                                </tr>
-                              ))}
+                              {applicants.filter(a => a.archived).map((app, idx) => {
+                                let resumeFiles: {path: string; name: string}[] = [];
+                                try {
+                                  if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
+                                } catch {}
+                                return (
+                                  <tr key={app.id} className="border-b border-slate-700/20" data-testid={`archived-job-applicant-row-${idx}`}>
+                                    <td className="py-3 pr-4 text-sm text-slate-400">{app.name}</td>
+                                    <td className="py-3 pr-4 text-sm text-slate-500">{app.email}</td>
+                                    <td className="py-3 pr-4 text-sm text-slate-500">{formatDate(app.submittedAt)}</td>
+                                    <td className="py-3 pr-4 text-sm">
+                                      {resumeFiles.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2">
+                                          {resumeFiles.map((file, fileIdx) => (
+                                            <a
+                                              key={fileIdx}
+                                              href={`/api/admin/applications/${app.id}/resume/${fileIdx}`}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="inline-flex items-center gap-1 border border-slate-600/30 text-slate-500 px-2 py-1 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                              data-testid={`link-archived-job-resume-${idx}-${fileIdx}`}
+                                            >
+                                              <Download size={10} />
+                                              {file.name}
+                                            </a>
+                                          ))}
+                                        </div>
+                                      ) : (
+                                        <span className="text-slate-600 text-xs">—</span>
+                                      )}
+                                    </td>
+                                    <td className="py-3 text-right">
+                                      <div className="flex items-center justify-end gap-2">
+                                        <button
+                                          onClick={() => setViewingApplicant(app)}
+                                          className="inline-flex items-center gap-1 border border-slate-600/30 text-slate-400 px-2 py-1 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                          data-testid={`button-archived-job-view-${idx}`}
+                                        >
+                                          <Eye size={10} />
+                                          View
+                                        </button>
+                                        <button
+                                          onClick={() => handleUnarchiveApplication(app.id, false)}
+                                          className="inline-flex items-center gap-1 border border-slate-600/30 text-slate-400 px-2 py-1 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                          data-testid={`button-archived-job-restore-${idx}`}
+                                        >
+                                          <CheckCircle size={10} />
+                                          Restore
+                                        </button>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
                             </tbody>
                           </table>
                         </div>
@@ -2216,28 +2288,77 @@ export default function Approvals() {
                   )}
 
                   {generalApplicants.filter(a => a.archived).length > 0 && (
-                    <details className="mt-6 opacity-40" data-testid="section-archived-general-applicants">
-                      <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors flex items-center gap-2 select-none">
+                    <details className="mt-6" data-testid="section-archived-general-applicants">
+                      <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-slate-500 hover:text-slate-400 transition-colors flex items-center gap-2 select-none">
                         <ChevronDown size={12} />
                         Archived History ({generalApplicants.filter(a => a.archived).length})
                       </summary>
                       <div className="overflow-x-auto mt-3">
                         <table className="w-full" data-testid="table-archived-general-applicants">
                           <thead>
-                            <tr className="border-b border-muted-foreground/10">
-                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/30 py-2 pr-4">Name</th>
-                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/30 py-2 pr-4">Email</th>
-                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/30 py-2 pr-4">Date Applied</th>
+                            <tr className="border-b border-slate-300/30">
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-slate-500 py-2 pr-4">Name</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-slate-500 py-2 pr-4">Email</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-slate-500 py-2 pr-4">Date Applied</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-slate-500 py-2 pr-4">Resume</th>
+                              <th className="text-right text-xs font-bold uppercase tracking-widest text-slate-500 py-2">Actions</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {generalApplicants.filter(a => a.archived).map((app, idx) => (
-                              <tr key={app.id} className="border-b border-muted-foreground/5" data-testid={`archived-general-applicant-row-${idx}`}>
-                                <td className="py-2 pr-4 text-xs text-muted-foreground/40">{app.name}</td>
-                                <td className="py-2 pr-4 text-xs text-muted-foreground/30">{app.email}</td>
-                                <td className="py-2 pr-4 text-xs text-muted-foreground/30">{formatDate(app.submittedAt)}</td>
-                              </tr>
-                            ))}
+                            {generalApplicants.filter(a => a.archived).map((app, idx) => {
+                              let resumeFiles: {path: string; name: string}[] = [];
+                              try {
+                                if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
+                              } catch {}
+                              return (
+                                <tr key={app.id} className="border-b border-slate-300/10" data-testid={`archived-general-applicant-row-${idx}`}>
+                                  <td className="py-3 pr-4 text-sm text-slate-500">{app.name}</td>
+                                  <td className="py-3 pr-4 text-sm text-slate-500">{app.email}</td>
+                                  <td className="py-3 pr-4 text-sm text-slate-500">{formatDate(app.submittedAt)}</td>
+                                  <td className="py-3 pr-4 text-sm">
+                                    {resumeFiles.length > 0 ? (
+                                      <div className="flex flex-wrap gap-2">
+                                        {resumeFiles.map((file, fileIdx) => (
+                                          <a
+                                            key={fileIdx}
+                                            href={`/api/admin/applications/${app.id}/resume/${fileIdx}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 border border-slate-400/30 text-slate-500 px-2 py-1 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                            data-testid={`link-archived-general-resume-${idx}-${fileIdx}`}
+                                          >
+                                            <Download size={10} />
+                                            {file.name}
+                                          </a>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <span className="text-slate-400 text-xs">—</span>
+                                    )}
+                                  </td>
+                                  <td className="py-3 text-right">
+                                    <div className="flex items-center justify-end gap-2">
+                                      <button
+                                        onClick={() => setViewingApplicant(app)}
+                                        className="inline-flex items-center gap-1 border border-slate-400/30 text-slate-500 px-2 py-1 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                        data-testid={`button-archived-general-view-${idx}`}
+                                      >
+                                        <Eye size={10} />
+                                        View
+                                      </button>
+                                      <button
+                                        onClick={() => handleUnarchiveApplication(app.id, true)}
+                                        className="inline-flex items-center gap-1 border border-slate-400/30 text-slate-500 px-2 py-1 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                        data-testid={`button-archived-general-restore-${idx}`}
+                                      >
+                                        <CheckCircle size={10} />
+                                        Restore
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
@@ -2249,6 +2370,85 @@ export default function Approvals() {
           </section>
         </div>
       </main>
+
+      {viewingApplicant && (() => {
+        let resumeFiles: {path: string; name: string}[] = [];
+        try {
+          if (viewingApplicant.resumePaths) resumeFiles = JSON.parse(viewingApplicant.resumePaths);
+        } catch {}
+        return (
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-testid="modal-view-applicant-overlay" onClick={() => setViewingApplicant(null)}>
+            <div className="bg-[#001F3F] max-w-lg w-full shadow-2xl border border-[#C5A059]/40 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()} data-testid="modal-view-applicant">
+              <div className="p-6 border-b border-[#C5A059]/30 flex items-center justify-between">
+                <h3 className="font-display text-xl text-[#C5A059] tracking-wide">Applicant Details</h3>
+                <button
+                  onClick={() => setViewingApplicant(null)}
+                  className="text-[#C5A059]/60 hover:text-[#C5A059] transition-colors"
+                  data-testid="button-view-modal-close"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 space-y-5">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#C5A059]/70 mb-1">Name</p>
+                  <p className="text-white text-sm" data-testid="text-view-name">{viewingApplicant.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#C5A059]/70 mb-1">Email</p>
+                  <p className="text-white/80 text-sm" data-testid="text-view-email">{viewingApplicant.email}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#C5A059]/70 mb-1">Date Applied</p>
+                  <p className="text-white/80 text-sm" data-testid="text-view-date">{formatDate(viewingApplicant.submittedAt)}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#C5A059]/70 mb-1">Status</p>
+                  <span className={`inline-flex items-center text-xs font-bold uppercase px-2 py-1 ${viewingApplicant.reviewStatus === "rejected" ? "bg-red-500/10 text-red-400" : viewingApplicant.reviewStatus === "shortlisted" ? "bg-green-500/10 text-green-400" : "bg-blue-500/10 text-blue-400"}`} data-testid="text-view-status">
+                    {viewingApplicant.reviewStatus}
+                  </span>
+                  {viewingApplicant.archived && (
+                    <span className="ml-2 inline-flex items-center text-xs font-bold uppercase px-2 py-1 bg-slate-500/10 text-slate-400">
+                      archived
+                    </span>
+                  )}
+                </div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-[#C5A059]/70 mb-2">Resume / Documents</p>
+                  {resumeFiles.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {resumeFiles.map((file, fileIdx) => (
+                        <a
+                          key={fileIdx}
+                          href={`/api/admin/applications/${viewingApplicant.id}/resume/${fileIdx}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 border border-[#C5A059]/30 text-[#C5A059] px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-[#C5A059]/10 transition-colors"
+                          data-testid={`link-view-resume-${fileIdx}`}
+                        >
+                          <Download size={12} />
+                          {file.name}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-white/40 text-sm italic">No documents attached</p>
+                  )}
+                </div>
+              </div>
+              <div className="p-6 border-t border-[#C5A059]/20 flex justify-end">
+                <button
+                  onClick={() => setViewingApplicant(null)}
+                  className="px-5 py-2 text-sm font-semibold uppercase tracking-widest border border-[#C5A059]/40 text-[#C5A059]/80 hover:bg-[#C5A059]/10 transition-colors"
+                  data-testid="button-view-modal-done"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {rejectConfirm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" data-testid="modal-reject-overlay">

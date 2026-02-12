@@ -800,6 +800,16 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/admin/applications/:id/unarchive", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const updated = await storage.unarchiveApplication(req.params.id as string);
+      if (!updated) return res.status(404).json({ error: "Application not found" });
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to unarchive application" });
+    }
+  });
+
   // Admin: Update application review status
   app.patch("/api/admin/applications/:id/status", requireAdmin, async (req: Request, res: Response) => {
     try {

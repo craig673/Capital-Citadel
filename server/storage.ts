@@ -44,6 +44,7 @@ export interface IStorage {
   updateApplicationStatus(id: string, reviewStatus: string): Promise<Application | undefined>;
   archiveOldRejected(): Promise<void>;
   archiveApplication(id: string): Promise<Application | undefined>;
+  unarchiveApplication(id: string): Promise<Application | undefined>;
   updateJob(id: string, data: Partial<InsertJob>): Promise<Job | undefined>;
 }
 
@@ -278,6 +279,11 @@ export class DrizzleStorage implements IStorage {
 
   async archiveApplication(id: string): Promise<Application | undefined> {
     const result = await db.update(applications).set({ archived: true }).where(eq(applications.id, id)).returning();
+    return result[0];
+  }
+
+  async unarchiveApplication(id: string): Promise<Application | undefined> {
+    const result = await db.update(applications).set({ archived: false }).where(eq(applications.id, id)).returning();
     return result[0];
   }
 
