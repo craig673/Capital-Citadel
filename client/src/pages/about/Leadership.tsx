@@ -2,6 +2,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { Link } from "wouter";
 
 import codyOnCnbc from "../../../../attached_assets/Cody_on_CNBC_3_1769800619131.jpg";
 import codyFamily from "../../../../attached_assets/Cody_&_Fam_1769800970387.jpg";
@@ -227,6 +228,25 @@ export default function Leadership() {
                 </motion.div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="py-32 bg-[#001F3F]">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9 }}
+            >
+              <Link
+                href="/about/locations"
+                className="inline-block border-2 border-white text-white font-display text-lg uppercase tracking-widest px-12 py-5 hover:bg-white hover:text-[#C5A059] transition-all duration-500"
+                data-testid="link-journey-locations"
+              >
+                View our Global Locations
+              </Link>
+            </motion.div>
           </div>
         </section>
       </main>

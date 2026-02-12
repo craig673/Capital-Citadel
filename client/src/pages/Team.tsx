@@ -210,6 +210,25 @@ export default function Team() {
             </div>
           </div>
         </section>
+
+        <section className="py-32 bg-[#001F3F]">
+          <div className="max-w-4xl mx-auto px-6 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9 }}
+            >
+              <Link
+                href="/about/leadership"
+                className="inline-block border-2 border-white text-white font-display text-lg uppercase tracking-widest px-12 py-5 hover:bg-white hover:text-[#C5A059] transition-all duration-500"
+                data-testid="link-journey-leadership"
+              >
+                Learn more about our Portfolio Manager, Cody Willard
+              </Link>
+            </motion.div>
+          </div>
+        </section>
       </main>
       <Footer />
     </div>
