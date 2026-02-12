@@ -1,134 +1,220 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useRef, useState } from "react";
+import { Link } from "wouter";
+
+const sections = [
+  {
+    id: "intro",
+    kicker: "Our Firm",
+    title: "Committed to Excellence",
+    body: "10,000 Days Capital Management was founded on a simple yet radical premise: the most valuable edge in modern finance is time. While the market chases micro-second arbitrage, we focus on the secular trends that define decades. We serve a select group of institutional partners — sovereign wealth funds, university endowments, and family offices — who share our belief that capital preservation is the prerequisite for capital growth.",
+    bgType: "video" as const,
+    bgSrc: "/videos/who-skyscraper.mp4",
+  },
+  {
+    id: "discipline",
+    kicker: "The Long View",
+    title: "The 10,000 Days",
+    body: "Our name reflects our commitment to the long game — roughly 27 years, or the span of a generation. This horizon shapes every decision we make, from our hiring practices to our risk management frameworks. In a world of noise, silence is the ultimate luxury. We buy quiet conviction and hold it with the patience that only a generational perspective can afford.",
+    bgType: "video" as const,
+    bgSrc: "/videos/who-hourglass.mp4",
+  },
+  {
+    id: "leadership",
+    kicker: "Our People",
+    title: "Led by Experience",
+    body: "Our approach is driven by a collective of thinkers, engineers, and analysts united by a single ambition: to be on the right side of history. Leadership at 10,000 Days is not about tenure — it is about clarity of vision and the courage to act on it. Every member of our team is selected for their ability to see what others miss and the discipline to wait for what others abandon.",
+    bgType: "image" as const,
+    bgSrc: "/images/who-boardroom.jpg",
+  },
+  {
+    id: "approach",
+    kicker: "Our Method",
+    title: "Rigor & Responsibility",
+    body: "We combine deep fundamental analysis with proprietary algorithmic scoring to identify the structural shifts that will reshape the global economy. Our dual-lens approach — telescopic for macro trends, microscopic for individual opportunities — ensures that every position in our portfolio has been stress-tested against the forces of time, disruption, and human behavior.",
+    bgType: "network" as const,
+    bgSrc: "",
+  },
+];
+
+function NetworkBackground() {
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full"
+      viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMid slice"
+      fill="none"
+    >
+      {[
+        [200, 200], [400, 350], [600, 150], [800, 400], [1000, 250],
+        [1200, 450], [1400, 300], [1600, 180], [1750, 400],
+        [300, 600], [500, 750], [700, 550], [900, 700], [1100, 600],
+        [1300, 800], [1500, 650], [1700, 750],
+        [250, 900], [550, 950], [850, 850], [1150, 950], [1450, 880], [1650, 950],
+      ].map(([x, y], i) => (
+        <circle key={`n${i}`} cx={x} cy={y} r="3" fill="#C5A059" opacity="0.3" />
+      ))}
+      {[
+        [[200, 200], [400, 350]], [[400, 350], [600, 150]], [[600, 150], [1000, 250]],
+        [[800, 400], [1200, 450]], [[1000, 250], [1400, 300]], [[1400, 300], [1600, 180]],
+        [[1600, 180], [1750, 400]], [[300, 600], [500, 750]], [[500, 750], [700, 550]],
+        [[700, 550], [900, 700]], [[900, 700], [1100, 600]], [[1100, 600], [1300, 800]],
+        [[1300, 800], [1500, 650]], [[1500, 650], [1700, 750]],
+        [[200, 200], [300, 600]], [[600, 150], [700, 550]], [[1000, 250], [1100, 600]],
+        [[1400, 300], [1500, 650]], [[400, 350], [500, 750]], [[800, 400], [900, 700]],
+        [[1200, 450], [1300, 800]], [[250, 900], [300, 600]], [[550, 950], [500, 750]],
+        [[850, 850], [900, 700]], [[1150, 950], [1100, 600]], [[1450, 880], [1500, 650]],
+      ].map(([[x1, y1], [x2, y2]], i) => (
+        <line key={`l${i}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#C5A059" strokeWidth="0.5" opacity="0.2" />
+      ))}
+    </svg>
+  );
+}
+
+function ScrollytellingSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const totalSections = sections.length;
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const segmentSize = 1 / totalSections;
+    const idx = Math.floor(v / segmentSize);
+    setActiveIndex(Math.min(totalSections - 1, idx));
+  });
+
+  return (
+    <div ref={containerRef} className="relative" style={{ height: `${(totalSections + 1) * 100}vh` }}>
+      <div className="sticky top-0 h-screen overflow-hidden">
+        {sections.map((section, i) => (
+          <div
+            key={section.id}
+            className="absolute inset-0 transition-opacity duration-1000"
+            style={{ opacity: i === activeIndex ? 1 : 0 }}
+          >
+            {section.bgType === "video" && (
+              <video
+                src={section.bgSrc}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+            {section.bgType === "image" && (
+              <img
+                src={section.bgSrc}
+                alt=""
+                className="absolute inset-0 w-full h-full object-cover"
+                style={{ filter: "blur(2px) brightness(0.4)" }}
+              />
+            )}
+            {section.bgType === "network" && (
+              <div className="absolute inset-0 bg-[#080810]">
+                <NetworkBackground />
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black/50" />
+          </div>
+        ))}
+
+        <div className="relative z-10 h-full flex items-center">
+          <div className="max-w-4xl mx-auto px-6 w-full">
+            {sections.map((section, i) => (
+              <motion.div
+                key={section.id}
+                data-testid={`section-${section.id}`}
+                animate={{
+                  opacity: i === activeIndex ? 1 : 0,
+                  y: i === activeIndex ? 0 : 40,
+                }}
+                transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
+                className="absolute max-w-4xl px-6"
+                style={{
+                  pointerEvents: i === activeIndex ? "auto" : "none",
+                }}
+              >
+                <div className="text-secondary font-bold uppercase tracking-widest mb-5 text-sm">
+                  {section.kicker}
+                </div>
+                <h2 className="font-display text-4xl md:text-6xl text-white leading-tight mb-8">
+                  {section.title}
+                </h2>
+                <div
+                  className="max-w-2xl rounded-sm p-6"
+                  style={{ backgroundColor: "rgba(0, 0, 0, 0.3)", backdropFilter: "blur(12px)" }}
+                >
+                  <p className="text-lg leading-relaxed" style={{ color: "rgba(255, 255, 255, 0.8)" }}>
+                    {section.body}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-3">
+          {sections.map((section, i) => (
+            <div
+              key={section.id}
+              className="w-2 h-2 rounded-full transition-all duration-500"
+              style={{
+                backgroundColor: i === activeIndex ? "#C5A059" : "rgba(255,255,255,0.3)",
+                transform: i === activeIndex ? "scale(1.5)" : "scale(1)",
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function WhatWeDo() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
-      <main className="flex-grow pt-24">
-        {/* Hero */}
-        <section className="pt-20 pb-16">
-          <div className="max-w-7xl mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="max-w-4xl"
+      <main className="flex-grow">
+        <ScrollytellingSection />
+
+        <section
+          className="min-h-screen flex items-center justify-center"
+          style={{ backgroundColor: "#C5A059" }}
+          data-testid="section-finale"
+        >
+          <div className="text-center px-6">
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
+              className="font-display text-3xl md:text-5xl text-white mb-10 leading-tight"
             >
-              <div
-                className="text-secondary font-bold uppercase tracking-widest mb-5 text-sm"
-                data-testid="text-whatwedo-hero-kicker"
+              See how we apply this discipline.
+            </motion.h2>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }}
+            >
+              <Link
+                href="/philosophy"
+                className="inline-block border-2 border-white text-white font-display text-lg uppercase tracking-widest px-12 py-5 hover:bg-white hover:text-[#C5A059] transition-all duration-500"
+                data-testid="link-explore-philosophy"
               >
-                Firm Overview
-              </div>
-              <h1
-                className="font-display text-4xl md:text-6xl text-primary leading-tight"
-                data-testid="text-whatwedo-hero-title"
-              >
-                Committed to excellence.
-              </h1>
-              <p
-                className="mt-8 text-lg text-muted-foreground leading-relaxed"
-                data-testid="text-whatwedo-hero-subtext"
-              >
-                10,000 Days Capital Management is a private investment firm dedicated to the
-                preservation and growth of capital. We navigate complex markets with a
-                disciplined, long-term perspective.
-              </p>
+                Explore Our Philosophy
+              </Link>
             </motion.div>
           </div>
         </section>
-
-        {/* Section 1 */}
-        <section className="py-20 border-t border-border">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="max-w-4xl">
-              <div className="text-secondary font-bold uppercase tracking-widest mb-4 text-sm" data-testid="text-whatwedo-1-kicker">
-                Who We Are
-              </div>
-              <h2 className="font-display text-3xl md:text-4xl text-primary mb-6" data-testid="text-whatwedo-1-title">
-                A Tradition of Discipline
-              </h2>
-              <div className="space-y-6 text-lg text-muted-foreground leading-relaxed" data-testid="text-whatwedo-1-body">
-                <p>
-                  We are an investment firm serving accredited investors and qualified
-                  purchasers. Our mission is to preserve and grow capital by identifying
-                  structural dislocations in the global economy.
-                </p>
-                <p>
-                  We do not chase temporary trends. We focus on “The 10,000 Days”—investing with
-                  a generational horizon that allows us to filter out market noise and execute
-                  with conviction.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 2 */}
-        <section className="py-20 border-t border-border">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="max-w-4xl">
-              <div className="text-secondary font-bold uppercase tracking-widest mb-4 text-sm" data-testid="text-whatwedo-2-kicker">
-                Our Leadership
-              </div>
-              <h2 className="font-display text-3xl md:text-4xl text-primary mb-6" data-testid="text-whatwedo-2-title">
-                Led by Experience
-              </h2>
-              <div className="space-y-6 text-lg text-muted-foreground leading-relaxed" data-testid="text-whatwedo-2-body">
-                <p>
-                  The firm is led by <span className="font-semibold text-primary">Cody Willard</span>, who brings
-                  over 30 years of investment experience to the portfolio.
-                </p>
-                <p>
-                  From the trading floor to the boardroom, our leadership’s deep domain
-                  expertise anchors our strategy. We combine this fundamental experience with
-                  proprietary analytical frameworks to maintain an edge in an evolving market.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 3 */}
-        <section className="py-20 border-t border-border">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="max-w-5xl">
-              <div className="text-secondary font-bold uppercase tracking-widest mb-4 text-sm" data-testid="text-whatwedo-3-kicker">
-                Our Approach
-              </div>
-              <h2 className="font-display text-3xl md:text-4xl text-primary mb-10" data-testid="text-whatwedo-3-title">
-                Rigor & Responsibility
-              </h2>
-
-              <div className="grid lg:grid-cols-3 gap-10" data-testid="grid-whatwedo-approach">
-                <div className="bg-white border border-border p-8" data-testid="card-approach-fundamental">
-                  <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">Fundamental Research</div>
-                  <p className="text-muted-foreground leading-relaxed">
-                    We conduct deep-dive analysis into business models, favoring companies with
-                    robust moats and visionary execution.
-                  </p>
-                </div>
-                <div className="bg-white border border-border p-8" data-testid="card-approach-risk">
-                  <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">Risk Management</div>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Capital preservation is our first mandate. We employ active hedging and
-                    strict position sizing to manage volatility.
-                  </p>
-                </div>
-                <div className="bg-white border border-border p-8" data-testid="card-approach-alignment">
-                  <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">Alignment</div>
-                  <p className="text-muted-foreground leading-relaxed">
-                    We are partners in prosperity. We invest our own capital alongside our
-                    clients, ensuring our interests are fully aligned.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
       </main>
       <Footer />
     </div>
