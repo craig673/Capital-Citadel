@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, X, FileText, CheckCircle, Loader2, ChevronDown } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import type { Job } from "@shared/schema";
 
 const fadeUp = {
@@ -236,9 +237,9 @@ export default function Careers() {
 
                           <div className="mt-8">
                             <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">About the Role</p>
-                            <p className="text-slate-600 leading-relaxed" data-testid={`text-job-description-${job.id}`}>
-                              {job.roleDescription}
-                            </p>
+                            <div className="text-slate-600 leading-relaxed prose prose-sm prose-slate max-w-none [&_strong]:font-semibold" data-testid={`text-job-description-${job.id}`}>
+                              <ReactMarkdown>{job.roleDescription || ""}</ReactMarkdown>
+                            </div>
                           </div>
 
                           <div className="mt-8">
@@ -253,7 +254,7 @@ export default function Careers() {
                               <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">Responsibilities</p>
                               <ul className="space-y-1.5 list-disc list-inside text-slate-600 leading-relaxed" data-testid={`list-job-responsibilities-${job.id}`}>
                                 {(job.responsibilities || []).map((item, i) => (
-                                  <li key={i}>{item}</li>
+                                  <li key={i} className="[&_p]:inline [&_strong]:font-semibold"><ReactMarkdown>{item}</ReactMarkdown></li>
                                 ))}
                               </ul>
                             </div>
@@ -264,7 +265,7 @@ export default function Careers() {
                               <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">Requirements</p>
                               <ul className="space-y-1.5 list-disc list-inside text-slate-600 leading-relaxed" data-testid={`list-job-requirements-${job.id}`}>
                                 {(job.requirements || []).map((item, i) => (
-                                  <li key={i}>{item}</li>
+                                  <li key={i} className="[&_p]:inline [&_strong]:font-semibold"><ReactMarkdown>{item}</ReactMarkdown></li>
                                 ))}
                               </ul>
                             </div>
@@ -275,7 +276,7 @@ export default function Careers() {
                               <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">What We Offer</p>
                               <ul className="space-y-1.5 list-disc list-inside text-slate-600 leading-relaxed" data-testid={`list-job-offer-${job.id}`}>
                                 {(job.whatWeOffer || []).map((item, i) => (
-                                  <li key={i}>{item}</li>
+                                  <li key={i} className="[&_p]:inline [&_strong]:font-semibold"><ReactMarkdown>{item}</ReactMarkdown></li>
                                 ))}
                               </ul>
                             </div>

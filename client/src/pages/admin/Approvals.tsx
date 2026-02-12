@@ -1318,6 +1318,7 @@ export default function Approvals() {
                     className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary resize-vertical"
                     data-testid="input-job-role-description"
                   />
+                  <p className="text-primary-foreground/40 text-xs mt-1">Tip: Use **text** to bold words.</p>
                 </div>
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
@@ -1334,7 +1335,7 @@ export default function Approvals() {
                           setTempResponsibility("");
                         }
                       }}
-                      placeholder="Add a responsibility..."
+                      placeholder="Add a responsibility... (use **text** to bold)"
                       className="flex-1 bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
                       data-testid="input-job-responsibility"
                     />
@@ -1385,7 +1386,7 @@ export default function Approvals() {
                           setTempRequirement("");
                         }
                       }}
-                      placeholder="Add a requirement..."
+                      placeholder="Add a requirement... (use **text** to bold)"
                       className="flex-1 bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
                       data-testid="input-job-requirement"
                     />
@@ -1436,7 +1437,7 @@ export default function Approvals() {
                           setTempOffer("");
                         }
                       }}
-                      placeholder="Add a benefit..."
+                      placeholder="Add a benefit... (use **text** to bold)"
                       className="flex-1 bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
                       data-testid="input-job-offer"
                     />
