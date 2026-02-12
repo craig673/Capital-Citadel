@@ -4,14 +4,14 @@ import { motion } from "framer-motion";
 import { useState, useRef } from "react";
 
 const revealVariants = {
-  hidden: { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.9,
-      delay: i * 0.15,
-      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
+      delay: i * 0.1,
+      ease: [0.0, 0.0, 0.2, 1] as [number, number, number, number],
     },
   }),
 };
@@ -181,7 +181,7 @@ export default function OurValues() {
 
               <div className="grid lg:grid-cols-3 gap-10" data-testid="list-values-pillars">
                 {pillars.map((p, i) => (
-                  <PillarCard key={p.number} pillar={p} index={i} />
+                  <PillarCard key={p.number} pillar={p} index={i + 1} />
                 ))}
               </div>
             </div>
