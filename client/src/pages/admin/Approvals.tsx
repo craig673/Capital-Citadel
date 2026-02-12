@@ -1257,12 +1257,10 @@ export default function Approvals() {
                     className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
                     data-testid="select-job-location"
                   >
+                    <option value="Las Cruces, NM">Las Cruces, NM</option>
+                    <option value="New York, NY">New York, NY</option>
                     <option value="Remote">Remote</option>
-                    <option value="New York">New York</option>
-                    <option value="Chicago">Chicago</option>
-                    <option value="San Francisco">San Francisco</option>
-                    <option value="Boston">Boston</option>
-                    <option value="Other">Other</option>
+                    <option value="Other - See Description">Other - See Description</option>
                   </select>
                 </div>
                 <div>
