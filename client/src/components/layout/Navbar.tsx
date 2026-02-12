@@ -59,14 +59,14 @@ export function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/40">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-3 font-display font-semibold text-xl tracking-tight text-primary uppercase hover:opacity-80 transition-opacity"
+          className="flex items-center gap-3 font-display font-semibold text-2xl tracking-tight text-primary uppercase hover:opacity-80 transition-opacity"
           data-testid="link-home-logo"
         >
-          <img src={logo} alt="10,000 Days Capital Logo" className="h-10 w-auto" data-testid="img-logo" />
+          <img src={logo} alt="10,000 Days Capital Logo" className="h-[3.25rem] w-auto" data-testid="img-logo" />
           <span data-testid="text-brand-name">
             10,000 Days <span className="text-secondary font-light">Capital</span>
           </span>
@@ -79,13 +79,13 @@ export function Navbar() {
             <Link
               href="/about/what-we-do"
               className={cn(
-                "inline-flex items-center gap-1 text-sm font-medium tracking-wide transition-colors hover:text-secondary",
+                "inline-flex items-center gap-1 text-lg font-medium tracking-wide transition-colors hover:text-secondary",
                 location.startsWith("/about") ? "text-primary" : "text-muted-foreground"
               )}
               data-testid="nav-about-trigger"
             >
               About Us
-              <ChevronDown className="h-4 w-4 opacity-70 transition-transform duration-200 group-hover:rotate-180" />
+              <ChevronDown className="h-5 w-5 opacity-70 transition-transform duration-200 group-hover:rotate-180" />
             </Link>
 
             <div className="pointer-events-none absolute left-0 top-full pt-3 opacity-0 translate-y-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto">
@@ -125,7 +125,7 @@ export function Navbar() {
               key={link.href}
               href={link.href}
               className={cn(
-                "text-sm font-medium tracking-wide transition-colors hover:text-secondary",
+                "text-lg font-medium tracking-wide transition-colors hover:text-secondary",
                 location === link.href ? "text-primary" : "text-muted-foreground"
               )}
               data-testid={`nav-link-${link.href}`}
@@ -139,25 +139,25 @@ export function Navbar() {
               <div className="flex items-center gap-4" data-testid="nav-user-menu">
                 <Link
                   href={user.role === "admin" ? "/admin/approvals" : "/dashboard"}
-                  className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-secondary transition-colors"
+                  className="flex items-center gap-2 text-lg font-medium text-muted-foreground hover:text-secondary transition-colors"
                   data-testid="link-user-portal"
                 >
-                  <User size={16} />
+                  <User size={21} />
                   <span className="hidden lg:inline">{user.email}</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
+                  className="flex items-center gap-2 bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
                   data-testid="button-logout"
                 >
-                  <LogOut size={14} />
+                  <LogOut size={18} />
                   Logout
                 </button>
               </div>
             ) : (
               <Link
                 href="/auth/login"
-                className="bg-primary text-primary-foreground px-5 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
+                className="bg-primary text-primary-foreground px-6 py-2.5 text-sm font-semibold uppercase tracking-widest hover:bg-primary/90 transition-colors"
                 data-testid="button-client-login"
               >
                 Client Login
@@ -179,7 +179,7 @@ export function Navbar() {
 
       {/* Mobile Nav */}
       {isOpen && (
-        <div className="md:hidden absolute top-20 left-0 right-0 bg-background border-b border-border/40 p-6 flex flex-col gap-4">
+        <div className="md:hidden absolute top-24 left-0 right-0 bg-background border-b border-border/40 p-6 flex flex-col gap-4">
           <div className="pt-1" data-testid="mobile-about-group">
             <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-2" data-testid="text-mobile-about">
               About Us
