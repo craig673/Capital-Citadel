@@ -77,7 +77,7 @@ function TeamMemberRow({ member, index }: { member: (typeof teamMembers)[0]; ind
   const [hovered, setHovered] = useState(false);
 
   const photoBlock = (
-    <div className="md:w-[40%] flex-shrink-0">
+    <div className="md:w-[30%] flex-shrink-0">
       <div
         className="overflow-hidden"
         data-testid={`card-team-${member.id}-headshot`}
