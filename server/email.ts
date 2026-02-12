@@ -270,7 +270,7 @@ export async function sendRejectionEmail(
               We have reviewed your qualifications in detail. After careful consideration, we have decided to move forward with other candidates who more closely align with our current specific needs for this role.
             </p>
             <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
-              The AIRS Revolution&trade; attracts remarkable talent, and this decision was difficult given the high caliber of applications we received.
+              This industry attracts remarkable talent, and this decision was difficult given the high caliber of applications we received.
             </p>
             <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
               Please note that due to our recruitment policy and the volume of applications, we are unable to provide specific feedback on individual applications or respond to follow-up inquiries regarding this decision.
