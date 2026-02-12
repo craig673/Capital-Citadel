@@ -12,7 +12,7 @@ export function Footer() {
             </h3>
           </div>
           <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-md">
-            Three decades of insight. One mission: Superior execution. We are Cody Willard's investment fund, built to lead throughout The AIRS Revolution and beyond.
+            Three decades of insight. One mission: Superior execution. We are Cody Willard's investment fund, built to lead throughout The AIRS Revolution™ and beyond.
           </p>
         </div>
 

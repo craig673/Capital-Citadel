@@ -5,9 +5,9 @@ import { Download, FileText } from "lucide-react";
 const documents = [
   {
     date: "JANUARY 2026",
-    title: "The AIRS Revolution",
+    title: "The AIRS Revolution™",
     summary:
-      "A foundational framework piece that explains why AI, robotics, and space are converging into a single compounding supercycle\u2014the AIRS Revolution. It reframes macro noise as secondary to technology-driven productivity and wealth creation, positioning 10,000 Days Capital as long-horizon Revolution Investors. This is a staple narrative for clients because it clarifies what we own, why we own it, and why the next 25 years are structurally different.",
+      "A foundational framework piece that explains why AI, robotics, and space are converging into a single compounding supercycle\u2014The AIRS Revolution™. It reframes macro noise as secondary to technology-driven productivity and wealth creation, positioning 10,000 Days Capital as long-horizon Revolution Investors. This is a staple narrative for clients because it clarifies what we own, why we own it, and why the next 25 years are structurally different.",
     href: "/assets/The-AIRS-Revolution.pdf",
   },
   {

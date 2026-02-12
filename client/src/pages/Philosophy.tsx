@@ -395,7 +395,7 @@ export default function Philosophy() {
                 viewport={{ once: true, margin: "-60px" }}
                 custom={0}
               >
-                <SectionTitle kicker="The Convergence" title="The AIRS Revolution" />
+                <SectionTitle kicker="The Convergence" title="The AIRS Revolution™" />
               </motion.div>
 
               <motion.p

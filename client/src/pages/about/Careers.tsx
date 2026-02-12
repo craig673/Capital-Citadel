@@ -151,7 +151,7 @@ export default function Careers() {
               and we build conviction where others see uncertainty.
             </p>
             <p data-testid="text-careers-description-2">
-              We are at the forefront of the AIRS Revolution, harnessing the
+              We are at the forefront of The AIRS Revolution™, harnessing the
               transformative power of Artificial Intelligence to reshape how capital
               is allocated and managed. If you are driven by intellectual curiosity,
               disciplined thinking, and the desire to be part of something
@@ -245,7 +245,7 @@ export default function Careers() {
                           <div className="mt-8">
                             <p className="text-xs font-bold uppercase tracking-[0.2em] text-secondary mb-3">Why 10,000 Days</p>
                             <p className="text-slate-600 leading-relaxed">
-                              10,000 Days Capital is a Revolutionary investment firm operating at the intersection of deep fundamental research and cutting-edge Artificial Intelligence. We believe in thinking in decades — not quarters — and our long-term horizon means we pursue opportunities that others overlook. As part of the AIRS Revolution, you will be at the forefront of how capital is allocated and managed in the 21st century. We offer a culture of intellectual curiosity, disciplined thinking, and the conviction that the greatest returns come from patience and vision.
+                              10,000 Days Capital is a Revolutionary investment firm operating at the intersection of deep fundamental research and cutting-edge Artificial Intelligence. We believe in thinking in decades — not quarters — and our long-term horizon means we pursue opportunities that others overlook. As part of The AIRS Revolution™, you will be at the forefront of how capital is allocated and managed in the 21st century. We offer a culture of intellectual curiosity, disciplined thinking, and the conviction that the greatest returns come from patience and vision.
                             </p>
                           </div>
 
@@ -309,7 +309,7 @@ export default function Careers() {
             </h2>
             {!selectedJob && (
               <p className="text-center text-gray-400 max-w-2xl mx-auto mb-8 mt-4 leading-relaxed">
-                Don't see the specific role you're looking for? We are always searching for exceptional talent to join us in navigating the AIRS Revolution. If you have the conviction and curiosity to contribute to our long-term mission, please submit your resume and a brief note describing how you can add value to the team.
+                Don't see the specific role you're looking for? We are always searching for exceptional talent to join us in navigating The AIRS Revolution™. If you have the conviction and curiosity to contribute to our long-term mission, please submit your resume and a brief note describing how you can add value to the team.
               </p>
             )}
             {selectedJob && (
