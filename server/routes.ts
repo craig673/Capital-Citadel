@@ -10,7 +10,7 @@ import multer from "multer";
 import { randomUUID } from "crypto";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
-import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail } from "./email";
+import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail } from "./email";
 import { objectStorageClient } from "./replit_integrations/object_storage";
 
 function getPrivateObjectDir(): string {
@@ -674,6 +674,44 @@ export async function registerRoutes(
       res.json({ letters, fundDocs });
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to fetch published documents" });
+    }
+  });
+
+  const applicationUpload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+      const allowedTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
+      if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Only PDF and Word documents are allowed"));
+      }
+    },
+  });
+
+  app.post("/api/applications", applicationUpload.array("files", 5), async (req: Request, res: Response) => {
+    try {
+      const { name, email } = req.body;
+      if (!name || !email) {
+        return res.status(400).json({ error: "Name and email are required" });
+      }
+
+      const files = (req.files as Express.Multer.File[]) || [];
+      const attachments = files.map((f) => ({
+        filename: f.originalname,
+        content: f.buffer,
+      }));
+
+      await sendApplicationEmail({ name, email }, attachments);
+      res.json({ success: true, message: "Application submitted successfully" });
+    } catch (error: any) {
+      console.error("[applications] Failed to process application:", error);
+      res.status(500).json({ error: "Failed to submit application. Please try again." });
     }
   });
 

@@ -157,6 +157,50 @@ export async function sendWelcomeEmail(user: {
   }
 }
 
+export async function sendApplicationEmail(
+  applicant: { name: string; email: string },
+  attachments: Array<{ filename: string; content: Buffer }>
+) {
+  try {
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: "craig@10000days.com",
+      subject: "A wild applicant has appeared!",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #001F3F;">New Job Application</h2>
+          <p>A new application has been submitted through the 10,000 Days Capital careers page.</p>
+          <table style="border-collapse: collapse; margin-top: 20px; width: 100%;">
+            <tr>
+              <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; background: #f5f5f5;">Name</td>
+              <td style="padding: 12px; border: 1px solid #ddd;">${applicant.name}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; background: #f5f5f5;">Email</td>
+              <td style="padding: 12px; border: 1px solid #ddd;">${applicant.email}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border: 1px solid #ddd; font-weight: bold; background: #f5f5f5;">Attachments</td>
+              <td style="padding: 12px; border: 1px solid #ddd;">${attachments.length} file(s)</td>
+            </tr>
+          </table>
+          <p style="margin-top: 20px; color: #666;">
+            Submitted at: ${new Date().toLocaleString()}
+          </p>
+        </div>
+      `,
+      attachments: attachments.map((a) => ({
+        filename: a.filename,
+        content: a.content,
+      })),
+    });
+    console.log(`[email] Application email sent for ${applicant.name} (${applicant.email})`);
+  } catch (error) {
+    console.error("[email] Failed to send application email:", error);
+    throw error;
+  }
+}
+
 export async function sendTestEmail(): Promise<{ success: boolean; message: string }> {
   try {
     await transporter.sendMail({

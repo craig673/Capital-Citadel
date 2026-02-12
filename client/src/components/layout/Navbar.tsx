@@ -18,6 +18,7 @@ const aboutItems = [
   { href: "/team", label: "Our Team" },
   { href: "/about/leadership", label: "Leadership" },
   { href: "/about/locations", label: "Locations" },
+  { href: "/about/careers", label: "Careers" },
 ];
 
 export function Navbar() {

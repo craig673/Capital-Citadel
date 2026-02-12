@@ -24,6 +24,7 @@ import AboutWhatWeDo from "@/pages/about/WhatWeDo";
 import AboutOurValues from "@/pages/about/OurValues";
 import AboutLeadership from "@/pages/about/Leadership";
 import AboutLocations from "@/pages/about/Locations";
+import AboutCareers from "@/pages/about/Careers";
 import Letters from "@/pages/Letters";
 
 function Router() {
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/about/values" component={AboutOurValues} />
       <Route path="/about/leadership" component={AboutLeadership} />
       <Route path="/about/locations" component={AboutLocations} />
+      <Route path="/about/careers" component={AboutCareers} />
       <Route component={NotFound} />
     </Switch>
   );
