@@ -1,6 +1,6 @@
 import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads, type PublishedDocument, type InsertPublishedDocument, publishedDocuments, type Application, type InsertApplication, applications, type Job, type InsertJob, jobs } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { eq, desc, and, gte } from "drizzle-orm";
+import { eq, desc, and, gte, lt, sql } from "drizzle-orm";
 import pg from "pg";
 
 const { Pool } = pg;
@@ -42,6 +42,8 @@ export interface IStorage {
   getApplicationsByJobId(jobId: string): Promise<Application[]>;
   getAllApplications(): Promise<Application[]>;
   updateApplicationStatus(id: string, reviewStatus: string): Promise<Application | undefined>;
+  archiveOldRejected(): Promise<void>;
+  archiveApplication(id: string): Promise<Application | undefined>;
   updateJob(id: string, data: Partial<InsertJob>): Promise<Job | undefined>;
 }
 
@@ -257,7 +259,25 @@ export class DrizzleStorage implements IStorage {
   }
 
   async updateApplicationStatus(id: string, reviewStatus: string): Promise<Application | undefined> {
-    const result = await db.update(applications).set({ reviewStatus }).where(eq(applications.id, id)).returning();
+    const result = await db.update(applications).set({ reviewStatus, updatedAt: new Date() }).where(eq(applications.id, id)).returning();
+    return result[0];
+  }
+
+  async archiveOldRejected(): Promise<void> {
+    const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    await db.update(applications)
+      .set({ archived: true })
+      .where(
+        and(
+          eq(applications.reviewStatus, "rejected"),
+          eq(applications.archived, false),
+          lt(applications.updatedAt, fourteenDaysAgo)
+        )
+      );
+  }
+
+  async archiveApplication(id: string): Promise<Application | undefined> {
+    const result = await db.update(applications).set({ archived: true }).where(eq(applications.id, id)).returning();
     return result[0];
   }
 

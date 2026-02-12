@@ -780,10 +780,23 @@ export async function registerRoutes(
   // Admin: Get all applications (general / no specific job)
   app.get("/api/admin/applications", requireAdmin, async (req: Request, res: Response) => {
     try {
+      storage.archiveOldRejected().catch((err) =>
+        console.error("[applications] Auto-archive failed (non-blocking):", err)
+      );
       const allApps = await storage.getAllApplications();
       res.json(allApps);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to fetch applications" });
+    }
+  });
+
+  app.patch("/api/admin/applications/:id/archive", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const updated = await storage.archiveApplication(req.params.id as string);
+      if (!updated) return res.status(404).json({ error: "Application not found" });
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to archive application" });
     }
   });
 

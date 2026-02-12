@@ -79,9 +79,9 @@ export default function Approvals() {
   const [jobCreating, setJobCreating] = useState(false);
   const [editingJobId, setEditingJobId] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
-  const [applicants, setApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; reviewStatus: string; submittedAt: string}[]>([]);
+  const [applicants, setApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; reviewStatus: string; archived: boolean; submittedAt: string}[]>([]);
   const [applicantsLoading, setApplicantsLoading] = useState(false);
-  const [generalApplicants, setGeneralApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; reviewStatus: string; submittedAt: string}[]>([]);
+  const [generalApplicants, setGeneralApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; reviewStatus: string; archived: boolean; submittedAt: string}[]>([]);
   const [generalApplicantsLoading, setGeneralApplicantsLoading] = useState(true);
   const [togglingJobId, setTogglingJobId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
@@ -371,6 +371,28 @@ export default function Approvals() {
       }
     } catch (err) {
       showToast("Failed to update status", "error");
+    }
+  };
+
+  const handleArchiveApplication = async (appId: string, isGeneral: boolean) => {
+    try {
+      const response = await fetch(`/api/admin/applications/${appId}/archive`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      if (response.ok) {
+        if (isGeneral) {
+          setGeneralApplicants(prev => prev.map(a => a.id === appId ? { ...a, archived: true } : a));
+        } else {
+          setApplicants(prev => prev.map(a => a.id === appId ? { ...a, archived: true } : a));
+        }
+        showToast("Application archived", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to archive", "error");
+      }
+    } catch (err) {
+      showToast("Failed to archive application", "error");
     }
   };
 
@@ -1863,11 +1885,11 @@ export default function Approvals() {
                       <p className="text-primary-foreground/50 text-center py-4">No active applicants for this position.</p>
                     )}
 
-                    {applicants.filter(a => a.reviewStatus === "rejected").length > 0 && (
+                    {applicants.filter(a => a.reviewStatus === "rejected" && !a.archived).length > 0 && (
                       <details className="mt-6" data-testid="section-rejected-job-applicants">
                         <summary className="cursor-pointer text-sm font-semibold uppercase tracking-widest text-primary-foreground/50 hover:text-primary-foreground transition-colors flex items-center gap-2 select-none">
                           <ChevronDown size={14} />
-                          Rejected Candidates ({applicants.filter(a => a.reviewStatus === "rejected").length})
+                          Rejected Candidates ({applicants.filter(a => a.reviewStatus === "rejected" && !a.archived).length})
                         </summary>
                         <div className="overflow-x-auto mt-4">
                           <table className="w-full" data-testid="table-rejected-job-applicants">
@@ -1882,7 +1904,7 @@ export default function Approvals() {
                               </tr>
                             </thead>
                             <tbody>
-                              {applicants.filter(a => a.reviewStatus === "rejected").map((app, idx) => {
+                              {applicants.filter(a => a.reviewStatus === "rejected" && !a.archived).map((app, idx) => {
                                 let resumeFiles: {path: string; name: string}[] = [];
                                 try {
                                   if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
@@ -1936,11 +1958,47 @@ export default function Approvals() {
                                           <Star size={12} />
                                           Shortlist
                                         </button>
+                                        <button
+                                          onClick={() => handleArchiveApplication(app.id, false)}
+                                          className="inline-flex items-center gap-1 border border-primary-foreground/20 text-primary-foreground/30 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:border-primary-foreground/40 hover:text-primary-foreground/50 transition-colors"
+                                          data-testid={`button-rejected-archive-${idx}`}
+                                        >
+                                          Archive
+                                        </button>
                                       </div>
                                     </td>
                                   </tr>
                                 );
                               })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </details>
+                    )}
+
+                    {applicants.filter(a => a.archived).length > 0 && (
+                      <details className="mt-6 opacity-40" data-testid="section-archived-job-applicants">
+                        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-primary-foreground/30 hover:text-primary-foreground/50 transition-colors flex items-center gap-2 select-none">
+                          <ChevronDown size={12} />
+                          Archived History ({applicants.filter(a => a.archived).length})
+                        </summary>
+                        <div className="overflow-x-auto mt-3">
+                          <table className="w-full" data-testid="table-archived-job-applicants">
+                            <thead>
+                              <tr className="border-b border-primary-foreground/10">
+                                <th className="text-left text-xs font-bold uppercase tracking-widest text-primary-foreground/20 py-2 pr-4">Name</th>
+                                <th className="text-left text-xs font-bold uppercase tracking-widest text-primary-foreground/20 py-2 pr-4">Email</th>
+                                <th className="text-left text-xs font-bold uppercase tracking-widest text-primary-foreground/20 py-2 pr-4">Date Applied</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {applicants.filter(a => a.archived).map((app, idx) => (
+                                <tr key={app.id} className="border-b border-primary-foreground/5" data-testid={`archived-job-applicant-row-${idx}`}>
+                                  <td className="py-2 pr-4 text-xs text-primary-foreground/30">{app.name}</td>
+                                  <td className="py-2 pr-4 text-xs text-primary-foreground/20">{app.email}</td>
+                                  <td className="py-2 pr-4 text-xs text-primary-foreground/20">{formatDate(app.submittedAt)}</td>
+                                </tr>
+                              ))}
                             </tbody>
                           </table>
                         </div>
@@ -2066,11 +2124,11 @@ export default function Approvals() {
                     </div>
                   )}
 
-                  {generalApplicants.filter(a => a.reviewStatus === "rejected").length > 0 && (
+                  {generalApplicants.filter(a => a.reviewStatus === "rejected" && !a.archived).length > 0 && (
                     <details className="mt-6" data-testid="section-rejected-general-applicants">
                       <summary className="cursor-pointer text-sm font-semibold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 select-none">
                         <ChevronDown size={14} />
-                        Rejected Applicants ({generalApplicants.filter(a => a.reviewStatus === "rejected").length})
+                        Rejected Applicants ({generalApplicants.filter(a => a.reviewStatus === "rejected" && !a.archived).length})
                       </summary>
                       <div className="overflow-x-auto mt-4">
                         <table className="w-full" data-testid="table-rejected-general-applicants">
@@ -2085,7 +2143,7 @@ export default function Approvals() {
                             </tr>
                           </thead>
                           <tbody>
-                            {generalApplicants.filter(a => a.reviewStatus === "rejected").map((app, idx) => {
+                            {generalApplicants.filter(a => a.reviewStatus === "rejected" && !a.archived).map((app, idx) => {
                               let resumeFiles: {path: string; name: string}[] = [];
                               try {
                                 if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
@@ -2139,11 +2197,47 @@ export default function Approvals() {
                                         <Star size={12} />
                                         Shortlist
                                       </button>
+                                      <button
+                                        onClick={() => handleArchiveApplication(app.id, true)}
+                                        className="inline-flex items-center gap-1 border border-muted-foreground/20 text-muted-foreground/50 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:border-muted-foreground/40 hover:text-muted-foreground/70 transition-colors"
+                                        data-testid={`button-rejected-general-archive-${idx}`}
+                                      >
+                                        Archive
+                                      </button>
                                     </div>
                                   </td>
                                 </tr>
                               );
                             })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </details>
+                  )}
+
+                  {generalApplicants.filter(a => a.archived).length > 0 && (
+                    <details className="mt-6 opacity-40" data-testid="section-archived-general-applicants">
+                      <summary className="cursor-pointer text-xs font-semibold uppercase tracking-widest text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors flex items-center gap-2 select-none">
+                        <ChevronDown size={12} />
+                        Archived History ({generalApplicants.filter(a => a.archived).length})
+                      </summary>
+                      <div className="overflow-x-auto mt-3">
+                        <table className="w-full" data-testid="table-archived-general-applicants">
+                          <thead>
+                            <tr className="border-b border-muted-foreground/10">
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/30 py-2 pr-4">Name</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/30 py-2 pr-4">Email</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/30 py-2 pr-4">Date Applied</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {generalApplicants.filter(a => a.archived).map((app, idx) => (
+                              <tr key={app.id} className="border-b border-muted-foreground/5" data-testid={`archived-general-applicant-row-${idx}`}>
+                                <td className="py-2 pr-4 text-xs text-muted-foreground/40">{app.name}</td>
+                                <td className="py-2 pr-4 text-xs text-muted-foreground/30">{app.email}</td>
+                                <td className="py-2 pr-4 text-xs text-muted-foreground/30">{formatDate(app.submittedAt)}</td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
