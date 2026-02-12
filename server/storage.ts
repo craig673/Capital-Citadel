@@ -41,6 +41,8 @@ export interface IStorage {
   updateJobStatus(id: string, status: string): Promise<Job | undefined>;
   getApplicationsByJobId(jobId: string): Promise<Application[]>;
   getAllApplications(): Promise<Application[]>;
+  updateApplicationStatus(id: string, reviewStatus: string): Promise<Application | undefined>;
+  updateJob(id: string, data: { title?: string; description?: string; requirements?: string }): Promise<Job | undefined>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -252,6 +254,21 @@ export class DrizzleStorage implements IStorage {
 
   async getAllApplications(): Promise<Application[]> {
     return await db.select().from(applications).orderBy(desc(applications.submittedAt));
+  }
+
+  async updateApplicationStatus(id: string, reviewStatus: string): Promise<Application | undefined> {
+    const result = await db.update(applications).set({ reviewStatus }).where(eq(applications.id, id)).returning();
+    return result[0];
+  }
+
+  async updateJob(id: string, data: { title?: string; description?: string; requirements?: string }): Promise<Job | undefined> {
+    const updateData: Partial<{ title: string; description: string; requirements: string }> = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.requirements !== undefined) updateData.requirements = data.requirements;
+    if (Object.keys(updateData).length === 0) return await this.getJob(id);
+    const result = await db.update(jobs).set(updateData).where(eq(jobs.id, id)).returning();
+    return result[0];
   }
 }
 

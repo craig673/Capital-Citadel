@@ -736,6 +736,21 @@ export async function registerRoutes(
     }
   });
 
+  // Admin: Update application review status
+  app.patch("/api/admin/applications/:id/status", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const { reviewStatus } = req.body;
+      if (!["new", "reviewed", "shortlisted", "rejected"].includes(reviewStatus)) {
+        return res.status(400).json({ error: "Invalid review status" });
+      }
+      const updated = await storage.updateApplicationStatus(req.params.id as string, reviewStatus);
+      if (!updated) return res.status(404).json({ error: "Application not found" });
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to update application status" });
+    }
+  });
+
   // Admin: Download applicant resume
   app.get("/api/admin/applications/:id/resume/:index", requireAdmin, async (req: Request, res: Response) => {
     try {

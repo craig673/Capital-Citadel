@@ -85,6 +85,7 @@ export const applications = pgTable("applications", {
   email: text("email").notNull(),
   jobId: varchar("job_id").references(() => jobs.id),
   resumePaths: text("resume_paths"),
+  reviewStatus: text("review_status").notNull().default("new"),
   submittedAt: timestamp("submitted_at").notNull().default(sql`now()`),
 });
 
