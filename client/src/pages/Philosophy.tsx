@@ -13,7 +13,7 @@ function ConvergenceGlow() {
         transform: "translate(-50%, -50%)",
         width: "140%",
         height: "180%",
-        background: "radial-gradient(ellipse at center, rgba(197, 160, 89, 0.07) 0%, rgba(197, 160, 89, 0.03) 40%, transparent 70%)",
+        background: "radial-gradient(ellipse at center, rgba(197, 160, 89, 0.18) 0%, rgba(197, 160, 89, 0.10) 35%, rgba(197, 160, 89, 0.04) 55%, transparent 75%)",
       }}
     />
   );
