@@ -3,7 +3,8 @@ import { useLocation, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User } from "@shared/schema";
-import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown, MoreVertical, Upload, Trash2, Calendar, Loader2, Briefcase, Users, Eye, ChevronDown, ChevronUp, CheckCircle, Star, Pencil } from "lucide-react";
+import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown, MoreVertical, Upload, Trash2, Calendar, Loader2, Briefcase, Users, Eye, ChevronDown, ChevronUp, CheckCircle, Star, Pencil, GripVertical } from "lucide-react";
+import { Reorder } from "framer-motion";
 
 type UserWithoutPassword = Omit<User, "password">;
 
@@ -1400,21 +1401,22 @@ export default function Approvals() {
                     </button>
                   </div>
                   {newJobResponsibilities.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {newJobResponsibilities.map((item, idx) => (
-                        <span key={idx} className="inline-flex items-center gap-1 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-1 text-sm">
-                          {item}
+                    <Reorder.Group axis="y" values={newJobResponsibilities} onReorder={setNewJobResponsibilities} className="flex flex-col gap-2 mt-2">
+                      {newJobResponsibilities.map((item) => (
+                        <Reorder.Item key={item} value={item} className="inline-flex items-center gap-2 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-2 text-sm cursor-default select-none" style={{ touchAction: "none" }} whileDrag={{ scale: 1.02, boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }} data-testid={`reorder-responsibility-${item}`}>
+                          <GripVertical size={14} className="text-secondary/60 cursor-grab active:cursor-grabbing shrink-0" />
+                          <span className="flex-1 min-w-0 break-words">{item}</span>
                           <button
                             type="button"
-                            onClick={() => setNewJobResponsibilities(prev => prev.filter((_, i) => i !== idx))}
-                            className="text-secondary hover:text-primary-foreground ml-1"
-                            data-testid={`button-remove-responsibility-${idx}`}
+                            onClick={() => setNewJobResponsibilities(prev => prev.filter((i) => i !== item))}
+                            className="text-secondary hover:text-primary-foreground ml-1 shrink-0"
+                            data-testid={`button-remove-responsibility-${item}`}
                           >
                             <X size={14} />
                           </button>
-                        </span>
+                        </Reorder.Item>
                       ))}
-                    </div>
+                    </Reorder.Group>
                   )}
                 </div>
                 <div>
@@ -1451,21 +1453,22 @@ export default function Approvals() {
                     </button>
                   </div>
                   {newJobRequirementsList.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {newJobRequirementsList.map((item, idx) => (
-                        <span key={idx} className="inline-flex items-center gap-1 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-1 text-sm">
-                          {item}
+                    <Reorder.Group axis="y" values={newJobRequirementsList} onReorder={setNewJobRequirementsList} className="flex flex-col gap-2 mt-2">
+                      {newJobRequirementsList.map((item) => (
+                        <Reorder.Item key={item} value={item} className="inline-flex items-center gap-2 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-2 text-sm cursor-default select-none" style={{ touchAction: "none" }} whileDrag={{ scale: 1.02, boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }} data-testid={`reorder-requirement-${item}`}>
+                          <GripVertical size={14} className="text-secondary/60 cursor-grab active:cursor-grabbing shrink-0" />
+                          <span className="flex-1 min-w-0 break-words">{item}</span>
                           <button
                             type="button"
-                            onClick={() => setNewJobRequirementsList(prev => prev.filter((_, i) => i !== idx))}
-                            className="text-secondary hover:text-primary-foreground ml-1"
-                            data-testid={`button-remove-requirement-${idx}`}
+                            onClick={() => setNewJobRequirementsList(prev => prev.filter((i) => i !== item))}
+                            className="text-secondary hover:text-primary-foreground ml-1 shrink-0"
+                            data-testid={`button-remove-requirement-${item}`}
                           >
                             <X size={14} />
                           </button>
-                        </span>
+                        </Reorder.Item>
                       ))}
-                    </div>
+                    </Reorder.Group>
                   )}
                 </div>
                 <div>
@@ -1502,21 +1505,22 @@ export default function Approvals() {
                     </button>
                   </div>
                   {newJobWhatWeOffer.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {newJobWhatWeOffer.map((item, idx) => (
-                        <span key={idx} className="inline-flex items-center gap-1 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-1 text-sm">
-                          {item}
+                    <Reorder.Group axis="y" values={newJobWhatWeOffer} onReorder={setNewJobWhatWeOffer} className="flex flex-col gap-2 mt-2">
+                      {newJobWhatWeOffer.map((item) => (
+                        <Reorder.Item key={item} value={item} className="inline-flex items-center gap-2 bg-secondary/20 text-primary-foreground border border-secondary/30 px-3 py-2 text-sm cursor-default select-none" style={{ touchAction: "none" }} whileDrag={{ scale: 1.02, boxShadow: "0 4px 16px rgba(0,0,0,0.25)" }} data-testid={`reorder-offer-${item}`}>
+                          <GripVertical size={14} className="text-secondary/60 cursor-grab active:cursor-grabbing shrink-0" />
+                          <span className="flex-1 min-w-0 break-words">{item}</span>
                           <button
                             type="button"
-                            onClick={() => setNewJobWhatWeOffer(prev => prev.filter((_, i) => i !== idx))}
-                            className="text-secondary hover:text-primary-foreground ml-1"
-                            data-testid={`button-remove-offer-${idx}`}
+                            onClick={() => setNewJobWhatWeOffer(prev => prev.filter((i) => i !== item))}
+                            className="text-secondary hover:text-primary-foreground ml-1 shrink-0"
+                            data-testid={`button-remove-offer-${item}`}
                           >
                             <X size={14} />
                           </button>
-                        </span>
+                        </Reorder.Item>
                       ))}
-                    </div>
+                    </Reorder.Group>
                   )}
                 </div>
                 <button
