@@ -6,31 +6,83 @@ import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
 import pg from "pg";
 import path from "path";
-import fs from "fs";
 import multer from "multer";
+import { randomUUID } from "crypto";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail } from "./email";
+import { objectStorageClient } from "./replit_integrations/object_storage";
 
-const UPLOAD_DIR = path.join(process.cwd(), "private_uploads");
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+function getPrivateObjectDir(): string {
+  const dir = process.env.PRIVATE_OBJECT_DIR || "";
+  if (!dir) {
+    throw new Error("PRIVATE_OBJECT_DIR not set");
+  }
+  return dir;
 }
 
-const uploadStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, `${uniqueSuffix}${ext}`);
-  },
-});
+function parseObjectPath(objPath: string): { bucketName: string; objectName: string } {
+  if (!objPath.startsWith("/")) {
+    objPath = `/${objPath}`;
+  }
+  const parts = objPath.split("/");
+  if (parts.length < 3) {
+    throw new Error("Invalid path: must contain at least a bucket name");
+  }
+  return { bucketName: parts[1], objectName: parts.slice(2).join("/") };
+}
+
+async function uploadToObjectStorage(buffer: Buffer, folder: string, originalName: string, contentType: string): Promise<string> {
+  const ext = path.extname(originalName);
+  const uniqueName = `${randomUUID()}${ext}`;
+  const privateDir = getPrivateObjectDir();
+  const objectPath = `${privateDir}/${folder}/${uniqueName}`;
+  const { bucketName, objectName } = parseObjectPath(objectPath);
+  const bucket = objectStorageClient.bucket(bucketName);
+  const file = bucket.file(objectName);
+  await file.save(buffer, { contentType });
+  return objectPath;
+}
+
+async function downloadFromObjectStorage(objectPath: string, res: Response, downloadName: string) {
+  const { bucketName, objectName } = parseObjectPath(objectPath);
+  const bucket = objectStorageClient.bucket(bucketName);
+  const file = bucket.file(objectName);
+  const [exists] = await file.exists();
+  if (!exists) {
+    return res.status(404).json({ error: "File not found on server" });
+  }
+  const [metadata] = await file.getMetadata();
+  res.set({
+    "Content-Type": metadata.contentType || "application/octet-stream",
+    "Content-Disposition": `attachment; filename="${encodeURIComponent(downloadName)}"`,
+  });
+  if (metadata.size) {
+    res.set("Content-Length", String(metadata.size));
+  }
+  const stream = file.createReadStream();
+  stream.on("error", (err) => {
+    console.error("Stream error:", err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Error streaming file" });
+    }
+  });
+  stream.pipe(res);
+}
+
+async function deleteFromObjectStorage(objectPath: string) {
+  const { bucketName, objectName } = parseObjectPath(objectPath);
+  const bucket = objectStorageClient.bucket(bucketName);
+  const file = bucket.file(objectName);
+  const [exists] = await file.exists();
+  if (exists) {
+    await file.delete();
+  }
+}
 
 const upload = multer({
-  storage: uploadStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ["application/pdf", "image/jpeg", "image/png", "image/gif"];
     if (allowedTypes.includes(file.mimetype)) {
@@ -325,13 +377,19 @@ export async function registerRoutes(
         return res.status(404).json({ error: "User not found" });
       }
 
+      const objectPath = await uploadToObjectStorage(
+        req.file.buffer,
+        "user-uploads",
+        req.file.originalname,
+        req.file.mimetype
+      );
+
       const documentUpload = await storage.createDocumentUpload({
         userId: req.user!.id,
         fileName: req.file.originalname,
-        storedPath: req.file.filename,
+        storedPath: objectPath,
       });
 
-      // Send notification email to admin
       sendDocumentUploadEmail(
         { firstName: user.firstName, lastName: user.lastName },
         req.file.originalname
@@ -394,13 +452,7 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Document not found" });
       }
 
-      const filePath = path.join(UPLOAD_DIR, document.storedPath);
-      
-      if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ error: "File not found on server" });
-      }
-
-      res.download(filePath, document.fileName);
+      await downloadFromObjectStorage(document.storedPath, res, document.fileName);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to download document" });
     }
@@ -494,26 +546,9 @@ export async function registerRoutes(
     }
   });
 
-  // Published Documents Directory
-  const PUBLISHED_DIR = path.join(process.cwd(), "published_documents");
-  if (!fs.existsSync(PUBLISHED_DIR)) {
-    fs.mkdirSync(PUBLISHED_DIR, { recursive: true });
-  }
-
-  const publishedStorage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, PUBLISHED_DIR);
-    },
-    filename: (req, file, cb) => {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      const ext = path.extname(file.originalname);
-      cb(null, `${uniqueSuffix}${ext}`);
-    },
-  });
-
   const publishedUpload = multer({
-    storage: publishedStorage,
-    limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 50 * 1024 * 1024 },
     fileFilter: (req, file, cb) => {
       if (file.mimetype === "application/pdf") {
         cb(null, true);
@@ -543,10 +578,17 @@ export async function registerRoutes(
 
       const { title, category, publishDate } = parseResult.data;
 
+      const objectPath = await uploadToObjectStorage(
+        req.file.buffer,
+        "published-documents",
+        req.file.originalname,
+        req.file.mimetype
+      );
+
       const doc = await storage.createPublishedDocument({
         title,
         fileName: req.file.originalname,
-        storedPath: req.file.filename,
+        storedPath: objectPath,
         category,
         publishDate: publishDate ? new Date(publishDate) : new Date(),
       });
@@ -578,13 +620,7 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Document not found" });
       }
 
-      const filePath = path.join(PUBLISHED_DIR, document.storedPath);
-      
-      if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ error: "File not found on server" });
-      }
-
-      res.download(filePath, document.fileName);
+      await downloadFromObjectStorage(document.storedPath, res, document.fileName);
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Failed to download document" });
     }
@@ -615,13 +651,7 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Document not found" });
       }
 
-      // Delete the file from disk
-      const filePath = path.join(PUBLISHED_DIR, document.storedPath);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-
-      // Delete from database
+      await deleteFromObjectStorage(document.storedPath);
       await storage.deletePublishedDocument(docId);
 
       res.json({ message: "Document deleted successfully" });
