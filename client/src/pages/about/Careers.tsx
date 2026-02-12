@@ -356,7 +356,7 @@ export default function Careers() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full rounded-lg border border-border bg-card px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-shadow"
+                  className="w-full rounded-lg border border-border bg-card px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-shadow"
                   placeholder="Your full name"
                   required
                   data-testid="input-name"
@@ -372,7 +372,7 @@ export default function Careers() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-border bg-card px-4 py-3 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-shadow"
+                  className="w-full rounded-lg border border-border bg-card px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-shadow"
                   placeholder="you@example.com"
                   required
                   data-testid="input-email"
