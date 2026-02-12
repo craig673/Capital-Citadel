@@ -12,7 +12,7 @@ export function Footer() {
             </h3>
           </div>
           <p className="text-primary-foreground/70 text-sm leading-relaxed max-w-md">
-            We are an investment firm led by Cody Willard. We build on his 30+ years of experience to maintain excellence in today's market.
+            Guided by the 30-year legacy of Cody Willard, we synthesize decades of market wisdom into superior execution.
           </p>
         </div>
 
