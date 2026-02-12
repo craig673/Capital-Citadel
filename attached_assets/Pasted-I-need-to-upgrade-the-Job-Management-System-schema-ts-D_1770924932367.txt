@@ -1,0 +1,65 @@
+I need to upgrade the Job Management System (schema.ts, Dashboard.tsx, and Careers.tsx) to support structured data instead of generic text blocks.
+
+1. Database Schema Updates:
+Modify the jobs table to replace the generic description field with these specific columns:
+
+location (text)
+
+employmentType (text)
+
+internshipStartDate (date, nullable)
+
+internshipEndDate (date, nullable)
+
+roleDescription (text - for the free text paragraph)
+
+responsibilities (json/array - to store a list of strings)
+
+whatWeOffer (json/array - to store a list of strings)
+
+2. Admin Dashboard Form ('Create Job' Modal):
+Section 1: Location: Create a Dropdown Select with these exact options:
+
+'On Site - New York, NY'
+
+'On Site - Las Cruces, NM'
+
+'Remote'
+
+Section 2: Employment Type: Create a Dropdown Select with:
+
+'Full Time', 'Part Time', 'Seasonal', 'Internship'
+
+Section 3: Internship Duration (Conditional):
+
+Only show this section if 'Internship' is selected above.
+
+Add two Date Pickers: 'Start Date' and 'End Date'.
+
+Section 4: The Role: A simple Textarea for the main introductory paragraph.
+
+Section 5 & 8: Dynamic List Builders (Responsibilities & What We Offer):
+
+Do not use a plain text box.
+
+Create a 'List Builder' interface: An input field with a '+ Add' button.
+
+When I type a line and hit Enter/Add, it adds it to a visible list below the input.
+
+Allow me to delete items from the list if I make a mistake.
+
+This ensures every entry is saved as a separate item.
+
+3. Careers Page Display Updates:
+Update the Job Accordion to display this new structured data:
+
+Header: Show the Title, followed by a subtitle line: '[Location] • [Employment Type]'
+
+Internship Dates: If it's an internship, display the date range (e.g., 'June 2026 - August 2026') clearly below the subtitle.
+
+The Role: Render the text paragraph.
+
+Responsibilities & What We Offer: Map through the saved JSON arrays and render them as clean, styled <ul> bulleted lists.
+
+4. Migration:
+Ensure the existing 'Requirements' section is also converted to this new 'List Builder' format so all list-based sections behave the same way.

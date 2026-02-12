@@ -1418,6 +1418,30 @@ export default function Approvals() {
                                   <Eye size={14} />
                                   View Applicants
                                 </button>
+                                <button
+                                  onClick={async () => {
+                                    const confirmed = window.confirm("Are you sure you want to permanently delete this job? This action cannot be undone.");
+                                    if (!confirmed) return;
+                                    try {
+                                      const response = await fetch(`/api/admin/jobs/${job.id}`, { method: "DELETE", credentials: "include" });
+                                      if (response.ok) {
+                                        setJobsData(prev => prev.filter(j => j.id !== job.id));
+                                        if (selectedJobId === job.id) setSelectedJobId(null);
+                                        showToast("Job permanently deleted", "success");
+                                      } else {
+                                        const data = await response.json();
+                                        showToast(data.error || "Failed to delete job", "error");
+                                      }
+                                    } catch (err) {
+                                      showToast("Failed to delete job", "error");
+                                    }
+                                  }}
+                                  className="inline-flex items-center gap-1 border border-red-500/30 text-red-500 px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors"
+                                  data-testid={`button-delete-job-${idx}`}
+                                >
+                                  <Trash2 size={14} />
+                                  Delete
+                                </button>
                               </div>
                             </td>
                           </tr>

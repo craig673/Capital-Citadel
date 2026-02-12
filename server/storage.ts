@@ -270,6 +270,10 @@ export class DrizzleStorage implements IStorage {
     const result = await db.update(jobs).set(updateData).where(eq(jobs.id, id)).returning();
     return result[0];
   }
+  async deleteJob(id: string): Promise<void> {
+    await db.delete(applications).where(eq(applications.jobId, id));
+    await db.delete(jobs).where(eq(jobs.id, id));
+  }
 }
 
 export const storage = new DrizzleStorage();

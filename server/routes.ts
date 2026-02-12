@@ -716,6 +716,18 @@ export async function registerRoutes(
     }
   });
 
+  // Admin: Delete a job and its linked applications
+  app.delete("/api/admin/jobs/:id", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const job = await storage.getJob(req.params.id as string);
+      if (!job) return res.status(404).json({ error: "Job not found" });
+      await storage.deleteJob(req.params.id as string);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to delete job" });
+    }
+  });
+
   // Admin: Get applicants for a specific job
   app.get("/api/admin/jobs/:id/applicants", requireAdmin, async (req: Request, res: Response) => {
     try {
