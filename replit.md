@@ -35,6 +35,10 @@ Preferred communication style: Simple, everyday language.
 - **ORM**: Drizzle ORM with drizzle-zod for schema-to-validation integration
 - **Schema Location**: `shared/schema.ts` defines all database tables
 - **Migrations**: Drizzle Kit with `db:push` command for schema synchronization
+- **File Storage**: Replit Object Storage (GCS-backed) for persistent document uploads
+  - User document uploads stored under `PRIVATE_OBJECT_DIR/user-uploads/`
+  - Published documents stored under `PRIVATE_OBJECT_DIR/published-documents/`
+  - Files are uploaded via multer memory storage → GCS, and streamed from GCS for downloads
 
 ### Authentication & Authorization
 - **User Model**: Email/password authentication with approval workflow
