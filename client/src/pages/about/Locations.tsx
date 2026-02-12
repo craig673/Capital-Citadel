@@ -32,8 +32,13 @@ function LocationBlock({
     <section className="py-16 md:py-20 border-t border-border" data-testid={`section-location-${testIdPrefix}`}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid lg:grid-cols-12 gap-12 items-center">
-          {/* Image first on mobile */}
-          <div className={`lg:col-span-6 ${reverse ? "lg:order-1" : "lg:order-2"}`}>
+          <motion.div
+            className={`lg:col-span-6 ${reverse ? "lg:order-1" : "lg:order-2"}`}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.8, ease: [0.0, 0.0, 0.2, 1] as [number, number, number, number] }}
+          >
             <div className="relative bg-primary border border-secondary/20" data-testid={`card-location-image-${testIdPrefix}`}>
               <img
                 src={imageSrc}
@@ -44,9 +49,15 @@ function LocationBlock({
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/70 via-primary/20 to-transparent" aria-hidden="true" />
               <div className="absolute inset-0 ring-1 ring-secondary/15" aria-hidden="true" />
             </div>
-          </div>
+          </motion.div>
 
-          <div className={`lg:col-span-6 ${reverse ? "lg:order-2" : "lg:order-1"}`}>
+          <motion.div
+            className={`lg:col-span-6 ${reverse ? "lg:order-2" : "lg:order-1"}`}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.0, 0.0, 0.2, 1] as [number, number, number, number] }}
+          >
             <div className="max-w-xl" data-testid={`block-location-text-${testIdPrefix}`}>
               <div className="text-secondary font-bold uppercase tracking-widest text-xs" data-testid={`text-location-header-${testIdPrefix}`}>
                 {header}
@@ -84,7 +95,7 @@ function LocationBlock({
 
               <div className="mt-10 h-px bg-border" aria-hidden="true" />
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
