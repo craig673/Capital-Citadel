@@ -158,7 +158,7 @@ export default function Careers() {
               and we build conviction where others see uncertainty.
             </p>
             <p data-testid="text-careers-description-2">
-              We are at the forefront of The AIRS Revolution™, harnessing the
+              We are at the forefront of The AIRS Revolution™, where companies harness the
               transformative power of Artificial Intelligence to reshape how capital
               is allocated and managed. If you are driven by intellectual curiosity,
               disciplined thinking, and the desire to be part of something
