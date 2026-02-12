@@ -1,16 +1,71 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 import codyOnCnbc from "../../../../attached_assets/Cody_on_CNBC_3_1769800619131.jpg";
 import codyFamily from "../../../../attached_assets/Cody_&_Fam_1769800970387.jpg";
+
+function ParallaxImage({
+  src,
+  alt,
+  testId,
+  className = "",
+}: {
+  src: string;
+  alt: string;
+  testId: string;
+  className?: string;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
+
+  return (
+    <div ref={ref} className={`overflow-hidden ${className}`}>
+      <motion.img
+        src={src}
+        alt={alt}
+        className="w-full h-auto"
+        style={{ y }}
+        data-testid={testId}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent pointer-events-none" />
+    </div>
+  );
+}
+
+function GoldShimmerLine() {
+  return (
+    <motion.div
+      initial={{ backgroundPosition: "-200% 0" }}
+      whileInView={{ backgroundPosition: "200% 0" }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 1.5, ease: "easeInOut" }}
+      className="h-[2px] w-20 mt-4"
+      style={{
+        backgroundImage: "linear-gradient(110deg, #C5A059 0%, #E8D5A3 40%, #ffffff 50%, #E8D5A3 60%, #C5A059 100%)",
+        backgroundSize: "200% 100%",
+      }}
+    />
+  );
+}
+
+const glassStyle = {
+  backgroundColor: "rgba(255, 255, 255, 0.55)",
+  backdropFilter: "blur(10px)",
+  WebkitBackdropFilter: "blur(10px)",
+  border: "1px solid rgba(255, 255, 255, 0.25)",
+};
 
 export default function Leadership() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
       <main className="flex-grow pt-24">
-        {/* Hero */}
         <section className="pt-20 pb-16">
           <div className="max-w-7xl mx-auto px-6">
             <motion.div
@@ -26,11 +81,17 @@ export default function Leadership() {
                 About
               </div>
               <h1
-                className="font-display text-4xl md:text-6xl text-primary leading-tight"
+                className="font-display text-4xl md:text-6xl leading-tight inline-block bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: "linear-gradient(110deg, #C5A059 0%, #E8D5A3 30%, #C5A059 50%, #A8843C 70%, #C5A059 100%)",
+                  backgroundSize: "300% 100%",
+                  animation: "shimmer 6s ease-in-out infinite",
+                }}
                 data-testid="text-leadership-hero-title"
               >
                 Leadership
               </h1>
+              <GoldShimmerLine />
               <p
                 className="mt-8 text-lg text-muted-foreground leading-relaxed"
                 data-testid="text-leadership-hero-subtext"
@@ -42,7 +103,6 @@ export default function Leadership() {
           </div>
         </section>
 
-        {/* Profile */}
         <section className="py-20 border-t border-border">
           <div className="max-w-7xl mx-auto px-6">
             <div className="grid lg:grid-cols-12 gap-12 items-start" data-testid="grid-leadership-profile">
@@ -54,19 +114,18 @@ export default function Leadership() {
                   <div className="mt-1 text-primary font-display text-3xl" data-testid="text-leadership-cody-name">
                     Cody Willard
                   </div>
+                  <GoldShimmerLine />
                 </div>
 
-                <div className="bg-white border border-border" data-testid="card-leadership-cody">
-                  <div className="relative">
-                    <img
-                      src={codyOnCnbc}
-                      alt="Cody Willard on CNBC"
-                      className="w-full h-auto"
-                      data-testid="img-leadership-cody-cnbc"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
-                  </div>
-                  <div className="p-8">
+                <div className="relative" data-testid="card-leadership-cody">
+                  <ParallaxImage
+                    src={codyOnCnbc}
+                    alt="Cody Willard on CNBC"
+                    testId="img-leadership-cody-cnbc"
+                    className="relative"
+                  />
+
+                  <div className="p-8" style={glassStyle} data-testid="card-leadership-cody-stats">
                     <div className="grid grid-cols-2 gap-6" data-testid="grid-leadership-cody-stats">
                       <div>
                         <div className="text-xs font-bold uppercase tracking-widest text-secondary" data-testid="text-leadership-cody-statlabel-0">
@@ -111,13 +170,14 @@ export default function Leadership() {
               </div>
 
               <div className="lg:col-span-7">
-                <div className="bg-white border border-border p-10" data-testid="card-leadership-bio">
+                <div className="p-10" style={glassStyle} data-testid="card-leadership-bio">
                   <div className="text-secondary font-bold uppercase tracking-widest text-sm" data-testid="text-leadership-bio-kicker">
                     Background
                   </div>
                   <h2 className="mt-3 font-display text-3xl md:text-4xl text-primary" data-testid="text-leadership-bio-title">
                     Career Highlights
                   </h2>
+                  <GoldShimmerLine />
 
                   <ul className="mt-10 space-y-6 text-muted-foreground" data-testid="list-leadership-highlights">
                     {[
@@ -131,13 +191,13 @@ export default function Leadership() {
                       "Holds a BA in Economics from the University of New Mexico.",
                     ].map((item, idx) => (
                       <li key={idx} className="flex gap-4" data-testid={`row-leadership-highlight-${idx}`}>
-                        <div className="mt-2 size-1.5 bg-secondary" aria-hidden="true" />
+                        <div className="mt-2 size-1.5 bg-secondary flex-shrink-0" aria-hidden="true" />
                         <div data-testid={`text-leadership-highlight-${idx}`}>{item}</div>
                       </li>
                     ))}
                   </ul>
 
-                  <div className="mt-12 border-t border-border pt-10" data-testid="section-leadership-personal">
+                  <div className="mt-12 border-t border-border/50 pt-10" data-testid="section-leadership-personal">
                     <div className="grid md:grid-cols-12 gap-8 items-start">
                       <div className="md:col-span-5">
                         <div className="text-secondary font-bold uppercase tracking-widest text-sm" data-testid="text-leadership-personal-kicker">
@@ -146,20 +206,19 @@ export default function Leadership() {
                         <h3 className="mt-3 font-display text-2xl text-primary" data-testid="text-leadership-personal-title">
                           A grounded approach
                         </h3>
+                        <GoldShimmerLine />
                         <p className="mt-4 text-muted-foreground leading-relaxed" data-testid="text-leadership-personal-body">
                           A disciplined life builds a disciplined investor. We approach markets
                           with humility, rigor, and responsibility.
                         </p>
                       </div>
                       <div className="md:col-span-7">
-                        <div className="bg-white border border-border" data-testid="card-leadership-family">
-                          <img
-                            src={codyFamily}
-                            alt="Cody Willard with family"
-                            className="w-full h-auto"
-                            data-testid="img-leadership-cody-family"
-                          />
-                        </div>
+                        <ParallaxImage
+                          src={codyFamily}
+                          alt="Cody Willard with family"
+                          testId="img-leadership-cody-family"
+                          className="relative"
+                        />
                       </div>
                     </div>
                   </div>
