@@ -420,14 +420,14 @@ export default function Careers() {
                         className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3"
                         data-testid={`file-item-${f.name}`}
                       >
-                        <span className="flex items-center gap-2 text-white/80 text-sm truncate">
+                        <span className="flex items-center gap-2 text-slate-900 text-sm truncate">
                           <FileText className="w-4 h-4 text-secondary/60 flex-shrink-0" />
                           {f.name}
                         </span>
                         <button
                           type="button"
                           onClick={() => removeFile(f.name)}
-                          className="text-white/40 hover:text-white transition-colors"
+                          className="text-slate-500 hover:text-slate-900 transition-colors"
                           aria-label={`Remove ${f.name}`}
                           data-testid={`button-remove-${f.name}`}
                         >
