@@ -1,6 +1,80 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
+import { useState, useRef } from "react";
+
+function AIRSCard({
+  kicker,
+  title,
+  description,
+  videoSrc,
+  testId,
+}: {
+  kicker: string;
+  title: string;
+  description: string;
+  videoSrc: string;
+  testId: string;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleMouseEnter = () => {
+    setHovered(true);
+    videoRef.current?.play();
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+    videoRef.current?.pause();
+  };
+
+  return (
+    <div
+      className="relative overflow-hidden border border-border p-8 transition-transform duration-300 ease-out cursor-default"
+      style={{ transform: hovered ? "scale(1.05)" : "scale(1)" }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      data-testid={testId}
+    >
+      <div
+        className="absolute inset-0 transition-opacity duration-500"
+        style={{ opacity: hovered ? 1 : 0 }}
+      >
+        <video
+          ref={videoRef}
+          src={videoSrc}
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-primary/80" />
+      </div>
+
+      <div className="relative z-10">
+        <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
+          {kicker}
+        </div>
+        <h3
+          className="font-display text-xl mb-4 transition-colors duration-300"
+          style={{ color: hovered ? "#ffffff" : "" }}
+        >
+          {!hovered && <span className="text-primary">{title}</span>}
+          {hovered && <span>{title}</span>}
+        </h3>
+        <p
+          className="leading-relaxed transition-colors duration-300"
+          style={{ color: hovered ? "rgba(255,255,255,0.85)" : "" }}
+        >
+          {!hovered && <span className="text-muted-foreground">{description}</span>}
+          {hovered && <span>{description}</span>}
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function SectionTitle({ kicker, title }: { kicker: string; title: string }) {
   return (
@@ -88,54 +162,29 @@ export default function Philosophy() {
               </p>
 
               <div className="grid lg:grid-cols-3 gap-10">
-                <div className="bg-white border border-border p-8" data-testid="card-airs-ai">
-                  <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
-                    1. The AI Revolution
-                  </div>
-                  <h3 className="font-display text-xl text-primary mb-4">
-                    The Cognitive Shift
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Artificial Intelligence is not just software; it is the decoupling of
-                    intelligence from biological constraints. It is the revolution of logic,
-                    creativity, and efficiency. We are moving from an era of static computation
-                    to one of generative reasoning, where machines do not just execute commands
-                    but solve problems. This revolution will redefine the value of human labor
-                    and the speed of scientific discovery.
-                  </p>
-                </div>
+                <AIRSCard
+                  kicker="1. The AI Revolution"
+                  title="The Cognitive Shift"
+                  description="Artificial Intelligence is not just software; it is the decoupling of intelligence from biological constraints. It is the revolution of logic, creativity, and efficiency. We are moving from an era of static computation to one of generative reasoning, where machines do not just execute commands but solve problems. This revolution will redefine the value of human labor and the speed of scientific discovery."
+                  videoSrc="/videos/airs-ai-bg.mp4"
+                  testId="card-airs-ai"
+                />
 
-                <div className="bg-white border border-border p-8" data-testid="card-airs-robotics">
-                  <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
-                    2. The Robotics Revolution
-                  </div>
-                  <h3 className="font-display text-xl text-primary mb-4">
-                    The Physical Shift
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    While AI transforms the digital world, Robotics reclaims the physical one.
-                    From autonomous logistics to humanoid assistants, we are witnessing the
-                    automation of the tangible. This is not just about manufacturing; it is about
-                    liberating humanity from dangerous and repetitive toil, allowing the physical
-                    world to move and adapt with the speed of software.
-                  </p>
-                </div>
+                <AIRSCard
+                  kicker="2. The Robotics Revolution"
+                  title="The Physical Shift"
+                  description="While AI transforms the digital world, Robotics reclaims the physical one. From autonomous logistics to humanoid assistants, we are witnessing the automation of the tangible. This is not just about manufacturing; it is about liberating humanity from dangerous and repetitive toil, allowing the physical world to move and adapt with the speed of software."
+                  videoSrc="/videos/airs-robotics-bg.mp4"
+                  testId="card-airs-robotics"
+                />
 
-                <div className="bg-white border border-border p-8" data-testid="card-airs-space">
-                  <div className="text-xs font-bold uppercase tracking-widest text-secondary mb-4">
-                    3. The Space Revolution
-                  </div>
-                  <h3 className="font-display text-xl text-primary mb-4">
-                    The Boundary Shift
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    For all of human history, our economy has been earthbound. That era is ending.
-                    The Space Revolution is not merely about exploration; it is about expansion.
-                    It is the industrialization of orbit, the harvesting of infinite resources,
-                    and the creation of a multi-planetary civilization. We view the stars not as
-                    a destination, but as the new frontier of economic and societal necessity.
-                  </p>
-                </div>
+                <AIRSCard
+                  kicker="3. The Space Revolution"
+                  title="The Boundary Shift"
+                  description="For all of human history, our economy has been earthbound. That era is ending. The Space Revolution is not merely about exploration; it is about expansion. It is the industrialization of orbit, the harvesting of infinite resources, and the creation of a multi-planetary civilization. We view the stars not as a destination, but as the new frontier of economic and societal necessity."
+                  videoSrc="/videos/airs-space-bg.mp4"
+                  testId="card-airs-space"
+                />
               </div>
             </div>
           </div>
