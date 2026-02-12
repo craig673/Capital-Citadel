@@ -1328,6 +1328,16 @@ export default function Approvals() {
                                 )}
                                 {job.status === "open" ? "Close" : "Reopen"}
                               </button>
+                              <a
+                                href={`/about/careers?jobId=${job.id}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 border border-muted-foreground/30 text-muted-foreground px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                data-testid={`button-view-live-${idx}`}
+                              >
+                                <ExternalLink size={14} />
+                                View Live
+                              </a>
                               <button
                                 onClick={() => {
                                   setSelectedJobId(job.id);

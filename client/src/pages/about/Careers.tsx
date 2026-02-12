@@ -30,7 +30,17 @@ export default function Careers() {
   useEffect(() => {
     fetch("/api/jobs/open")
       .then((res) => res.json())
-      .then((data) => setOpenJobs(data))
+      .then((data: Job[]) => {
+        setOpenJobs(data);
+        const params = new URLSearchParams(window.location.search);
+        const deepLinkId = params.get("jobId");
+        if (deepLinkId && data.some((j: Job) => j.id === deepLinkId)) {
+          setExpandedJobs(new Set([deepLinkId]));
+          setTimeout(() => {
+            document.getElementById(`job-accordion-${deepLinkId}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 300);
+        }
+      })
       .catch(() => setOpenJobs([]))
       .finally(() => setJobsLoading(false));
   }, []);
@@ -187,6 +197,7 @@ export default function Careers() {
                   className="rounded-xl border border-slate-200 bg-white overflow-hidden"
                   {...fadeUp}
                   transition={{ ...fadeUp.transition, delay: 0.1 + index * 0.1 }}
+                  id={`job-accordion-${job.id}`}
                   data-testid={`card-job-${job.id}`}
                 >
                   <button
