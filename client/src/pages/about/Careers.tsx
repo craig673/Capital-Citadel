@@ -1,8 +1,9 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { Upload, X, FileText, CheckCircle, Loader2 } from "lucide-react";
+import type { Job } from "@shared/schema";
 
 const fadeUp = {
   initial: { opacity: 0, y: 40 },
@@ -20,6 +21,20 @@ export default function Careers() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [openJobs, setOpenJobs] = useState<Job[]>([]);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [jobsLoading, setJobsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/jobs/open")
+      .then((res) => res.json())
+      .then((data) => setOpenJobs(data))
+      .catch(() => setOpenJobs([]))
+      .finally(() => setJobsLoading(false));
+  }, []);
+
+  const selectedJob = openJobs.find((j) => j.id === selectedJobId) || null;
 
   const acceptedTypes = [
     "application/pdf",
@@ -59,6 +74,7 @@ export default function Careers() {
       const formData = new FormData();
       formData.append("name", name.trim());
       formData.append("email", email.trim());
+      if (selectedJobId) formData.append("jobId", selectedJobId);
       files.forEach((f) => formData.append("files", f));
 
       const res = await fetch("/api/applications", { method: "POST", body: formData });
@@ -72,6 +88,13 @@ export default function Careers() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleApplyForRole = (jobId: string) => {
+    setSelectedJobId(jobId);
+    setTimeout(() => {
+      document.getElementById("application-form")?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
   };
 
   return (
@@ -126,26 +149,80 @@ export default function Careers() {
             <div className="mt-3 h-px w-16 bg-secondary mx-auto" aria-hidden="true" />
           </motion.div>
 
-          <motion.div
-            className="mt-12 rounded-xl border border-slate-200 bg-slate-50 p-8 md:p-12 text-center"
-            {...fadeUp}
-            transition={{ ...fadeUp.transition, delay: 0.15 }}
-            data-testid="card-no-open-roles"
-          >
-            <p className="text-slate-900 text-lg leading-relaxed font-medium" data-testid="text-no-roles-message">
-              We currently have no open roles, but if you are interested in joining the team,
-              please upload your resume below and click send.
-            </p>
-          </motion.div>
+          {jobsLoading ? (
+            <motion.div
+              className="mt-12 flex justify-center"
+              {...fadeUp}
+              transition={{ ...fadeUp.transition, delay: 0.15 }}
+            >
+              <Loader2 className="w-8 h-8 animate-spin text-secondary" data-testid="spinner-jobs-loading" />
+            </motion.div>
+          ) : openJobs.length === 0 ? (
+            <motion.div
+              className="mt-12 rounded-xl border border-slate-200 bg-slate-50 p-8 md:p-12 text-center"
+              {...fadeUp}
+              transition={{ ...fadeUp.transition, delay: 0.15 }}
+              data-testid="card-no-open-roles"
+            >
+              <p className="text-slate-900 text-lg leading-relaxed font-medium" data-testid="text-no-roles-message">
+                We currently have no open roles, but if you are interested in joining the team,
+                please upload your resume below and click send.
+              </p>
+            </motion.div>
+          ) : (
+            <div className="mt-12 space-y-6" data-testid="list-open-jobs">
+              {openJobs.map((job, index) => (
+                <motion.div
+                  key={job.id}
+                  className="rounded-xl border border-slate-200 bg-white p-6 md:p-8 hover:shadow-lg transition-shadow"
+                  {...fadeUp}
+                  transition={{ ...fadeUp.transition, delay: 0.1 + index * 0.1 }}
+                  data-testid={`card-job-${job.id}`}
+                >
+                  <h3 className="font-display text-xl text-slate-900" data-testid={`text-job-title-${job.id}`}>
+                    {job.title}
+                  </h3>
+                  <p className="mt-3 text-slate-600 leading-relaxed" data-testid={`text-job-description-${job.id}`}>
+                    {job.description}
+                  </p>
+                  {job.requirements && (
+                    <ul className="mt-4 space-y-1.5 list-disc list-inside text-slate-600 text-sm" data-testid={`list-job-requirements-${job.id}`}>
+                      {job.requirements.split("\n").filter(Boolean).map((req, i) => (
+                        <li key={i}>{req.trim()}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleApplyForRole(job.id)}
+                    className="mt-6 inline-flex items-center gap-2 rounded-lg bg-secondary px-5 py-2.5 text-primary font-bold uppercase tracking-wider text-sm hover:bg-secondary/90 transition-colors"
+                    data-testid={`button-apply-${job.id}`}
+                  >
+                    Apply for this Role
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      <section className="py-20 md:py-28 bg-primary border-t border-border" data-testid="section-application-form">
+      <section id="application-form" className="py-20 md:py-28 bg-primary border-t border-border" data-testid="section-application-form">
         <div className="max-w-2xl mx-auto px-6">
           <motion.div className="text-center" {...fadeUp}>
             <h2 className="font-display text-3xl md:text-4xl text-white" data-testid="text-application-title">
-              Send Us Your Resume
+              {selectedJob ? `Apply for ${selectedJob.title}` : "Send Us Your Resume"}
             </h2>
+            {selectedJob && (
+              <button
+                type="button"
+                onClick={() => setSelectedJobId(null)}
+                className="mt-2 text-secondary/70 hover:text-secondary text-sm underline underline-offset-2 transition-colors"
+                data-testid="button-clear-selection"
+              >
+                Clear selection — send a general application instead
+              </button>
+            )}
             <div className="mt-3 h-px w-16 bg-secondary mx-auto" aria-hidden="true" />
           </motion.div>
 

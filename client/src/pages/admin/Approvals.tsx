@@ -3,7 +3,7 @@ import { useLocation, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User } from "@shared/schema";
-import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown, MoreVertical, Upload, Trash2, Calendar, Loader2 } from "lucide-react";
+import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown, MoreVertical, Upload, Trash2, Calendar, Loader2, Briefcase, Users, Eye, ChevronDown, ChevronUp } from "lucide-react";
 
 type UserWithoutPassword = Omit<User, "password">;
 
@@ -61,6 +61,18 @@ export default function Approvals() {
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null);
   const letterFileRef = useRef<HTMLInputElement>(null);
   const fundDocFileRef = useRef<HTMLInputElement>(null);
+  const [jobsData, setJobsData] = useState<{id: string; title: string; description: string; requirements: string; status: string; createdAt: string}[]>([]);
+  const [jobsLoading, setJobsLoading] = useState(true);
+  const [newJobTitle, setNewJobTitle] = useState("");
+  const [newJobDescription, setNewJobDescription] = useState("");
+  const [newJobRequirements, setNewJobRequirements] = useState("");
+  const [jobCreating, setJobCreating] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [applicants, setApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; submittedAt: string}[]>([]);
+  const [applicantsLoading, setApplicantsLoading] = useState(false);
+  const [generalApplicants, setGeneralApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; submittedAt: string}[]>([]);
+  const [generalApplicantsLoading, setGeneralApplicantsLoading] = useState(true);
+  const [togglingJobId, setTogglingJobId] = useState<string | null>(null);
 
   const sortedFilteredUsers = useMemo(() => {
     let filtered = approvedUsers;
@@ -186,11 +198,113 @@ export default function Approvals() {
     URL.revokeObjectURL(link.href);
   };
 
+  const fetchJobs = async () => {
+    try {
+      const response = await fetch("/api/admin/jobs", { credentials: "include" });
+      if (response.ok) {
+        const data = await response.json();
+        setJobsData(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch jobs:", err);
+    } finally {
+      setJobsLoading(false);
+    }
+  };
+
+  const handleCreateJob = async () => {
+    if (!newJobTitle.trim() || !newJobDescription.trim() || !newJobRequirements.trim()) return;
+    setJobCreating(true);
+    try {
+      const response = await fetch("/api/admin/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          title: newJobTitle.trim(),
+          description: newJobDescription.trim(),
+          requirements: newJobRequirements.trim(),
+        }),
+      });
+      if (response.ok) {
+        const job = await response.json();
+        setJobsData(prev => [job, ...prev]);
+        setNewJobTitle("");
+        setNewJobDescription("");
+        setNewJobRequirements("");
+        showToast("Job posting created successfully", "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to create job posting", "error");
+      }
+    } catch (err) {
+      showToast("Failed to create job posting", "error");
+    } finally {
+      setJobCreating(false);
+    }
+  };
+
+  const handleToggleJobStatus = async (id: string, currentStatus: string) => {
+    setTogglingJobId(id);
+    try {
+      const newStatus = currentStatus === "open" ? "closed" : "open";
+      const response = await fetch(`/api/admin/jobs/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (response.ok) {
+        const updatedJob = await response.json();
+        setJobsData(prev => prev.map(j => j.id === id ? updatedJob : j));
+        showToast(`Job ${newStatus === "open" ? "reopened" : "closed"} successfully`, "success");
+      } else {
+        const data = await response.json();
+        showToast(data.error || "Failed to update job status", "error");
+      }
+    } catch (err) {
+      showToast("Failed to update job status", "error");
+    } finally {
+      setTogglingJobId(null);
+    }
+  };
+
+  const fetchApplicants = async (jobId: string) => {
+    setApplicantsLoading(true);
+    try {
+      const response = await fetch(`/api/admin/jobs/${jobId}/applicants`, { credentials: "include" });
+      if (response.ok) {
+        const data = await response.json();
+        setApplicants(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch applicants:", err);
+    } finally {
+      setApplicantsLoading(false);
+    }
+  };
+
+  const fetchGeneralApplicants = async () => {
+    try {
+      const response = await fetch("/api/admin/applications", { credentials: "include" });
+      if (response.ok) {
+        const data = await response.json();
+        setGeneralApplicants(data.filter((app: any) => !app.jobId));
+      }
+    } catch (err) {
+      console.error("Failed to fetch general applicants:", err);
+    } finally {
+      setGeneralApplicantsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchPendingUsers();
     fetchDocuments();
     fetchApprovedUsers();
     fetchPublishedDocuments();
+    fetchJobs();
+    fetchGeneralApplicants();
   }, []);
 
   const fetchPublishedDocuments = async () => {
@@ -1055,6 +1169,278 @@ export default function Approvals() {
                   </div>
                 )}
               </div>
+            </div>
+          </section>
+
+          <section className="mt-16" data-testid="section-careers-management">
+            <h2 className="font-display text-3xl text-primary tracking-tight border-b-4 border-secondary pb-3 inline-block mb-8">
+              CAREERS MANAGEMENT
+            </h2>
+
+            <div className="bg-primary text-primary-foreground p-6 border border-secondary/30 mb-8" data-testid="section-create-job">
+              <h3 className="font-display text-xl mb-6">Create Job Posting</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    Job Title
+                  </label>
+                  <input
+                    type="text"
+                    value={newJobTitle}
+                    onChange={(e) => setNewJobTitle(e.target.value)}
+                    placeholder="e.g., Senior Analyst"
+                    className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary"
+                    data-testid="input-job-title"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={newJobDescription}
+                    onChange={(e) => setNewJobDescription(e.target.value)}
+                    placeholder="Job description..."
+                    rows={4}
+                    className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary resize-vertical"
+                    data-testid="input-job-description"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
+                    Requirements
+                  </label>
+                  <textarea
+                    value={newJobRequirements}
+                    onChange={(e) => setNewJobRequirements(e.target.value)}
+                    placeholder="Job requirements..."
+                    rows={4}
+                    className="w-full bg-primary-foreground text-primary border border-secondary/30 p-3 text-sm focus:outline-none focus:border-secondary resize-vertical"
+                    data-testid="input-job-requirements"
+                  />
+                </div>
+                <button
+                  onClick={handleCreateJob}
+                  disabled={!newJobTitle.trim() || !newJobDescription.trim() || !newJobRequirements.trim() || jobCreating}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
+                  data-testid="button-create-job"
+                >
+                  {jobCreating ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Briefcase size={16} />
+                      Create Job Posting
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <h3 className="font-display text-xl text-primary mb-4">Active Job Postings</h3>
+              {jobsLoading ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+                </div>
+              ) : jobsData.length === 0 ? (
+                <div className="bg-primary border border-secondary/30 p-8 text-center" data-testid="section-no-jobs">
+                  <Briefcase size={32} className="mx-auto mb-3 text-secondary/50" />
+                  <p className="text-muted-foreground">No job postings yet.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full" data-testid="table-job-postings">
+                    <thead>
+                      <tr className="border-b border-secondary/30">
+                        <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Title</th>
+                        <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Status</th>
+                        <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Created</th>
+                        <th className="text-right text-xs font-bold uppercase tracking-widest text-secondary py-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {jobsData.map((job, idx) => (
+                        <tr
+                          key={job.id}
+                          className="border-b border-border/50 hover:bg-primary/5 transition-colors"
+                          data-testid={`row-job-${idx}`}
+                        >
+                          <td className="py-4 pr-4 text-sm font-medium text-primary" data-testid={`text-job-title-${idx}`}>{job.title}</td>
+                          <td className="py-4 pr-4">
+                            <span
+                              className={`inline-flex items-center text-xs font-bold uppercase px-2 py-1 ${
+                                job.status === "open"
+                                  ? "text-green-600 bg-green-500/10"
+                                  : "text-muted-foreground bg-muted"
+                              }`}
+                              data-testid={`badge-job-status-${idx}`}
+                            >
+                              {job.status}
+                            </span>
+                          </td>
+                          <td className="py-4 pr-4 text-sm text-muted-foreground" data-testid={`text-job-created-${idx}`}>
+                            {formatDate(job.createdAt)}
+                          </td>
+                          <td className="py-4 text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => handleToggleJobStatus(job.id, job.status)}
+                                disabled={togglingJobId === job.id}
+                                className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
+                                data-testid={`button-toggle-job-${idx}`}
+                              >
+                                {togglingJobId === job.id ? (
+                                  <Loader2 size={14} className="animate-spin" />
+                                ) : job.status === "open" ? (
+                                  <ChevronDown size={14} />
+                                ) : (
+                                  <ChevronUp size={14} />
+                                )}
+                                {job.status === "open" ? "Close" : "Reopen"}
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedJobId(job.id);
+                                  fetchApplicants(job.id);
+                                }}
+                                className="inline-flex items-center gap-1 border border-secondary text-secondary px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-secondary hover:text-secondary-foreground transition-colors"
+                                data-testid={`button-view-applicants-${idx}`}
+                              >
+                                <Eye size={14} />
+                                View Applicants
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {selectedJobId && (
+              <div className="bg-primary text-primary-foreground p-6 border border-secondary/30 mb-8" data-testid="section-applicants-panel">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-display text-xl flex items-center gap-2">
+                    <Users size={20} />
+                    Applicants for: {jobsData.find(j => j.id === selectedJobId)?.title}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedJobId(null)}
+                    className="text-primary-foreground/70 hover:text-primary-foreground transition-colors"
+                    data-testid="button-close-applicants"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+                {applicantsLoading ? (
+                  <div className="text-center py-8">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+                  </div>
+                ) : applicants.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4" data-testid="text-no-applicants">No applicants for this position yet.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {applicants.map((app, idx) => {
+                      let resumeFiles: {path: string; name: string}[] = [];
+                      try {
+                        if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
+                      } catch {}
+                      return (
+                        <div key={app.id} className="p-4 bg-primary-foreground/5 border border-secondary/20" data-testid={`applicant-card-${idx}`}>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                            <div>
+                              <div className="text-sm font-medium text-primary-foreground" data-testid={`text-applicant-name-${idx}`}>{app.name}</div>
+                              <div className="text-xs text-primary-foreground/60" data-testid={`text-applicant-email-${idx}`}>{app.email}</div>
+                              <div className="text-xs text-primary-foreground/40 mt-1" data-testid={`text-applicant-date-${idx}`}>
+                                Submitted: {formatDate(app.submittedAt)}
+                              </div>
+                            </div>
+                            {resumeFiles.length > 0 && (
+                              <div className="flex flex-wrap gap-2">
+                                {resumeFiles.map((file, fileIdx) => (
+                                  <a
+                                    key={fileIdx}
+                                    href={`/api/admin/applications/${app.id}/resume/${fileIdx}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                                    data-testid={`link-resume-${idx}-${fileIdx}`}
+                                  >
+                                    <Download size={12} />
+                                    {file.name}
+                                  </a>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-8" data-testid="section-general-applications">
+              <h3 className="font-display text-xl text-primary mb-4 flex items-center gap-2">
+                <Users size={20} />
+                General Applications
+              </h3>
+              {generalApplicantsLoading ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
+                </div>
+              ) : generalApplicants.length === 0 ? (
+                <div className="bg-primary border border-secondary/30 p-8 text-center" data-testid="section-no-general-applicants">
+                  <Users size={32} className="mx-auto mb-3 text-secondary/50" />
+                  <p className="text-muted-foreground">No general applications received yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {generalApplicants.map((app, idx) => {
+                    let resumeFiles: {path: string; name: string}[] = [];
+                    try {
+                      if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
+                    } catch {}
+                    return (
+                      <div key={app.id} className="bg-primary text-primary-foreground p-4 border border-secondary/30" data-testid={`general-applicant-card-${idx}`}>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <div>
+                            <div className="text-sm font-medium text-primary-foreground" data-testid={`text-general-applicant-name-${idx}`}>{app.name}</div>
+                            <div className="text-xs text-primary-foreground/60" data-testid={`text-general-applicant-email-${idx}`}>{app.email}</div>
+                            <div className="text-xs text-primary-foreground/40 mt-1" data-testid={`text-general-applicant-date-${idx}`}>
+                              Submitted: {formatDate(app.submittedAt)}
+                            </div>
+                          </div>
+                          {resumeFiles.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {resumeFiles.map((file, fileIdx) => (
+                                <a
+                                  key={fileIdx}
+                                  href={`/api/admin/applications/${app.id}/resume/${fileIdx}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                                  data-testid={`link-general-resume-${idx}-${fileIdx}`}
+                                >
+                                  <Download size={12} />
+                                  {file.name}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </section>
         </div>
