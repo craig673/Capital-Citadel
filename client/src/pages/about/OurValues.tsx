@@ -77,7 +77,7 @@ function PillarCard({
   };
 
   return (
-    <div style={{ perspective: "800px" }}>
+    <div className="h-full" style={{ perspective: "800px" }}>
       <motion.div
         ref={cardRef}
         variants={revealVariants}
@@ -85,7 +85,7 @@ function PillarCard({
         whileInView="visible"
         viewport={{ once: true, margin: "-60px" }}
         custom={index}
-        className="relative overflow-hidden border border-border p-8 cursor-default"
+        className="relative overflow-hidden border border-border p-8 cursor-default h-full"
         style={{
           transform: `scale(${hovered ? 1.05 : 1}) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
           transition: "transform 0.15s ease-out, box-shadow 0.3s ease-out",
@@ -214,7 +214,7 @@ export default function OurValues() {
                 </p>
               </motion.div>
 
-              <div className="grid lg:grid-cols-3 gap-10" data-testid="list-values-pillars">
+              <div className="grid lg:grid-cols-3 gap-10 items-stretch" data-testid="list-values-pillars">
                 {pillars.map((p, i) => (
                   <PillarCard key={p.number} pillar={p} index={i + 1} />
                 ))}
