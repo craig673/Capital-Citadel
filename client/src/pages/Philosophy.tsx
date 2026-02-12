@@ -1,7 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { motion } from "framer-motion";
-import { useState, useRef } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
 
 const revealVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -11,10 +11,196 @@ const revealVariants = {
     transition: {
       duration: 0.9,
       delay: i * 0.15,
-      ease: [0.25, 0.1, 0.25, 1],
+      ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
     },
   }),
 };
+
+const disciplinePoints = [
+  {
+    id: "section-discipline-1",
+    title: "1. The Discipline of 10,000 Days",
+    content: (
+      <p>
+        Civilization is built on long horizons. While the world reacts to the
+        volatility of the hour, we operate on a timeline of 10,000 days. We model the
+        future not by quarters, but by decades. This long-term discipline allows us
+        to see past the "froth" of hype cycles and identify the enduring technologies
+        that will thrive long after the bubbles burst.
+      </p>
+    ),
+  },
+  {
+    id: "section-discipline-2",
+    title: "2. The Contrarian Mindset",
+    content: (
+      <p>
+        The Status Quo is rarely the future. To see what others miss, one must be
+        willing to stand apart. We challenge conventional wisdom and reject the
+        comfort of the crowd. When the world sees fear, we see opportunity. When the
+        world sees euphoria, we see caution. We strip away emotional bias to view the
+        mechanics of society with absolute clarity.
+      </p>
+    ),
+  },
+  {
+    id: "section-discipline-3",
+    title: "3. The Proprietary Lens",
+    content: (
+      <>
+        <p className="mb-5">
+          Understanding a Revolution requires both a telescope and a microscope.
+        </p>
+        <ul className="list-disc pl-6 space-y-3">
+          <li>
+            <span className="font-semibold text-white">Top-Down:</span> We analyze the
+            macroscopic shifts in demographics, energy, and geopolitics that create the
+            fertile ground for change.
+          </li>
+          <li>
+            <span className="font-semibold text-white">Bottom-Up:</span> We apply
+            rigorous mathematical modeling to the specific engines of these
+            Revolutions—the entities executing the vision.
+          </li>
+        </ul>
+        <p className="mt-5">
+          By quantifying factors like "Inflection Points" and "Scalability" through our
+          proprietary models, we turn abstract visions into measurable data.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: "section-discipline-4",
+    title: "4. The Human Element",
+    content: (
+      <p>
+        Technology is the tool, but humanity is the architect. Our approach is driven
+        by a collective of thinkers, engineers, and analysts united by a single
+        ambition: to be on the right side of history.
+      </p>
+    ),
+  },
+];
+
+function WireframeSphere() {
+  return (
+    <svg
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+      width="600"
+      height="600"
+      viewBox="0 0 600 600"
+      fill="none"
+      style={{ opacity: 0.10 }}
+    >
+      <circle cx="300" cy="300" r="250" stroke="#C5A059" strokeWidth="0.5" />
+      <circle cx="300" cy="300" r="200" stroke="#C5A059" strokeWidth="0.4" />
+      <circle cx="300" cy="300" r="150" stroke="#C5A059" strokeWidth="0.3" />
+
+      <ellipse cx="300" cy="300" rx="250" ry="80" stroke="#C5A059" strokeWidth="0.5" />
+      <ellipse cx="300" cy="300" rx="250" ry="80" stroke="#C5A059" strokeWidth="0.4" transform="rotate(30 300 300)" />
+      <ellipse cx="300" cy="300" rx="250" ry="80" stroke="#C5A059" strokeWidth="0.4" transform="rotate(60 300 300)" />
+      <ellipse cx="300" cy="300" rx="250" ry="80" stroke="#C5A059" strokeWidth="0.4" transform="rotate(90 300 300)" />
+      <ellipse cx="300" cy="300" rx="250" ry="80" stroke="#C5A059" strokeWidth="0.4" transform="rotate(120 300 300)" />
+      <ellipse cx="300" cy="300" rx="250" ry="80" stroke="#C5A059" strokeWidth="0.4" transform="rotate(150 300 300)" />
+
+      <ellipse cx="300" cy="300" rx="80" ry="250" stroke="#C5A059" strokeWidth="0.4" />
+      <ellipse cx="300" cy="300" rx="160" ry="250" stroke="#C5A059" strokeWidth="0.3" />
+
+      <line x1="50" y1="300" x2="550" y2="300" stroke="#C5A059" strokeWidth="0.3" />
+      <line x1="300" y1="50" x2="300" y2="550" stroke="#C5A059" strokeWidth="0.3" />
+    </svg>
+  );
+}
+
+function DisciplineScrollytelling() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const totalPoints = disciplinePoints.length;
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [sphereRotation, setSphereRotation] = useState(0);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"],
+  });
+
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const segmentSize = 1 / (totalPoints + 1);
+    const idx = Math.floor(v / segmentSize) - 1;
+    const clamped = Math.max(-1, Math.min(totalPoints - 1, idx));
+    setActiveIndex(clamped);
+    setSphereRotation(v * 120);
+  });
+
+  return (
+    <div ref={containerRef} style={{ height: `${(totalPoints + 2) * 100}vh` }}>
+      <div className="sticky top-0 h-screen overflow-hidden" style={{ backgroundColor: "#0A0A0F" }}>
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{ transform: `rotate(${sphereRotation}deg)`, transition: "transform 0.3s ease-out" }}
+        >
+          <WireframeSphere />
+        </div>
+
+        <div className="relative z-10 h-full flex flex-col justify-center max-w-4xl mx-auto px-6">
+          <div className="mb-12">
+            <div className="text-secondary font-bold uppercase tracking-widest mb-4 text-sm">
+              Our Discipline
+            </div>
+            <h2 className="font-display text-3xl md:text-4xl text-white">
+              How We See the Future
+            </h2>
+          </div>
+
+          <div className="space-y-10">
+            {disciplinePoints.map((point, i) => {
+              const isActive = i === activeIndex;
+              const isPast = i < activeIndex;
+              const isFuture = i > activeIndex;
+              const isVisible = activeIndex >= 0;
+
+              let opacity = 0;
+              let translateY = 40;
+
+              if (isVisible) {
+                if (isActive) {
+                  opacity = 1;
+                  translateY = 0;
+                } else if (isPast) {
+                  opacity = 0.3;
+                  translateY = -20;
+                } else if (isFuture && i === activeIndex + 1) {
+                  opacity = 0.15;
+                  translateY = 30;
+                } else {
+                  opacity = 0;
+                  translateY = 40;
+                }
+              }
+
+              return (
+                <motion.div
+                  key={point.id}
+                  data-testid={point.id}
+                  animate={{ opacity, y: translateY }}
+                  transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="leading-relaxed"
+                >
+                  <h3 className="font-display text-2xl text-white mb-3">
+                    {point.title}
+                  </h3>
+                  <div className="text-gray-400">
+                    {point.content}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function AIRSCard({
   kicker,
@@ -256,115 +442,8 @@ export default function Philosophy() {
           </div>
         </section>
 
-        {/* Discipline */}
-        <section className="py-20 border-t border-border">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="max-w-4xl">
-              <motion.div
-                variants={revealVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-60px" }}
-                custom={0}
-              >
-                <SectionTitle kicker="Our Discipline" title="How We See the Future" />
-              </motion.div>
-
-              <div className="space-y-12 text-muted-foreground leading-relaxed">
-                <motion.section
-                  variants={revealVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-60px" }}
-                  custom={0}
-                  data-testid="section-discipline-1"
-                >
-                  <h3 className="font-display text-2xl text-primary mb-3">
-                    1. The Discipline of 10,000 Days
-                  </h3>
-                  <p>
-                    Civilization is built on long horizons. While the world reacts to the
-                    volatility of the hour, we operate on a timeline of 10,000 days. We model the
-                    future not by quarters, but by decades. This long-term discipline allows us
-                    to see past the "froth" of hype cycles and identify the enduring technologies
-                    that will thrive long after the bubbles burst.
-                  </p>
-                </motion.section>
-
-                <motion.section
-                  variants={revealVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-60px" }}
-                  custom={1}
-                  data-testid="section-discipline-2"
-                >
-                  <h3 className="font-display text-2xl text-primary mb-3">
-                    2. The Contrarian Mindset
-                  </h3>
-                  <p>
-                    The Status Quo is rarely the future. To see what others miss, one must be
-                    willing to stand apart. We challenge conventional wisdom and reject the
-                    comfort of the crowd. When the world sees fear, we see opportunity. When the
-                    world sees euphoria, we see caution. We strip away emotional bias to view the
-                    mechanics of society with absolute clarity.
-                  </p>
-                </motion.section>
-
-                <motion.section
-                  variants={revealVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-60px" }}
-                  custom={2}
-                  data-testid="section-discipline-3"
-                >
-                  <h3 className="font-display text-2xl text-primary mb-3">
-                    3. The Proprietary Lens
-                  </h3>
-                  <p className="mb-5">
-                    Understanding a Revolution requires both a telescope and a microscope.
-                  </p>
-                  <ul className="list-disc pl-6 space-y-3">
-                    <li>
-                      <span className="font-semibold text-primary">Top-Down:</span> We analyze the
-                      macroscopic shifts in demographics, energy, and geopolitics that create the
-                      fertile ground for change.
-                    </li>
-                    <li>
-                      <span className="font-semibold text-primary">Bottom-Up:</span> We apply
-                      rigorous mathematical modeling to the specific engines of these
-                      Revolutions—the entities executing the vision.
-                    </li>
-                  </ul>
-                  <p className="mt-5">
-                    By quantifying factors like "Inflection Points" and "Scalability" through our
-                    proprietary models, we turn abstract visions into measurable data.
-                  </p>
-                </motion.section>
-
-                <motion.section
-                  variants={revealVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-60px" }}
-                  custom={3}
-                  data-testid="section-discipline-4"
-                  className="border-t border-border pt-10"
-                >
-                  <h3 className="font-display text-2xl text-primary mb-3">
-                    4. The Human Element
-                  </h3>
-                  <p>
-                    Technology is the tool, but humanity is the architect. Our approach is driven
-                    by a collective of thinkers, engineers, and analysts united by a single
-                    ambition: to be on the right side of history.
-                  </p>
-                </motion.section>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Discipline — Sticky Scrollytelling */}
+        <DisciplineScrollytelling />
       </main>
       <Footer />
     </div>
