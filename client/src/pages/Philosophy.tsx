@@ -3,80 +3,19 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { useState, useRef } from "react";
 
-function ConvergenceSVG() {
+function ConvergenceGlow() {
   return (
-    <svg
-      className="absolute inset-0 w-full h-full"
-      viewBox="0 0 1200 600"
-      preserveAspectRatio="xMidYMid slice"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      style={{ opacity: 0.50 }}
-    >
-      <defs>
-        <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#C5A059" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#C5A059" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-
-      <line x1="200" y1="300" x2="600" y2="300" stroke="#C5A059" strokeWidth="1" />
-      <line x1="600" y1="300" x2="1000" y2="300" stroke="#C5A059" strokeWidth="1" />
-
-      <line x1="200" y1="300" x2="600" y2="120" stroke="#C5A059" strokeWidth="0.7" strokeDasharray="6 4" />
-      <line x1="1000" y1="300" x2="600" y2="120" stroke="#C5A059" strokeWidth="0.7" strokeDasharray="6 4" />
-
-      <line x1="200" y1="300" x2="600" y2="480" stroke="#C5A059" strokeWidth="0.7" strokeDasharray="6 4" />
-      <line x1="1000" y1="300" x2="600" y2="480" stroke="#C5A059" strokeWidth="0.7" strokeDasharray="6 4" />
-
-      <path d="M100 150 L160 150 L160 200 L220 200" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M100 450 L160 450 L160 400 L220 400" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M980 150 L1040 150 L1040 200 L1100 200" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M980 450 L1040 450 L1040 400 L1100 400" stroke="#C5A059" strokeWidth="0.5" />
-
-      <path d="M350 100 L400 100 L400 160" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M350 500 L400 500 L400 440" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M800 100 L850 100 L850 160" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M800 500 L850 500 L850 440" stroke="#C5A059" strokeWidth="0.5" />
-
-      <path d="M500 80 L540 80 L540 140 L580 140" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M620 140 L660 140 L660 80 L700 80" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M500 520 L540 520 L540 460 L580 460" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M620 460 L660 460 L660 520 L700 520" stroke="#C5A059" strokeWidth="0.5" />
-
-      <path d="M280 220 Q340 180 400 220" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M800 220 Q860 180 920 220" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M280 380 Q340 420 400 380" stroke="#C5A059" strokeWidth="0.5" />
-      <path d="M800 380 Q860 420 920 380" stroke="#C5A059" strokeWidth="0.5" />
-
-      <circle cx="200" cy="300" r="8" fill="url(#nodeGlow)" />
-      <circle cx="200" cy="300" r="3" fill="#C5A059" />
-
-      <circle cx="600" cy="300" r="12" fill="url(#nodeGlow)" />
-      <circle cx="600" cy="300" r="4" fill="#C5A059" />
-
-      <circle cx="1000" cy="300" r="8" fill="url(#nodeGlow)" />
-      <circle cx="1000" cy="300" r="3" fill="#C5A059" />
-
-      <circle cx="600" cy="120" r="5" fill="url(#nodeGlow)" />
-      <circle cx="600" cy="120" r="2" fill="#C5A059" />
-      <circle cx="600" cy="480" r="5" fill="url(#nodeGlow)" />
-      <circle cx="600" cy="480" r="2" fill="#C5A059" />
-
-      {[160, 220, 350, 400, 500, 540, 660, 700, 800, 850, 980, 1040].map((x, i) =>
-        [100, 150, 200, 450, 500, 520].filter((_, j) => (i + j) % 3 === 0).map((y) => (
-          <circle key={`n-${x}-${y}`} cx={x} cy={y} r="1.5" fill="#C5A059" opacity="0.5" />
-        ))
-      )}
-
-      <rect x="180" y="280" width="40" height="40" rx="0" stroke="#C5A059" strokeWidth="0.4" fill="none" />
-      <rect x="580" y="280" width="40" height="40" rx="0" stroke="#C5A059" strokeWidth="0.4" fill="none" />
-      <rect x="980" y="280" width="40" height="40" rx="0" stroke="#C5A059" strokeWidth="0.4" fill="none" />
-
-      <rect x="140" y="260" width="120" height="80" rx="0" stroke="#C5A059" strokeWidth="0.3" fill="none" strokeDasharray="3 3" />
-      <rect x="540" y="260" width="120" height="80" rx="0" stroke="#C5A059" strokeWidth="0.3" fill="none" strokeDasharray="3 3" />
-      <rect x="940" y="260" width="120" height="80" rx="0" stroke="#C5A059" strokeWidth="0.3" fill="none" strokeDasharray="3 3" />
-    </svg>
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "140%",
+        height: "180%",
+        background: "radial-gradient(ellipse at center, rgba(197, 160, 89, 0.07) 0%, rgba(197, 160, 89, 0.03) 40%, transparent 70%)",
+      }}
+    />
   );
 }
 
@@ -274,7 +213,7 @@ export default function Philosophy() {
         </section>
 
         {/* AIRS */}
-        <section className="py-20 border-t border-border overflow-visible">
+        <section className="py-20 border-t border-border">
           <div className="max-w-7xl mx-auto px-6">
             <div className="max-w-5xl">
               <motion.div
@@ -301,11 +240,9 @@ export default function Philosophy() {
                 society.
               </motion.p>
 
-              <div className="relative" style={{ isolation: "isolate" }}>
-                <div className="absolute -inset-12 z-0 hidden lg:block pointer-events-none" aria-hidden="true">
-                  <ConvergenceSVG />
-                </div>
-              <div className="relative z-10 grid lg:grid-cols-3 gap-10">
+              <div className="relative overflow-visible">
+                <ConvergenceGlow />
+              <div className="relative grid lg:grid-cols-3 gap-10">
                 <AIRSCard
                   kicker="1. The AI Revolution"
                   title="The Cognitive Shift"
