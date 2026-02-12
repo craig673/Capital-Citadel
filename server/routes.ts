@@ -10,7 +10,7 @@ import multer from "multer";
 import { randomUUID } from "crypto";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
-import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail } from "./email";
+import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail, sendApplicationConfirmationEmail } from "./email";
 import { objectStorageClient } from "./replit_integrations/object_storage";
 
 function getPrivateObjectDir(): string {
@@ -882,6 +882,9 @@ export async function registerRoutes(
       }
 
       await sendApplicationEmail({ name, email }, attachments);
+      sendApplicationConfirmationEmail({ name, email }).catch((err) =>
+        console.error("[applications] Confirmation email failed (non-blocking):", err)
+      );
       await storage.createApplication({
         name: name.trim(),
         email: email.trim().toLowerCase(),

@@ -201,6 +201,50 @@ export async function sendApplicationEmail(
   }
 }
 
+export async function sendApplicationConfirmationEmail(
+  applicant: { name: string; email: string }
+) {
+  try {
+    await transporter.sendMail({
+      from: `"10,000 Days Capital (No Reply)" <${process.env.SMTP_USER}>`,
+      to: applicant.email,
+      subject: "Application Received - 10,000 Days Capital",
+      html: `
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #001F3F; color: #ffffff; border: 1px solid #C5A059;">
+          <div style="padding: 32px 40px 24px; text-align: center; border-bottom: 2px solid #C5A059;">
+            <h1 style="font-size: 22px; font-weight: 700; letter-spacing: 2px; margin: 0; color: #C5A059;">10,000 DAYS CAPITAL</h1>
+            <p style="font-size: 11px; letter-spacing: 3px; color: #C5A059; margin: 6px 0 0; text-transform: uppercase;">Management, LP</p>
+          </div>
+          <div style="padding: 36px 40px;">
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              Thank you for your interest in joining the 10,000 Days Capital Team. Your application has been successfully received and is currently being reviewed by our partners.
+            </p>
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              We appreciate the time and effort you put into your submission. Due to the high volume of applications, we prioritize candidates who demonstrate the conviction and curiosity required to navigate The AIRS Revolution&trade;.
+            </p>
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0;">
+              We will be in contact if your background aligns with our current needs.
+            </p>
+          </div>
+          <div style="padding: 24px 40px; border-top: 1px solid rgba(197,160,89,0.3); text-align: center;">
+            <p style="font-size: 13px; color: #999; margin: 0 0 8px;">
+              If you have urgent questions or need to follow up, please email
+              <a href="mailto:hr@10000dayscapital.com" style="color: #C5A059; text-decoration: none;">hr@10000dayscapital.com</a>.
+            </p>
+            <p style="font-size: 12px; color: #666; margin: 12px 0 0; letter-spacing: 1px;">
+              &mdash; 10,000 Days Capital Management, LP<br/>
+              New York &nbsp;|&nbsp; Las Cruces
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    console.log(`[email] Confirmation email sent to applicant ${applicant.email}`);
+  } catch (error) {
+    console.error("[email] Failed to send confirmation email to applicant:", error);
+  }
+}
+
 export async function sendTestEmail(): Promise<{ success: boolean; message: string }> {
   try {
     await transporter.sendMail({
