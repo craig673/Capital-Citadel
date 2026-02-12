@@ -712,6 +712,34 @@ export async function registerRoutes(
     }
   });
 
+  // Admin: Update an existing job posting
+  app.put("/api/admin/jobs/:id", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const jobId = req.params.id as string;
+      const existing = await storage.getJob(jobId);
+      if (!existing) return res.status(404).json({ error: "Job not found" });
+
+      const { title, location, employmentType, internshipStartDate, internshipEndDate, roleDescription, responsibilities, requirements, whatWeOffer } = req.body;
+      if (!title) {
+        return res.status(400).json({ error: "Title is required" });
+      }
+      const job = await storage.updateJob(jobId, {
+        title,
+        location: location || "Remote",
+        employmentType: employmentType || "Full Time",
+        internshipStartDate: internshipStartDate || null,
+        internshipEndDate: internshipEndDate || null,
+        roleDescription: roleDescription || "",
+        responsibilities: Array.isArray(responsibilities) ? responsibilities : [],
+        requirements: Array.isArray(requirements) ? requirements : [],
+        whatWeOffer: Array.isArray(whatWeOffer) ? whatWeOffer : [],
+      });
+      res.json(job);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to update job" });
+    }
+  });
+
   // Admin: Toggle job status
   app.patch("/api/admin/jobs/:id/status", requireAdmin, async (req: Request, res: Response) => {
     try {

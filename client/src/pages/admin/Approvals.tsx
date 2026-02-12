@@ -3,7 +3,7 @@ import { useLocation, Link } from "wouter";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { User } from "@shared/schema";
-import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown, MoreVertical, Upload, Trash2, Calendar, Loader2, Briefcase, Users, Eye, ChevronDown, ChevronUp, CheckCircle, Star } from "lucide-react";
+import { ExternalLink, Download, FileText, X, AlertTriangle, UserCheck, Search, FileDown, MoreVertical, Upload, Trash2, Calendar, Loader2, Briefcase, Users, Eye, ChevronDown, ChevronUp, CheckCircle, Star, Pencil } from "lucide-react";
 
 type UserWithoutPassword = Omit<User, "password">;
 
@@ -76,6 +76,7 @@ export default function Approvals() {
   const [tempRequirement, setTempRequirement] = useState("");
   const [tempOffer, setTempOffer] = useState("");
   const [jobCreating, setJobCreating] = useState(false);
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [applicants, setApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; reviewStatus: string; submittedAt: string}[]>([]);
   const [applicantsLoading, setApplicantsLoading] = useState(false);
@@ -222,48 +223,81 @@ export default function Approvals() {
     }
   };
 
-  const handleCreateJob = async () => {
+  const clearJobForm = () => {
+    setNewJobTitle("");
+    setNewJobLocation("Remote");
+    setNewJobEmploymentType("Full Time");
+    setNewJobInternshipStart("");
+    setNewJobInternshipEnd("");
+    setNewJobRoleDescription("");
+    setNewJobResponsibilities([]);
+    setNewJobRequirementsList([]);
+    setNewJobWhatWeOffer([]);
+    setTempResponsibility("");
+    setTempRequirement("");
+    setTempOffer("");
+    setEditingJobId(null);
+  };
+
+  const openEditJob = (job: typeof jobsData[0]) => {
+    setEditingJobId(job.id);
+    setNewJobTitle(job.title);
+    setNewJobLocation(job.location || "Remote");
+    setNewJobEmploymentType(job.employmentType || "Full Time");
+    setNewJobInternshipStart(job.internshipStartDate || "");
+    setNewJobInternshipEnd(job.internshipEndDate || "");
+    setNewJobRoleDescription(job.roleDescription || "");
+    setNewJobResponsibilities(job.responsibilities || []);
+    setNewJobRequirementsList(job.requirements || []);
+    setNewJobWhatWeOffer(job.whatWeOffer || []);
+    setTempResponsibility("");
+    setTempRequirement("");
+    setTempOffer("");
+    setTimeout(() => {
+      document.getElementById("job-form-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
+  const handleSaveJob = async () => {
     if (!newJobTitle.trim()) return;
     setJobCreating(true);
+    const payload = {
+      title: newJobTitle.trim(),
+      location: newJobLocation,
+      employmentType: newJobEmploymentType,
+      internshipStartDate: newJobEmploymentType === "Internship" ? newJobInternshipStart || null : null,
+      internshipEndDate: newJobEmploymentType === "Internship" ? newJobInternshipEnd || null : null,
+      roleDescription: newJobRoleDescription.trim(),
+      responsibilities: newJobResponsibilities,
+      requirements: newJobRequirementsList,
+      whatWeOffer: newJobWhatWeOffer,
+    };
     try {
-      const response = await fetch("/api/admin/jobs", {
-        method: "POST",
+      const isEditing = !!editingJobId;
+      const url = isEditing ? `/api/admin/jobs/${editingJobId}` : "/api/admin/jobs";
+      const method = isEditing ? "PUT" : "POST";
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          title: newJobTitle.trim(),
-          location: newJobLocation,
-          employmentType: newJobEmploymentType,
-          internshipStartDate: newJobEmploymentType === "Internship" ? newJobInternshipStart || null : null,
-          internshipEndDate: newJobEmploymentType === "Internship" ? newJobInternshipEnd || null : null,
-          roleDescription: newJobRoleDescription.trim(),
-          responsibilities: newJobResponsibilities,
-          requirements: newJobRequirementsList,
-          whatWeOffer: newJobWhatWeOffer,
-        }),
+        body: JSON.stringify(payload),
       });
       if (response.ok) {
         const job = await response.json();
-        setJobsData(prev => [job, ...prev]);
-        setNewJobTitle("");
-        setNewJobLocation("Remote");
-        setNewJobEmploymentType("Full Time");
-        setNewJobInternshipStart("");
-        setNewJobInternshipEnd("");
-        setNewJobRoleDescription("");
-        setNewJobResponsibilities([]);
-        setNewJobRequirementsList([]);
-        setNewJobWhatWeOffer([]);
-        setTempResponsibility("");
-        setTempRequirement("");
-        setTempOffer("");
-        showToast("Job posting created successfully", "success");
+        if (isEditing) {
+          setJobsData(prev => prev.map(j => j.id === editingJobId ? job : j));
+          showToast("Job posting updated successfully", "success");
+        } else {
+          setJobsData(prev => [job, ...prev]);
+          showToast("Job posting created successfully", "success");
+        }
+        clearJobForm();
       } else {
         const data = await response.json();
-        showToast(data.error || "Failed to create job posting", "error");
+        showToast(data.error || `Failed to ${isEditing ? "update" : "create"} job posting`, "error");
       }
     } catch (err) {
-      showToast("Failed to create job posting", "error");
+      showToast(`Failed to ${editingJobId ? "update" : "create"} job posting`, "error");
     } finally {
       setJobCreating(false);
     }
@@ -1231,8 +1265,20 @@ export default function Approvals() {
               CAREERS MANAGEMENT
             </h2>
 
-            <div className="bg-primary text-primary-foreground p-6 border border-secondary/30 mb-8" data-testid="section-create-job">
-              <h3 className="font-display text-xl mb-6">Create Job Posting</h3>
+            <div id="job-form-section" className="bg-primary text-primary-foreground p-6 border border-secondary/30 mb-8" data-testid="section-create-job">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-display text-xl">{editingJobId ? "Edit Job Posting" : "Create Job Posting"}</h3>
+                {editingJobId && (
+                  <button
+                    onClick={clearJobForm}
+                    className="inline-flex items-center gap-1 text-primary-foreground/60 hover:text-primary-foreground text-xs font-semibold uppercase tracking-widest transition-colors"
+                    data-testid="button-cancel-edit"
+                  >
+                    <X size={14} />
+                    Cancel Edit
+                  </button>
+                )}
+              </div>
               <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-widest text-secondary mb-2">
@@ -1474,7 +1520,7 @@ export default function Approvals() {
                   )}
                 </div>
                 <button
-                  onClick={handleCreateJob}
+                  onClick={handleSaveJob}
                   disabled={!newJobTitle.trim() || jobCreating}
                   className="w-full inline-flex items-center justify-center gap-2 bg-secondary text-secondary-foreground px-4 py-3 text-sm font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
                   data-testid="button-create-job"
@@ -1482,12 +1528,12 @@ export default function Approvals() {
                   {jobCreating ? (
                     <>
                       <Loader2 size={16} className="animate-spin" />
-                      Creating...
+                      {editingJobId ? "Saving..." : "Creating..."}
                     </>
                   ) : (
                     <>
-                      <Briefcase size={16} />
-                      Create Job Posting
+                      {editingJobId ? <CheckCircle size={16} /> : <Briefcase size={16} />}
+                      {editingJobId ? "Save Changes" : "Create Job Posting"}
                     </>
                   )}
                 </button>
@@ -1534,6 +1580,14 @@ export default function Approvals() {
                           </td>
                           <td className="py-4 text-right">
                             <div className="flex items-center justify-end gap-2">
+                              <button
+                                onClick={() => openEditJob(job)}
+                                className="inline-flex items-center gap-1 border border-secondary text-secondary px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-secondary hover:text-secondary-foreground transition-colors"
+                                data-testid={`button-edit-active-job-${idx}`}
+                              >
+                                <Pencil size={14} />
+                                Edit
+                              </button>
                               <button
                                 onClick={() => handleToggleJobStatus(job.id, job.status)}
                                 disabled={togglingJobId === job.id}
@@ -1617,6 +1671,14 @@ export default function Approvals() {
                             </td>
                             <td className="py-4 text-right">
                               <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => openEditJob(job)}
+                                  className="inline-flex items-center gap-1 border border-muted-foreground/30 text-muted-foreground px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                  data-testid={`button-edit-archived-job-${idx}`}
+                                >
+                                  <Pencil size={14} />
+                                  Edit
+                                </button>
                                 <button
                                   onClick={() => handleToggleJobStatus(job.id, job.status)}
                                   disabled={togglingJobId === job.id}
