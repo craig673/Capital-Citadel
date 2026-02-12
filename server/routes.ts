@@ -701,6 +701,11 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Name and email are required" });
       }
 
+      const recentApp = await storage.getRecentApplicationByEmail(email.trim().toLowerCase(), 30);
+      if (recentApp) {
+        return res.status(429).json({ error: "You've already submitted documentation. We will be in contact soon." });
+      }
+
       const files = (req.files as Express.Multer.File[]) || [];
       const attachments = files.map((f) => ({
         filename: f.originalname,
@@ -708,6 +713,7 @@ export async function registerRoutes(
       }));
 
       await sendApplicationEmail({ name, email }, attachments);
+      await storage.createApplication({ name: name.trim(), email: email.trim().toLowerCase() });
       res.json({ success: true, message: "Application submitted successfully" });
     } catch (error: any) {
       console.error("[applications] Failed to process application:", error);

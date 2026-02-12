@@ -61,3 +61,18 @@ export const insertPublishedDocumentSchema = createInsertSchema(publishedDocumen
 
 export type InsertPublishedDocument = z.infer<typeof insertPublishedDocumentSchema>;
 export type PublishedDocument = typeof publishedDocuments.$inferSelect;
+
+export const applications = pgTable("applications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  submittedAt: timestamp("submitted_at").notNull().default(sql`now()`),
+});
+
+export const insertApplicationSchema = createInsertSchema(applications).omit({
+  id: true,
+  submittedAt: true,
+});
+
+export type InsertApplication = z.infer<typeof insertApplicationSchema>;
+export type Application = typeof applications.$inferSelect;

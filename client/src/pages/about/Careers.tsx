@@ -269,7 +269,7 @@ export default function Careers() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !name.trim() || !email.trim() || files.length === 0}
                 className="w-full flex items-center justify-center gap-2 rounded-lg bg-secondary px-6 py-3.5 text-primary font-bold uppercase tracking-wider text-sm hover:bg-secondary/90 disabled:opacity-50 transition-colors"
                 data-testid="button-submit"
               >
@@ -279,7 +279,7 @@ export default function Careers() {
                     Sending…
                   </>
                 ) : (
-                  "Send Application"
+                  "Send"
                 )}
               </button>
             </motion.form>

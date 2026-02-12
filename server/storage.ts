@@ -1,6 +1,6 @@
-import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads, type PublishedDocument, type InsertPublishedDocument, publishedDocuments } from "@shared/schema";
+import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads, type PublishedDocument, type InsertPublishedDocument, publishedDocuments, type Application, type InsertApplication, applications } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, gte } from "drizzle-orm";
 import pg from "pg";
 
 const { Pool } = pg;
@@ -32,6 +32,8 @@ export interface IStorage {
   getRecentLetters(limit: number): Promise<PublishedDocument[]>;
   deletePublishedDocument(id: string): Promise<void>;
   getPublishedDocument(id: string): Promise<PublishedDocument | undefined>;
+  getRecentApplicationByEmail(email: string, withinDays: number): Promise<Application | undefined>;
+  createApplication(app: InsertApplication): Promise<Application>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -195,6 +197,22 @@ export class DrizzleStorage implements IStorage {
 
   async getPublishedDocument(id: string): Promise<PublishedDocument | undefined> {
     const result = await db.select().from(publishedDocuments).where(eq(publishedDocuments.id, id));
+    return result[0];
+  }
+  async getRecentApplicationByEmail(email: string, withinDays: number): Promise<Application | undefined> {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - withinDays);
+    const result = await db
+      .select()
+      .from(applications)
+      .where(and(eq(applications.email, email), gte(applications.submittedAt, cutoff)))
+      .orderBy(desc(applications.submittedAt))
+      .limit(1);
+    return result[0];
+  }
+
+  async createApplication(app: InsertApplication): Promise<Application> {
+    const result = await db.insert(applications).values(app).returning();
     return result[0];
   }
 }
