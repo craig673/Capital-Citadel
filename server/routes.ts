@@ -677,6 +677,94 @@ export async function registerRoutes(
     }
   });
 
+  // Admin: Create a new job posting
+  app.post("/api/admin/jobs", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const { title, description, requirements } = req.body;
+      if (!title || !description || !requirements) {
+        return res.status(400).json({ error: "Title, description, and requirements are required" });
+      }
+      const job = await storage.createJob({ title, description, requirements, status: "open" });
+      res.json(job);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to create job" });
+    }
+  });
+
+  // Admin: Get all jobs
+  app.get("/api/admin/jobs", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const allJobs = await storage.getAllJobs();
+      res.json(allJobs);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch jobs" });
+    }
+  });
+
+  // Admin: Toggle job status
+  app.patch("/api/admin/jobs/:id/status", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const { status } = req.body;
+      if (!["open", "closed"].includes(status)) {
+        return res.status(400).json({ error: "Status must be 'open' or 'closed'" });
+      }
+      const job = await storage.updateJobStatus(req.params.id as string, status);
+      if (!job) return res.status(404).json({ error: "Job not found" });
+      res.json(job);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to update job status" });
+    }
+  });
+
+  // Admin: Get applicants for a specific job
+  app.get("/api/admin/jobs/:id/applicants", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const applicants = await storage.getApplicationsByJobId(req.params.id as string);
+      res.json(applicants);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch applicants" });
+    }
+  });
+
+  // Admin: Get all applications (general / no specific job)
+  app.get("/api/admin/applications", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const allApps = await storage.getAllApplications();
+      res.json(allApps);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch applications" });
+    }
+  });
+
+  // Admin: Download applicant resume
+  app.get("/api/admin/applications/:id/resume/:index", requireAdmin, async (req: Request, res: Response) => {
+    try {
+      const apps = await storage.getAllApplications();
+      const app_record = apps.find(a => a.id === (req.params.id as string));
+      if (!app_record || !app_record.resumePaths) {
+        return res.status(404).json({ error: "Resume not found" });
+      }
+      const paths = JSON.parse(app_record.resumePaths) as { path: string; name: string }[];
+      const idx = parseInt(req.params.index as string);
+      if (isNaN(idx) || idx < 0 || idx >= paths.length) {
+        return res.status(404).json({ error: "Resume not found" });
+      }
+      await downloadFromObjectStorage(paths[idx].path, res, paths[idx].name);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to download resume" });
+    }
+  });
+
+  // Public: Get open jobs
+  app.get("/api/jobs/open", async (req: Request, res: Response) => {
+    try {
+      const openJobs = await storage.getOpenJobs();
+      res.json(openJobs);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message || "Failed to fetch jobs" });
+    }
+  });
+
   const applicationUpload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 },
@@ -696,7 +784,7 @@ export async function registerRoutes(
 
   app.post("/api/applications", applicationUpload.array("files", 5), async (req: Request, res: Response) => {
     try {
-      const { name, email } = req.body;
+      const { name, email, jobId } = req.body;
       if (!name || !email) {
         return res.status(400).json({ error: "Name and email are required" });
       }
@@ -712,8 +800,24 @@ export async function registerRoutes(
         content: f.buffer,
       }));
 
+      // Store files in object storage for admin download
+      const storedFiles: { path: string; name: string }[] = [];
+      for (const f of files) {
+        try {
+          const storedPath = await uploadToObjectStorage(f.buffer, "applications", f.originalname, f.mimetype);
+          storedFiles.push({ path: storedPath, name: f.originalname });
+        } catch (uploadErr) {
+          console.error("[applications] File upload error:", uploadErr);
+        }
+      }
+
       await sendApplicationEmail({ name, email }, attachments);
-      await storage.createApplication({ name: name.trim(), email: email.trim().toLowerCase() });
+      await storage.createApplication({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        jobId: jobId || null,
+        resumePaths: storedFiles.length > 0 ? JSON.stringify(storedFiles) : null,
+      });
       res.json({ success: true, message: "Application submitted successfully" });
     } catch (error: any) {
       console.error("[applications] Failed to process application:", error);

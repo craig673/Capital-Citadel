@@ -1,4 +1,4 @@
-import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads, type PublishedDocument, type InsertPublishedDocument, publishedDocuments, type Application, type InsertApplication, applications } from "@shared/schema";
+import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads, type PublishedDocument, type InsertPublishedDocument, publishedDocuments, type Application, type InsertApplication, applications, type Job, type InsertJob, jobs } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, desc, and, gte } from "drizzle-orm";
 import pg from "pg";
@@ -34,6 +34,13 @@ export interface IStorage {
   getPublishedDocument(id: string): Promise<PublishedDocument | undefined>;
   getRecentApplicationByEmail(email: string, withinDays: number): Promise<Application | undefined>;
   createApplication(app: InsertApplication): Promise<Application>;
+  createJob(job: InsertJob): Promise<Job>;
+  getAllJobs(): Promise<Job[]>;
+  getOpenJobs(): Promise<Job[]>;
+  getJob(id: string): Promise<Job | undefined>;
+  updateJobStatus(id: string, status: string): Promise<Job | undefined>;
+  getApplicationsByJobId(jobId: string): Promise<Application[]>;
+  getAllApplications(): Promise<Application[]>;
 }
 
 export class DrizzleStorage implements IStorage {
@@ -214,6 +221,37 @@ export class DrizzleStorage implements IStorage {
   async createApplication(app: InsertApplication): Promise<Application> {
     const result = await db.insert(applications).values(app).returning();
     return result[0];
+  }
+
+  async createJob(job: InsertJob): Promise<Job> {
+    const result = await db.insert(jobs).values(job).returning();
+    return result[0];
+  }
+
+  async getAllJobs(): Promise<Job[]> {
+    return await db.select().from(jobs).orderBy(desc(jobs.createdAt));
+  }
+
+  async getOpenJobs(): Promise<Job[]> {
+    return await db.select().from(jobs).where(eq(jobs.status, "open")).orderBy(desc(jobs.createdAt));
+  }
+
+  async getJob(id: string): Promise<Job | undefined> {
+    const result = await db.select().from(jobs).where(eq(jobs.id, id));
+    return result[0];
+  }
+
+  async updateJobStatus(id: string, status: string): Promise<Job | undefined> {
+    const result = await db.update(jobs).set({ status }).where(eq(jobs.id, id)).returning();
+    return result[0];
+  }
+
+  async getApplicationsByJobId(jobId: string): Promise<Application[]> {
+    return await db.select().from(applications).where(eq(applications.jobId, jobId)).orderBy(desc(applications.submittedAt));
+  }
+
+  async getAllApplications(): Promise<Application[]> {
+    return await db.select().from(applications).orderBy(desc(applications.submittedAt));
   }
 }
 
