@@ -12,7 +12,6 @@ interface AuthUser {
 }
 
 const aboutItems = [
-  { href: "/about/what-we-do", label: "What We Do" },
   { href: "/about/values", label: "Our Values" },
   { href: "/team", label: "Our Team" },
   { href: "/about/leadership", label: "Leadership" },
@@ -53,6 +52,7 @@ export function Navbar() {
   };
 
   const links = [
+    { href: "/about/what-we-do", label: "What We Do" },
     { href: "/philosophy", label: "Our Philosophy" },
     { href: "/insights", label: "Insights" },
   ];
@@ -77,10 +77,10 @@ export function Navbar() {
           {/* About dropdown */}
           <div className="relative group">
             <Link
-              href="/about/what-we-do"
+              href="/who-we-are"
               className={cn(
                 "inline-flex items-center gap-1 text-lg font-medium tracking-wide transition-colors hover:text-secondary",
-                location.startsWith("/about") ? "text-primary" : "text-muted-foreground"
+                location === "/who-we-are" || location.startsWith("/about") ? "text-primary" : "text-muted-foreground"
               )}
               data-testid="nav-about-trigger"
             >
