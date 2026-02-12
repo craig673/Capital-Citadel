@@ -11,7 +11,7 @@ function ConvergenceSVG() {
       preserveAspectRatio="xMidYMid slice"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      style={{ opacity: 0.12 }}
+      style={{ opacity: 0.25 }}
     >
       <defs>
         <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
