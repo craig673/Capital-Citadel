@@ -164,7 +164,7 @@ export async function sendApplicationEmail(
   try {
     await transporter.sendMail({
       from: FROM_EMAIL,
-      to: "craig@10000days.com",
+      to: "craig@10000daysfund.com",
       subject: "A wild applicant has appeared!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

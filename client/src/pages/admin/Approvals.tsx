@@ -1878,101 +1878,190 @@ export default function Approvals() {
                   <p className="text-muted-foreground">No general applications received yet.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full" data-testid="table-general-applicants">
-                    <thead>
-                      <tr className="border-b border-secondary/30">
-                        <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Name</th>
-                        <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Email</th>
-                        <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Date Applied</th>
-                        <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Status</th>
-                        <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Resume</th>
-                        <th className="text-right text-xs font-bold uppercase tracking-widest text-secondary py-3">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {generalApplicants.map((app, idx) => {
-                        let resumeFiles: {path: string; name: string}[] = [];
-                        try {
-                          if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
-                        } catch {}
-                        return (
-                          <tr key={app.id} className="border-b border-border/50" data-testid={`general-applicant-row-${idx}`}>
-                            <td className="py-4 pr-4 text-sm font-medium" data-testid={`text-general-applicant-name-${idx}`}>{app.name}</td>
-                            <td className="py-4 pr-4 text-sm text-muted-foreground" data-testid={`text-general-applicant-email-${idx}`}>{app.email}</td>
-                            <td className="py-4 pr-4 text-sm text-muted-foreground" data-testid={`text-general-applicant-date-${idx}`}>{formatDate(app.submittedAt)}</td>
-                            <td className="py-4 pr-4 text-sm" data-testid={`badge-general-applicant-status-${idx}`}>
-                              <span className={`inline-flex items-center text-xs font-bold uppercase px-2 py-1 ${
-                                app.reviewStatus === "new" ? "bg-blue-500/10 text-blue-500" :
-                                app.reviewStatus === "reviewed" ? "bg-yellow-500/10 text-yellow-600" :
-                                app.reviewStatus === "shortlisted" ? "bg-green-500/10 text-green-600" :
-                                app.reviewStatus === "rejected" ? "bg-red-500/10 text-red-500" :
-                                "bg-muted text-muted-foreground"
-                              }`}>
-                                {app.reviewStatus}
-                              </span>
-                            </td>
-                            <td className="py-4 pr-4 text-sm">
-                              {resumeFiles.length > 0 ? (
-                                <div className="flex flex-wrap gap-2">
-                                  {resumeFiles.map((file, fileIdx) => (
-                                    <a
-                                      key={fileIdx}
-                                      href={`/api/admin/applications/${app.id}/resume/${fileIdx}`}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
-                                      data-testid={`link-general-resume-${idx}-${fileIdx}`}
-                                    >
-                                      <Download size={12} />
-                                      {file.name}
-                                    </a>
-                                  ))}
-                                </div>
-                              ) : (
-                                <span className="text-muted-foreground text-xs">—</span>
-                              )}
-                            </td>
-                            <td className="py-4 text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                {app.reviewStatus === "new" && (
-                                  <button
-                                    onClick={() => handleUpdateApplicantStatus(app.id, "reviewed", true)}
-                                    className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
-                                    data-testid={`button-general-mark-reviewed-${idx}`}
-                                  >
-                                    <CheckCircle size={12} />
-                                    Mark Reviewed
-                                  </button>
-                                )}
-                                {(app.reviewStatus === "new" || app.reviewStatus === "reviewed") && (
-                                  <button
-                                    onClick={() => handleUpdateApplicantStatus(app.id, "shortlisted", true)}
-                                    className="inline-flex items-center gap-1 border border-green-600 text-green-600 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:bg-green-600 hover:text-white transition-colors"
-                                    data-testid={`button-general-shortlist-${idx}`}
-                                  >
-                                    <Star size={12} />
-                                    Shortlist
-                                  </button>
-                                )}
-                                {app.reviewStatus !== "rejected" && (
-                                  <button
-                                    onClick={() => handleUpdateApplicantStatus(app.id, "rejected", true)}
-                                    className="inline-flex items-center gap-1 border border-red-500 text-red-500 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors"
-                                    data-testid={`button-general-reject-${idx}`}
-                                  >
-                                    <X size={12} />
-                                    Reject
-                                  </button>
-                                )}
-                              </div>
-                            </td>
+                <>
+                  {generalApplicants.filter(a => a.reviewStatus !== "rejected").length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full" data-testid="table-general-applicants">
+                        <thead>
+                          <tr className="border-b border-secondary/30">
+                            <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Name</th>
+                            <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Email</th>
+                            <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Date Applied</th>
+                            <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Status</th>
+                            <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Resume</th>
+                            <th className="text-right text-xs font-bold uppercase tracking-widest text-secondary py-3">Actions</th>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                        </thead>
+                        <tbody>
+                          {generalApplicants.filter(a => a.reviewStatus !== "rejected").map((app, idx) => {
+                            let resumeFiles: {path: string; name: string}[] = [];
+                            try {
+                              if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
+                            } catch {}
+                            return (
+                              <tr key={app.id} className="border-b border-border/50" data-testid={`general-applicant-row-${idx}`}>
+                                <td className="py-4 pr-4 text-sm font-medium" data-testid={`text-general-applicant-name-${idx}`}>{app.name}</td>
+                                <td className="py-4 pr-4 text-sm text-muted-foreground" data-testid={`text-general-applicant-email-${idx}`}>{app.email}</td>
+                                <td className="py-4 pr-4 text-sm text-muted-foreground" data-testid={`text-general-applicant-date-${idx}`}>{formatDate(app.submittedAt)}</td>
+                                <td className="py-4 pr-4 text-sm" data-testid={`badge-general-applicant-status-${idx}`}>
+                                  <span className={`inline-flex items-center text-xs font-bold uppercase px-2 py-1 ${
+                                    app.reviewStatus === "new" ? "bg-blue-500/10 text-blue-500" :
+                                    app.reviewStatus === "reviewed" ? "bg-yellow-500/10 text-yellow-600" :
+                                    app.reviewStatus === "shortlisted" ? "bg-green-500/10 text-green-600" :
+                                    "bg-muted text-muted-foreground"
+                                  }`}>
+                                    {app.reviewStatus}
+                                  </span>
+                                </td>
+                                <td className="py-4 pr-4 text-sm">
+                                  {resumeFiles.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                      {resumeFiles.map((file, fileIdx) => (
+                                        <a
+                                          key={fileIdx}
+                                          href={`/api/admin/applications/${app.id}/resume/${fileIdx}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                                          data-testid={`link-general-resume-${idx}-${fileIdx}`}
+                                        >
+                                          <Download size={12} />
+                                          {file.name}
+                                        </a>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <span className="text-muted-foreground text-xs">—</span>
+                                  )}
+                                </td>
+                                <td className="py-4 text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    {app.reviewStatus === "new" && (
+                                      <button
+                                        onClick={() => handleUpdateApplicantStatus(app.id, "reviewed", true)}
+                                        className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter]"
+                                        data-testid={`button-general-mark-reviewed-${idx}`}
+                                      >
+                                        <CheckCircle size={12} />
+                                        Mark Reviewed
+                                      </button>
+                                    )}
+                                    {(app.reviewStatus === "new" || app.reviewStatus === "reviewed") && (
+                                      <button
+                                        onClick={() => handleUpdateApplicantStatus(app.id, "shortlisted", true)}
+                                        className="inline-flex items-center gap-1 border border-green-600 text-green-600 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:bg-green-600 hover:text-white transition-colors"
+                                        data-testid={`button-general-shortlist-${idx}`}
+                                      >
+                                        <Star size={12} />
+                                        Shortlist
+                                      </button>
+                                    )}
+                                    <button
+                                      onClick={() => handleUpdateApplicantStatus(app.id, "rejected", true)}
+                                      className="inline-flex items-center gap-1 border border-red-500 text-red-500 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:bg-red-500 hover:text-white transition-colors"
+                                      data-testid={`button-general-reject-${idx}`}
+                                    >
+                                      <X size={12} />
+                                      Reject
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="bg-primary border border-secondary/30 p-8 text-center">
+                      <p className="text-muted-foreground">No active general applications.</p>
+                    </div>
+                  )}
+
+                  {generalApplicants.filter(a => a.reviewStatus === "rejected").length > 0 && (
+                    <details className="mt-6" data-testid="section-rejected-general-applicants">
+                      <summary className="cursor-pointer text-sm font-semibold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 select-none">
+                        <ChevronDown size={14} />
+                        Rejected Applicants ({generalApplicants.filter(a => a.reviewStatus === "rejected").length})
+                      </summary>
+                      <div className="overflow-x-auto mt-4">
+                        <table className="w-full" data-testid="table-rejected-general-applicants">
+                          <thead>
+                            <tr className="border-b border-secondary/30">
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/60 py-3 pr-4">Name</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/60 py-3 pr-4">Email</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/60 py-3 pr-4">Date Applied</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/60 py-3 pr-4">Status</th>
+                              <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/60 py-3 pr-4">Resume</th>
+                              <th className="text-right text-xs font-bold uppercase tracking-widest text-muted-foreground/60 py-3">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {generalApplicants.filter(a => a.reviewStatus === "rejected").map((app, idx) => {
+                              let resumeFiles: {path: string; name: string}[] = [];
+                              try {
+                                if (app.resumePaths) resumeFiles = JSON.parse(app.resumePaths);
+                              } catch {}
+                              return (
+                                <tr key={app.id} className="border-b border-border/50 opacity-60" data-testid={`rejected-general-applicant-row-${idx}`}>
+                                  <td className="py-4 pr-4 text-sm font-medium text-muted-foreground">{app.name}</td>
+                                  <td className="py-4 pr-4 text-sm text-muted-foreground">{app.email}</td>
+                                  <td className="py-4 pr-4 text-sm text-muted-foreground">{formatDate(app.submittedAt)}</td>
+                                  <td className="py-4 pr-4 text-sm">
+                                    <span className="inline-flex items-center text-xs font-bold uppercase px-2 py-1 bg-red-500/10 text-red-500">
+                                      rejected
+                                    </span>
+                                  </td>
+                                  <td className="py-4 pr-4 text-sm">
+                                    {resumeFiles.length > 0 ? (
+                                      <div className="flex flex-wrap gap-2">
+                                        {resumeFiles.map((file, fileIdx) => (
+                                          <a
+                                            key={fileIdx}
+                                            href={`/api/admin/applications/${app.id}/resume/${fileIdx}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 border border-muted-foreground/30 text-muted-foreground px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                            data-testid={`link-rejected-general-resume-${idx}-${fileIdx}`}
+                                          >
+                                            <Download size={12} />
+                                            {file.name}
+                                          </a>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <span className="text-muted-foreground text-xs">—</span>
+                                    )}
+                                  </td>
+                                  <td className="py-4 text-right">
+                                    <div className="flex items-center justify-end gap-2">
+                                      <button
+                                        onClick={() => handleUpdateApplicantStatus(app.id, "reviewed", true)}
+                                        className="inline-flex items-center gap-1 border border-muted-foreground/30 text-muted-foreground px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors"
+                                        data-testid={`button-rejected-general-restore-${idx}`}
+                                      >
+                                        <CheckCircle size={12} />
+                                        Restore
+                                      </button>
+                                      <button
+                                        onClick={() => handleUpdateApplicantStatus(app.id, "shortlisted", true)}
+                                        className="inline-flex items-center gap-1 border border-green-600/50 text-green-600/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest hover:bg-green-600 hover:text-white transition-colors"
+                                        data-testid={`button-rejected-general-shortlist-${idx}`}
+                                      >
+                                        <Star size={12} />
+                                        Shortlist
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </details>
+                  )}
+                </>
               )}
             </div>
           </section>
