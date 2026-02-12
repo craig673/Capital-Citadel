@@ -36,11 +36,11 @@ export default function Home() {
             
             <div className="text-center">
               <Link
-                href="/philosophy"
-                className="inline-flex items-center gap-2 text-primary font-semibold tracking-wide border-b border-secondary pb-1 hover:text-secondary transition-colors"
+                href="/about/what-we-do"
+                className="inline-flex items-center gap-3 text-2xl text-primary font-display font-semibold tracking-widest uppercase border-2 border-secondary px-14 py-6 hover:bg-secondary hover:text-white transition-all duration-500"
                 data-testid="link-discover-philosophy"
               >
-                Discover Our Philosophy <ArrowRight size={16} />
+                Discover Who We Are <ArrowRight size={24} />
               </Link>
             </div>
           </div>
