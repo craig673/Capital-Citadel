@@ -73,6 +73,7 @@ export default function Approvals() {
   const [generalApplicants, setGeneralApplicants] = useState<{id: string; name: string; email: string; jobId: string | null; resumePaths: string | null; reviewStatus: string; submittedAt: string}[]>([]);
   const [generalApplicantsLoading, setGeneralApplicantsLoading] = useState(true);
   const [togglingJobId, setTogglingJobId] = useState<string | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
 
   const sortedFilteredUsers = useMemo(() => {
     let filtered = approvedUsers;
@@ -245,6 +246,10 @@ export default function Approvals() {
   };
 
   const handleToggleJobStatus = async (id: string, currentStatus: string) => {
+    if (currentStatus === "open") {
+      const confirmed = window.confirm("Are you sure you want to close this job posting? It will be removed from the public Careers page immediately.");
+      if (!confirmed) return;
+    }
     setTogglingJobId(id);
     try {
       const newStatus = currentStatus === "open" ? "closed" : "open";
@@ -1267,19 +1272,19 @@ export default function Approvals() {
             </div>
 
             <div className="mb-8">
-              <h3 className="font-display text-xl text-primary mb-4">All Job Postings</h3>
+              <h3 className="font-display text-xl text-primary mb-4">Active Postings</h3>
               {jobsLoading ? (
                 <div className="text-center py-8">
                   <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-secondary"></div>
                 </div>
-              ) : jobsData.length === 0 ? (
+              ) : jobsData.filter(j => j.status === "open").length === 0 ? (
                 <div className="bg-primary border border-secondary/30 p-8 text-center" data-testid="section-no-jobs">
                   <Briefcase size={32} className="mx-auto mb-3 text-secondary/50" />
-                  <p className="text-muted-foreground">No job postings yet.</p>
+                  <p className="text-muted-foreground">No active job postings.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full" data-testid="table-job-postings">
+                  <table className="w-full" data-testid="table-active-postings">
                     <thead>
                       <tr className="border-b border-secondary/30">
                         <th className="text-left text-xs font-bold uppercase tracking-widest text-secondary py-3 pr-4">Title</th>
@@ -1289,26 +1294,19 @@ export default function Approvals() {
                       </tr>
                     </thead>
                     <tbody>
-                      {jobsData.map((job, idx) => (
+                      {jobsData.filter(j => j.status === "open").map((job, idx) => (
                         <tr
                           key={job.id}
                           className="border-b border-border/50 hover:bg-primary/5 transition-colors"
-                          data-testid={`row-job-${idx}`}
+                          data-testid={`row-active-job-${idx}`}
                         >
-                          <td className="py-4 pr-4 text-sm font-medium text-primary" data-testid={`text-job-title-${idx}`}>{job.title}</td>
+                          <td className="py-4 pr-4 text-sm font-medium text-primary" data-testid={`text-active-job-title-${idx}`}>{job.title}</td>
                           <td className="py-4 pr-4">
-                            <span
-                              className={`inline-flex items-center text-xs font-bold uppercase px-2 py-1 ${
-                                job.status === "open"
-                                  ? "text-green-600 bg-green-500/10"
-                                  : "text-muted-foreground bg-muted"
-                              }`}
-                              data-testid={`badge-job-status-${idx}`}
-                            >
+                            <span className="inline-flex items-center text-xs font-bold uppercase px-2 py-1 text-green-600 bg-green-500/10" data-testid={`badge-active-job-status-${idx}`}>
                               {job.status}
                             </span>
                           </td>
-                          <td className="py-4 pr-4 text-sm text-muted-foreground" data-testid={`text-job-created-${idx}`}>
+                          <td className="py-4 pr-4 text-sm text-muted-foreground" data-testid={`text-active-job-created-${idx}`}>
                             {formatDate(job.createdAt)}
                           </td>
                           <td className="py-4 text-right">
@@ -1317,16 +1315,14 @@ export default function Approvals() {
                                 onClick={() => handleToggleJobStatus(job.id, job.status)}
                                 disabled={togglingJobId === job.id}
                                 className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:brightness-110 transition-[filter] disabled:opacity-50 disabled:cursor-not-allowed"
-                                data-testid={`button-toggle-job-${idx}`}
+                                data-testid={`button-close-job-${idx}`}
                               >
                                 {togglingJobId === job.id ? (
                                   <Loader2 size={14} className="animate-spin" />
-                                ) : job.status === "open" ? (
-                                  <ChevronDown size={14} />
                                 ) : (
-                                  <ChevronUp size={14} />
+                                  <ChevronDown size={14} />
                                 )}
-                                {job.status === "open" ? "Close" : "Reopen"}
+                                Close
                               </button>
                               <a
                                 href={`/about/careers?jobId=${job.id}`}
@@ -1344,7 +1340,7 @@ export default function Approvals() {
                                   fetchApplicants(job.id);
                                 }}
                                 className="inline-flex items-center gap-1 border border-secondary text-secondary px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-secondary hover:text-secondary-foreground transition-colors"
-                                data-testid={`button-view-applicants-${idx}`}
+                                data-testid={`button-view-applicants-active-${idx}`}
                               >
                                 <Eye size={14} />
                                 View Applicants
@@ -1358,6 +1354,80 @@ export default function Approvals() {
                 </div>
               )}
             </div>
+
+            {jobsData.filter(j => j.status === "closed").length > 0 && (
+              <div className="mb-8">
+                <button
+                  onClick={() => setShowArchived(!showArchived)}
+                  className="flex items-center gap-2 font-display text-xl text-muted-foreground hover:text-primary transition-colors mb-4"
+                  data-testid="button-toggle-archived"
+                >
+                  <ChevronDown size={20} className={`transition-transform duration-200 ${showArchived ? "rotate-180" : ""}`} />
+                  Archived Postings ({jobsData.filter(j => j.status === "closed").length})
+                </button>
+                {showArchived && (
+                  <div className="overflow-x-auto opacity-75">
+                    <table className="w-full" data-testid="table-archived-postings">
+                      <thead>
+                        <tr className="border-b border-border/30">
+                          <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/70 py-3 pr-4">Title</th>
+                          <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/70 py-3 pr-4">Status</th>
+                          <th className="text-left text-xs font-bold uppercase tracking-widest text-muted-foreground/70 py-3 pr-4">Created</th>
+                          <th className="text-right text-xs font-bold uppercase tracking-widest text-muted-foreground/70 py-3">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {jobsData.filter(j => j.status === "closed").map((job, idx) => (
+                          <tr
+                            key={job.id}
+                            className="border-b border-border/30 hover:bg-primary/5 transition-colors"
+                            data-testid={`row-archived-job-${idx}`}
+                          >
+                            <td className="py-4 pr-4 text-sm font-medium text-muted-foreground" data-testid={`text-archived-job-title-${idx}`}>{job.title}</td>
+                            <td className="py-4 pr-4">
+                              <span className="inline-flex items-center text-xs font-bold uppercase px-2 py-1 text-muted-foreground bg-muted" data-testid={`badge-archived-job-status-${idx}`}>
+                                closed
+                              </span>
+                            </td>
+                            <td className="py-4 pr-4 text-sm text-muted-foreground/60" data-testid={`text-archived-job-created-${idx}`}>
+                              {formatDate(job.createdAt)}
+                            </td>
+                            <td className="py-4 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => handleToggleJobStatus(job.id, job.status)}
+                                  disabled={togglingJobId === job.id}
+                                  className="inline-flex items-center gap-1 border border-muted-foreground/30 text-muted-foreground px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:border-secondary hover:text-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  data-testid={`button-reopen-job-${idx}`}
+                                >
+                                  {togglingJobId === job.id ? (
+                                    <Loader2 size={14} className="animate-spin" />
+                                  ) : (
+                                    <ChevronUp size={14} />
+                                  )}
+                                  Reopen
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setSelectedJobId(job.id);
+                                    fetchApplicants(job.id);
+                                  }}
+                                  className="inline-flex items-center gap-1 border border-secondary text-secondary px-3 py-2 text-xs font-semibold uppercase tracking-widest hover:bg-secondary hover:text-secondary-foreground transition-colors"
+                                  data-testid={`button-view-applicants-archived-${idx}`}
+                                >
+                                  <Eye size={14} />
+                                  View Applicants
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
 
             {selectedJobId && (
               <div className="bg-primary text-primary-foreground p-6 border border-secondary/30 mb-8" data-testid="section-applicants-panel">
