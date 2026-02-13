@@ -170,13 +170,13 @@ function DisciplineScrollytelling() {
                   className="leading-relaxed origin-left"
                 >
                   <h3
-                    className="font-display text-xl md:text-2xl mb-2 transition-colors duration-500"
+                    className="font-display text-2xl md:text-3xl mb-3 transition-colors duration-500"
                     style={{ color: isActive ? "#ffffff" : "rgba(255,255,255,0.35)" }}
                   >
                     {point.title}
                   </h3>
                   <div
-                    className="text-sm md:text-base transition-colors duration-500"
+                    className="text-base md:text-xl leading-relaxed transition-colors duration-500"
                     style={{ color: isActive ? "rgba(209,213,219,0.95)" : "rgba(156,163,175,0.3)" }}
                   >
                     {point.content}
