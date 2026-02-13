@@ -3,6 +3,7 @@ import { Footer } from "@/components/layout/Footer";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { Link } from "wouter";
+import spaceVideo from "@/assets/videos/space-discipline.mp4";
 
 const revealVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -117,8 +118,7 @@ function WireframeSphere() {
 function DisciplineScrollytelling() {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPoints = disciplinePoints.length;
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const [sphereRotation, setSphereRotation] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -126,27 +126,26 @@ function DisciplineScrollytelling() {
   });
 
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    const leadIn = 0.08;
-    const remaining = 1 - leadIn;
-    const segmentSize = remaining / totalPoints;
-    const idx = Math.floor((v - leadIn) / segmentSize);
-    const clamped = v < leadIn ? -1 : Math.min(totalPoints - 1, idx);
-    setActiveIndex(clamped);
-    setSphereRotation(v * 120);
+    const segmentSize = 1 / totalPoints;
+    const idx = Math.floor(v / segmentSize);
+    setActiveIndex(Math.min(totalPoints - 1, Math.max(0, idx)));
   });
 
   return (
-    <div ref={containerRef} style={{ height: `${(totalPoints + 1) * 100}vh` }}>
-      <div className="sticky top-0 h-screen overflow-hidden" style={{ backgroundColor: "#0A0A0F" }}>
-        <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          style={{ transform: `rotate(${sphereRotation}deg)`, transition: "transform 0.3s ease-out" }}
-        >
-          <WireframeSphere />
-        </div>
+    <div ref={containerRef} style={{ height: `${(totalPoints + 1.5) * 100}vh` }}>
+      <div className="sticky top-0 h-screen overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          src={spaceVideo}
+        />
+        <div className="absolute inset-0 bg-black/50" />
 
         <div className="relative z-10 h-full flex flex-col justify-center max-w-4xl mx-auto px-6">
-          <div className="mb-12">
+          <div className="mb-14">
             <div className="text-secondary font-bold uppercase tracking-widest mb-4 text-sm">
               Our Discipline
             </div>
@@ -158,41 +157,28 @@ function DisciplineScrollytelling() {
           <div className="space-y-10">
             {disciplinePoints.map((point, i) => {
               const isActive = i === activeIndex;
-              const isPast = i < activeIndex;
-              const isFuture = i > activeIndex;
-              const isVisible = activeIndex >= 0;
-
-              let opacity = 0;
-              let translateY = 40;
-
-              if (isVisible) {
-                if (isActive) {
-                  opacity = 1;
-                  translateY = 0;
-                } else if (isPast) {
-                  opacity = 0.3;
-                  translateY = -20;
-                } else if (isFuture && i === activeIndex + 1) {
-                  opacity = 0.15;
-                  translateY = 30;
-                } else {
-                  opacity = 0;
-                  translateY = 40;
-                }
-              }
 
               return (
                 <motion.div
                   key={point.id}
                   data-testid={point.id}
-                  animate={{ opacity, y: translateY }}
-                  transition={{ duration: 0.7, ease: [0.25, 0.1, 0.25, 1] }}
-                  className="leading-relaxed"
+                  animate={{
+                    opacity: isActive ? 1 : 0.2,
+                    scale: isActive ? 1.02 : 1,
+                  }}
+                  transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+                  className="leading-relaxed origin-left"
                 >
-                  <h3 className="font-display text-2xl text-white mb-3">
+                  <h3
+                    className="font-display text-xl md:text-2xl mb-2 transition-colors duration-500"
+                    style={{ color: isActive ? "#ffffff" : "rgba(255,255,255,0.35)" }}
+                  >
                     {point.title}
                   </h3>
-                  <div className="text-gray-400">
+                  <div
+                    className="text-sm md:text-base transition-colors duration-500"
+                    style={{ color: isActive ? "rgba(209,213,219,0.95)" : "rgba(156,163,175,0.3)" }}
+                  >
                     {point.content}
                   </div>
                 </motion.div>
