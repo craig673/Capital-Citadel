@@ -119,6 +119,7 @@ function DisciplineScrollytelling() {
   const containerRef = useRef<HTMLDivElement>(null);
   const totalPoints = disciplinePoints.length;
   const [activeIndex, setActiveIndex] = useState(0);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -156,7 +157,7 @@ function DisciplineScrollytelling() {
 
           <div className="space-y-10">
             {disciplinePoints.map((point, i) => {
-              const isActive = i === activeIndex;
+              const isActive = i === activeIndex || i === hoveredIndex;
 
               return (
                 <motion.div
@@ -167,16 +168,18 @@ function DisciplineScrollytelling() {
                     scale: isActive ? 1.02 : 1,
                   }}
                   transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-                  className="leading-relaxed origin-left"
+                  className="leading-relaxed origin-left cursor-default"
+                  onMouseEnter={() => setHoveredIndex(i)}
+                  onMouseLeave={() => setHoveredIndex(null)}
                 >
                   <h3
-                    className="font-display text-2xl md:text-3xl mb-3 transition-colors duration-500"
+                    className="font-display text-xl md:text-2xl mb-2 transition-colors duration-500"
                     style={{ color: isActive ? "#ffffff" : "rgba(255,255,255,0.35)" }}
                   >
                     {point.title}
                   </h3>
                   <div
-                    className="text-base md:text-xl leading-relaxed transition-colors duration-500"
+                    className="text-sm md:text-lg leading-relaxed transition-colors duration-500"
                     style={{ color: isActive ? "rgba(209,213,219,0.95)" : "rgba(156,163,175,0.3)" }}
                   >
                     {point.content}
