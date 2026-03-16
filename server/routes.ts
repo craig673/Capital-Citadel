@@ -11,79 +11,22 @@ import { randomUUID } from "crypto";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail, sendApplicationConfirmationEmail, sendRejectionEmail } from "./email";
-import { objectStorageClient } from "./replit_integrations/object_storage";
+import { uploadToS3, downloadFromS3, deleteFromS3 } from "./storage_s3";
 
-function getPrivateObjectDir(): string {
-  const dir = process.env.PRIVATE_OBJECT_DIR || "";
-  if (!dir) {
-    throw new Error("PRIVATE_OBJECT_DIR not set");
-  }
-  return dir;
-}
-
-function parseObjectPath(objPath: string): { bucketName: string; objectName: string } {
-  if (!objPath.startsWith("/")) {
-    objPath = `/${objPath}`;
-  }
-  const parts = objPath.split("/");
-  if (parts.length < 3) {
-    throw new Error("Invalid path: must contain at least a bucket name");
-  }
-  return { bucketName: parts[1], objectName: parts.slice(2).join("/") };
-}
-
+// Thin wrappers to keep call-sites unchanged
 async function uploadToObjectStorage(buffer: Buffer, folder: string, originalName: string, contentType: string): Promise<string> {
-  const ext = path.extname(originalName);
-  const uniqueName = `${randomUUID()}${ext}`;
-  const privateDir = getPrivateObjectDir();
-  const objectPath = `${privateDir}/${folder}/${uniqueName}`;
-  const { bucketName, objectName } = parseObjectPath(objectPath);
-  const bucket = objectStorageClient.bucket(bucketName);
-  const file = bucket.file(objectName);
-  await file.save(buffer, { contentType });
-  return objectPath;
+  return uploadToS3(buffer, folder, originalName, contentType);
 }
 
-async function downloadFromObjectStorage(objectPath: string, res: Response, downloadName: string) {
-  if (!objectPath.includes("/")) {
+async function downloadFromObjectStorage(objectKey: string, res: Response, downloadName: string) {
+  if (!objectKey || !objectKey.includes("/")) {
     return res.status(404).json({ error: "File not found — it was uploaded before cloud storage migration and needs to be re-uploaded" });
   }
-  const { bucketName, objectName } = parseObjectPath(objectPath);
-  const bucket = objectStorageClient.bucket(bucketName);
-  const file = bucket.file(objectName);
-  const [exists] = await file.exists();
-  if (!exists) {
-    return res.status(404).json({ error: "File not found on server" });
-  }
-  const [metadata] = await file.getMetadata();
-  res.set({
-    "Content-Type": metadata.contentType || "application/octet-stream",
-    "Content-Disposition": `attachment; filename="${encodeURIComponent(downloadName)}"`,
-  });
-  if (metadata.size) {
-    res.set("Content-Length", String(metadata.size));
-  }
-  const stream = file.createReadStream();
-  stream.on("error", (err) => {
-    console.error("Stream error:", err);
-    if (!res.headersSent) {
-      res.status(500).json({ error: "Error streaming file" });
-    }
-  });
-  stream.pipe(res);
+  return downloadFromS3(objectKey, res, downloadName);
 }
 
-async function deleteFromObjectStorage(objectPath: string) {
-  if (!objectPath.includes("/")) {
-    return;
-  }
-  const { bucketName, objectName } = parseObjectPath(objectPath);
-  const bucket = objectStorageClient.bucket(bucketName);
-  const file = bucket.file(objectName);
-  const [exists] = await file.exists();
-  if (exists) {
-    await file.delete();
-  }
+async function deleteFromObjectStorage(objectKey: string) {
+  return deleteFromS3(objectKey);
 }
 
 const upload = multer({
@@ -156,8 +99,13 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  // Trust proxy for secure cookies behind Replit's reverse proxy
+  // Trust proxy for secure cookies behind Railway/Nginx reverse proxy
   app.set("trust proxy", 1);
+
+  // Health check endpoint — used by Railway, Docker HEALTHCHECK, and load balancers
+  app.get("/api/health", (_req, res) => {
+    res.json({ status: "ok", service: "10000-days-capital", timestamp: new Date().toISOString() });
+  });
 
   app.use(
     session({

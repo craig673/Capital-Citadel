@@ -1,6 +1,32 @@
-node_modules
-dist
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment secrets — NEVER commit
+.env
+.env.local
+.env.production
+
+# Replit artifacts
+.replit
+replit.nix
+.upm/
+.cache/
+
+# OS artifacts
 .DS_Store
+Thumbs.db
 server/public
+
+# TypeScript
 vite.config.ts.*
+*.tsbuildinfo
+
+# Archives
 *.tar.gz
+
+# Logs
+*.log
+npm-debug.log*

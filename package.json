@@ -1,5 +1,5 @@
 {
-  "name": "rest-express",
+  "name": "10000-days-capital",
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
@@ -12,7 +12,8 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
-    "@google-cloud/storage": "^7.19.0",
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/s3-request-presigner": "^3.600.0",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@radix-ui/react-accordion": "^1.2.12",
@@ -90,9 +91,6 @@
     "zod-validation-error": "^3.4.0"
   },
   "devDependencies": {
-    "@replit/vite-plugin-cartographer": "^0.4.4",
-    "@replit/vite-plugin-dev-banner": "^0.1.1",
-    "@replit/vite-plugin-runtime-error-modal": "^0.0.4",
     "@tailwindcss/vite": "^4.1.14",
     "@types/connect-pg-simple": "^7.0.3",
     "@types/express": "^5.0.0",
