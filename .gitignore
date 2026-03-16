@@ -29,4 +29,4 @@ vite.config.ts.*
 
 # Logs
 *.log
-npm-debug.log*
+npm-debug.log*package-lock.json
