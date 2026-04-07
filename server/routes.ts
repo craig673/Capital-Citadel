@@ -10,7 +10,7 @@ import multer from "multer";
 import { randomUUID } from "crypto";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
-import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail, sendApplicationConfirmationEmail, sendRejectionEmail } from "./email";
+import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail, sendApplicationConfirmationEmail, sendRejectionEmail, sendRsvpNotification } from "./email";
 import { uploadToS3, downloadFromS3, deleteFromS3 } from "./storage_s3";
 
 // Thin wrappers to keep call-sites unchanged
@@ -873,6 +873,29 @@ export async function registerRoutes(
     } catch (error: any) {
       console.error("[applications] Failed to process application:", error);
       res.status(500).json({ error: "Failed to submit application. Please try again." });
+    }
+  });
+
+  // RSVP endpoint for Santa Fe event
+  app.post("/api/rsvp", async (req: Request, res: Response) => {
+    try {
+      const { firstName, lastName, email } = req.body;
+
+      if (!firstName || !lastName || !email) {
+        return res.status(400).json({ error: "All fields are required." });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ error: "Please provide a valid email address." });
+      }
+
+      await sendRsvpNotification({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim() });
+      console.log(`[rsvp] RSVP received: ${firstName} ${lastName} (${email})`);
+      res.json({ success: true, message: "RSVP confirmed successfully." });
+    } catch (error: any) {
+      console.error("[rsvp] Failed to process RSVP:", error);
+      res.status(500).json({ error: "Failed to submit RSVP. Please try again." });
     }
   });
 

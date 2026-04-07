@@ -245,6 +245,54 @@ export async function sendApplicationConfirmationEmail(
   }
 }
 
+export async function sendRsvpNotification(rsvp: {
+  firstName: string;
+  lastName: string;
+  email: string;
+}) {
+  try {
+    await transporter.sendMail({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
+      subject: `New RSVP: Santa Fe Event - ${rsvp.firstName} ${rsvp.lastName}`,
+      html: `
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #001F3F; color: #ffffff; border: 1px solid #C5A059;">
+          <div style="padding: 32px 40px 24px; text-align: center; border-bottom: 2px solid #C5A059;">
+            <h1 style="font-size: 22px; font-weight: 700; letter-spacing: 2px; margin: 0; color: #C5A059;">10,000 DAYS CAPITAL</h1>
+            <p style="font-size: 11px; letter-spacing: 3px; color: #C5A059; margin: 6px 0 0; text-transform: uppercase;">Santa Fe Event RSVP</p>
+          </div>
+          <div style="padding: 36px 40px;">
+            <h2 style="color: #C5A059; margin: 0 0 20px; font-size: 18px;">New RSVP Received</h2>
+            <table style="border-collapse: collapse; width: 100%;">
+              <tr>
+                <td style="padding: 12px; border: 1px solid rgba(197,160,89,0.3); font-weight: bold; color: #C5A059; background: rgba(197,160,89,0.1);">First Name</td>
+                <td style="padding: 12px; border: 1px solid rgba(197,160,89,0.3); color: #e0e0e0;">${rsvp.firstName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid rgba(197,160,89,0.3); font-weight: bold; color: #C5A059; background: rgba(197,160,89,0.1);">Last Name</td>
+                <td style="padding: 12px; border: 1px solid rgba(197,160,89,0.3); color: #e0e0e0;">${rsvp.lastName}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid rgba(197,160,89,0.3); font-weight: bold; color: #C5A059; background: rgba(197,160,89,0.1);">Email</td>
+                <td style="padding: 12px; border: 1px solid rgba(197,160,89,0.3); color: #e0e0e0;">${rsvp.email}</td>
+              </tr>
+              <tr>
+                <td style="padding: 12px; border: 1px solid rgba(197,160,89,0.3); font-weight: bold; color: #C5A059; background: rgba(197,160,89,0.1);">RSVP Time</td>
+                <td style="padding: 12px; border: 1px solid rgba(197,160,89,0.3); color: #e0e0e0;">${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })}</td>
+              </tr>
+            </table>
+            <p style="margin-top: 24px; font-size: 14px; color: #999;">Event: September 9&ndash;11 &bull; La Fonda on the Plaza, Santa Fe</p>
+          </div>
+        </div>
+      `,
+    });
+    console.log(`[email] RSVP notification sent for ${rsvp.firstName} ${rsvp.lastName}`);
+  } catch (error) {
+    console.error("[email] Failed to send RSVP notification:", error);
+    throw error;
+  }
+}
+
 export async function sendRejectionEmail(
   applicant: { name: string; email: string }
 ) {
