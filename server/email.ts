@@ -58,7 +58,7 @@ export async function sendDocumentUploadEmail(user: {
             </tr>
           </table>
           <p style="margin-top: 20px;">
-            <a href="${process.env.APP_URL || 'https://10000dayscapital.com'}/admin/approvals" 
+            <a href="${process.env.APP_URL || 'https://10000-days-capital-production.up.railway.app'}/admin/approvals" 
                style="background-color: #001F3F; color: white; padding: 12px 24px; text-decoration: none; display: inline-block; text-transform: uppercase; letter-spacing: 1px;">
               View Uploads
             </a>
@@ -97,7 +97,7 @@ export async function sendNewAccessRequestEmail(user: {
           </tr>
         </table>
         <p style="margin-top: 20px;">
-          <a href="${process.env.APP_URL || 'https://10000dayscapital.com'}/admin/approvals" 
+          <a href="${process.env.APP_URL || 'https://10000-days-capital-production.up.railway.app'}/admin/approvals" 
              style="background-color: #001F3F; color: white; padding: 10px 20px; text-decoration: none; display: inline-block;">
             Review Request
           </a>
@@ -138,7 +138,7 @@ export async function sendWelcomeEmail(user: {
   email: string;
 }) {
   const firstName = user.firstName || "Investor";
-  const loginUrl = `${process.env.APP_URL || 'https://10000dayscapital.com'}/auth/login`;
+  const loginUrl = `${process.env.APP_URL || 'https://10000-days-capital-production.up.railway.app'}/auth/login`;
   
   try {
     await sendEmail({
