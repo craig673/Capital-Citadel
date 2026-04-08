@@ -1,22 +1,37 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const smtpPort = parseInt(process.env.SMTP_PORT || "587");
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: smtpPort,
-  secure: smtpPort === 465, // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10000,  // 10 seconds
-  greetingTimeout: 10000,    // 10 seconds
-  socketTimeout: 15000,      // 15 seconds
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const ADMIN_EMAIL = "craig@10000daysfund.com";
-const FROM_EMAIL = process.env.SMTP_FROM || "noreply@10000dayscapital.com";
+const FROM_EMAIL = process.env.EMAIL_FROM || "10,000 Days Capital <onboarding@resend.dev>";
+
+async function sendEmail(options: {
+  from?: string;
+  to: string | string[];
+  subject: string;
+  html: string;
+  attachments?: Array<{ filename: string; content: Buffer }>;
+}) {
+  const toArray = Array.isArray(options.to) ? options.to : [options.to];
+  const result = await resend.emails.send({
+    from: options.from || FROM_EMAIL,
+    to: toArray,
+    subject: options.subject,
+    html: options.html,
+    ...(options.attachments && options.attachments.length > 0
+      ? {
+          attachments: options.attachments.map((a) => ({
+            filename: a.filename,
+            content: a.content,
+          })),
+        }
+      : {}),
+  });
+  if (result.error) {
+    throw new Error(`Resend API error: ${result.error.message}`);
+  }
+  return result;
+}
 
 export async function sendDocumentUploadEmail(user: {
   firstName: string | null;
@@ -25,8 +40,7 @@ export async function sendDocumentUploadEmail(user: {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || "Unknown Investor";
   
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await sendEmail({
       to: ADMIN_EMAIL,
       subject: `New Document Uploaded by ${fullName}`,
       html: `
@@ -66,8 +80,7 @@ export async function sendNewAccessRequestEmail(user: {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || "Unknown";
   
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await sendEmail({
       to: ADMIN_EMAIL,
       subject: "New Access Request",
       html: `
@@ -104,8 +117,7 @@ export async function sendDenialEmail(user: {
   const firstName = user.firstName || "Investor";
   
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await sendEmail({
       to: user.email,
       subject: "Update on your Access Request",
       html: `
@@ -129,8 +141,7 @@ export async function sendWelcomeEmail(user: {
   const loginUrl = `${process.env.APP_URL || 'https://10000dayscapital.com'}/auth/login`;
   
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await sendEmail({
       to: user.email,
       subject: "Welcome to 10,000 Days Capital – Access Granted",
       html: `
@@ -165,8 +176,7 @@ export async function sendApplicationEmail(
   attachments: Array<{ filename: string; content: Buffer }>
 ) {
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await sendEmail({
       to: "craig@10000daysfund.com",
       subject: "A wild applicant has appeared!",
       html: `
@@ -208,8 +218,7 @@ export async function sendApplicationConfirmationEmail(
   applicant: { name: string; email: string }
 ) {
   try {
-    await transporter.sendMail({
-      from: `"10,000 Days Capital (No Reply)" <${process.env.SMTP_USER}>`,
+    await sendEmail({
       to: applicant.email,
       subject: "Application Received - 10,000 Days Capital",
       html: `
@@ -254,8 +263,7 @@ export async function sendRsvpNotification(rsvp: {
   email: string;
 }) {
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await sendEmail({
       to: ADMIN_EMAIL,
       subject: `New RSVP: Santa Fe Event - ${rsvp.firstName} ${rsvp.lastName}`,
       html: `
@@ -300,8 +308,7 @@ export async function sendRejectionEmail(
   applicant: { name: string; email: string }
 ) {
   try {
-    await transporter.sendMail({
-      from: `"10,000 Days Capital (No Reply)" <${process.env.SMTP_USER}>`,
+    await sendEmail({
       to: applicant.email,
       subject: "Update regarding your application to 10,000 Days Capital",
       html: `
@@ -347,8 +354,7 @@ export async function sendRejectionEmail(
 
 export async function sendTestEmail(): Promise<{ success: boolean; message: string }> {
   try {
-    await transporter.sendMail({
-      from: FROM_EMAIL,
+    await sendEmail({
       to: ADMIN_EMAIL,
       subject: "10,000 Days Capital - Email System Test",
       html: `
