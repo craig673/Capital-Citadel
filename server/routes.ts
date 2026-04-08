@@ -890,9 +890,12 @@ export async function registerRoutes(
         return res.status(400).json({ error: "Please provide a valid email address." });
       }
 
-      await sendRsvpNotification({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim() });
+      // Respond immediately so the user gets instant feedback regardless of email status
       console.log(`[rsvp] RSVP received: ${firstName} ${lastName} (${email})`);
       res.json({ success: true, message: "RSVP confirmed successfully." });
+      // Send notification email in the background (fire-and-forget)
+      sendRsvpNotification({ firstName: firstName.trim(), lastName: lastName.trim(), email: email.trim() })
+        .catch((err: any) => console.error("[rsvp] Background email notification failed:", err));
     } catch (error: any) {
       console.error("[rsvp] Failed to process RSVP:", error);
       res.status(500).json({ error: "Failed to submit RSVP. Please try again." });
