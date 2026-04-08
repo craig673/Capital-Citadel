@@ -99,6 +99,12 @@ export default function Login() {
               </button>
             </form>
 
+            <div className="mt-4 text-right">
+              <Link href="/auth/forgot-password" className="text-sm text-secondary hover:brightness-110 font-semibold">
+                Forgot Password?
+              </Link>
+            </div>
+
             <div className="mt-6 pt-6 border-t border-secondary/30">
               <p className="text-sm text-muted-foreground text-center">
                 Don't have access?{" "}

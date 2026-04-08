@@ -1,4 +1,4 @@
-import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads, type PublishedDocument, type InsertPublishedDocument, publishedDocuments, type Application, type InsertApplication, applications, type Job, type InsertJob, jobs } from "@shared/schema";
+import { type User, type InsertUser, users, type DocumentUpload, type InsertDocumentUpload, documentUploads, type PublishedDocument, type InsertPublishedDocument, publishedDocuments, type Application, type InsertApplication, applications, type Job, type InsertJob, jobs, type PasswordResetToken, passwordResetTokens } from "@shared/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq, desc, and, gte, lt, sql } from "drizzle-orm";
 import pg from "pg";
@@ -15,6 +15,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUserPassword(id: string, hashedPassword: string): Promise<void>;
   getPendingUsers(): Promise<User[]>;
   approveUser(id: string, role?: string): Promise<User | undefined>;
   denyUser(id: string): Promise<User | undefined>;
@@ -24,6 +25,9 @@ export interface IStorage {
   banUser(id: string, reason: string): Promise<User | undefined>;
   reactivateUser(id: string): Promise<User | undefined>;
   updateUser(id: string, data: { firstName?: string; lastName?: string; role?: string }): Promise<User | undefined>;
+  createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<PasswordResetToken>;
+  getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined>;
+  markTokenUsed(tokenId: string): Promise<void>;
   createDocumentUpload(upload: InsertDocumentUpload): Promise<DocumentUpload>;
   getAllDocumentUploads(): Promise<(DocumentUpload & { user: User })[]>;
   getDocumentUpload(id: string): Promise<DocumentUpload | undefined>;
@@ -64,6 +68,10 @@ export class DrizzleStorage implements IStorage {
     return result[0];
   }
 
+  async updateUserPassword(id: string, hashedPassword: string): Promise<void> {
+    await db.update(users).set({ password: hashedPassword }).where(eq(users.id, id));
+  }
+
   async getPendingUsers(): Promise<User[]> {
     return await db.select().from(users).where(eq(users.isApproved, false));
   }
@@ -88,7 +96,6 @@ export class DrizzleStorage implements IStorage {
       .returning();
     
     if (result[0]) {
-      // Increment denial count manually since we can't do arithmetic in set
       const updated = await db
         .update(users)
         .set({ denialCount: (result[0].denialCount || 0) + 1 })
@@ -145,6 +152,20 @@ export class DrizzleStorage implements IStorage {
       .where(eq(users.id, id))
       .returning();
     return result[0];
+  }
+
+  async createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<PasswordResetToken> {
+    const result = await db.insert(passwordResetTokens).values({ userId, token, expiresAt }).returning();
+    return result[0];
+  }
+
+  async getPasswordResetToken(token: string): Promise<PasswordResetToken | undefined> {
+    const result = await db.select().from(passwordResetTokens).where(eq(passwordResetTokens.token, token));
+    return result[0];
+  }
+
+  async markTokenUsed(tokenId: string): Promise<void> {
+    await db.update(passwordResetTokens).set({ usedAt: new Date() }).where(eq(passwordResetTokens.id, tokenId));
   }
 
   async createDocumentUpload(upload: InsertDocumentUpload): Promise<DocumentUpload> {
@@ -211,6 +232,7 @@ export class DrizzleStorage implements IStorage {
     const result = await db.select().from(publishedDocuments).where(eq(publishedDocuments.id, id));
     return result[0];
   }
+
   async getRecentApplicationByEmail(email: string, withinDays: number): Promise<Application | undefined> {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - withinDays);
@@ -292,6 +314,7 @@ export class DrizzleStorage implements IStorage {
     const result = await db.update(jobs).set(data).where(eq(jobs.id, id)).returning();
     return result[0];
   }
+
   async deleteJob(id: string): Promise<void> {
     await db.delete(applications).where(eq(applications.jobId, id));
     await db.delete(jobs).where(eq(jobs.id, id));

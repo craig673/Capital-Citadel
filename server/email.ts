@@ -352,6 +352,55 @@ export async function sendRejectionEmail(
   }
 }
 
+export async function sendPasswordResetEmail(user: {
+  email: string;
+  firstName: string | null;
+}, resetToken: string) {
+  const firstName = user.firstName || "Investor";
+  const resetUrl = `${process.env.APP_URL || 'https://10000-days-capital-production.up.railway.app'}/auth/reset-password?token=${resetToken}`;
+
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: "Password Reset - 10,000 Days Capital",
+      html: `
+        <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #001F3F; color: #ffffff; border: 1px solid #C5A059;">
+          <div style="padding: 32px 40px 24px; text-align: center; border-bottom: 2px solid #C5A059;">
+            <h1 style="font-size: 22px; font-weight: 700; letter-spacing: 2px; margin: 0; color: #C5A059;">10,000 DAYS CAPITAL</h1>
+            <p style="font-size: 11px; letter-spacing: 3px; color: #C5A059; margin: 6px 0 0; text-transform: uppercase;">Password Reset</p>
+          </div>
+          <div style="padding: 36px 40px;">
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              Dear ${firstName},
+            </p>
+            <p style="font-size: 15px; line-height: 1.7; color: #e0e0e0; margin: 0 0 20px;">
+              We received a request to reset the password associated with your 10,000 Days Capital account.
+            </p>
+            <p style="margin: 30px 0; text-align: center;">
+              <a href="${resetUrl}" 
+                 style="background-color: #C5A059; color: #001F3F; padding: 14px 28px; text-decoration: none; display: inline-block; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                Reset Password
+              </a>
+            </p>
+            <p style="font-size: 13px; line-height: 1.7; color: #999; margin: 20px 0 0;">
+              This link will expire in 1 hour. If you did not request a password reset, you may safely disregard this email.
+            </p>
+          </div>
+          <div style="padding: 24px 40px; border-top: 1px solid rgba(197,160,89,0.3); text-align: center;">
+            <p style="font-size: 12px; color: #666; margin: 0; letter-spacing: 1px;">
+              10,000 Days Capital Management, LP
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    console.log(`[email] Password reset email sent to ${user.email}`);
+  } catch (error) {
+    console.error("[email] Failed to send password reset email:", error);
+    throw error;
+  }
+}
+
 export async function sendTestEmail(): Promise<{ success: boolean; message: string }> {
   try {
     await sendEmail({

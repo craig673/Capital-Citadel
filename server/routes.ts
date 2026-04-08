@@ -10,7 +10,7 @@ import multer from "multer";
 import { randomUUID } from "crypto";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
-import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail, sendApplicationConfirmationEmail, sendRejectionEmail, sendRsvpNotification } from "./email";
+import { sendNewAccessRequestEmail, sendDenialEmail, sendTestEmail, sendWelcomeEmail, sendDocumentUploadEmail, sendApplicationEmail, sendApplicationConfirmationEmail, sendRejectionEmail, sendRsvpNotification, sendPasswordResetEmail } from "./email";
 import { uploadToS3, downloadFromS3, deleteFromS3 } from "./storage_s3";
 
 // Thin wrappers to keep call-sites unchanged
@@ -210,6 +210,73 @@ export async function registerRoutes(
       res.json({ user: userWithoutPassword });
     } catch (error: any) {
       res.status(500).json({ error: error.message || "Login failed" });
+    }
+  });
+
+  // Forgot Password - request reset link
+  app.post("/api/auth/forgot-password", async (req: Request, res: Response) => {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ error: "Email is required." });
+      }
+
+      // Always return success to prevent email enumeration
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        return res.json({ success: true, message: "If an account with that email exists, a password reset link has been sent." });
+      }
+
+      // Generate a secure token
+      const token = randomUUID() + "-" + randomUUID();
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      await storage.createPasswordResetToken(user.id, token, expiresAt);
+
+      // Send reset email in background
+      sendPasswordResetEmail({ email: user.email, firstName: user.firstName }, token)
+        .catch((err: any) => console.error("[auth] Failed to send password reset email:", err));
+
+      res.json({ success: true, message: "If an account with that email exists, a password reset link has been sent." });
+    } catch (error: any) {
+      console.error("[auth] Forgot password error:", error);
+      res.status(500).json({ error: "An error occurred. Please try again." });
+    }
+  });
+
+  // Reset Password - set new password using token
+  app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
+    try {
+      const { token, password } = req.body;
+      if (!token || !password) {
+        return res.status(400).json({ error: "Token and new password are required." });
+      }
+
+      if (password.length < 8) {
+        return res.status(400).json({ error: "Password must be at least 8 characters." });
+      }
+
+      const resetToken = await storage.getPasswordResetToken(token);
+      if (!resetToken) {
+        return res.status(400).json({ error: "Invalid or expired reset link." });
+      }
+
+      if (resetToken.usedAt) {
+        return res.status(400).json({ error: "This reset link has already been used." });
+      }
+
+      if (new Date() > resetToken.expiresAt) {
+        return res.status(400).json({ error: "This reset link has expired. Please request a new one." });
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await storage.updateUserPassword(resetToken.userId, hashedPassword);
+      await storage.markTokenUsed(resetToken.id);
+
+      res.json({ success: true, message: "Password has been reset successfully. You may now log in." });
+    } catch (error: any) {
+      console.error("[auth] Reset password error:", error);
+      res.status(500).json({ error: "An error occurred. Please try again." });
     }
   });
 

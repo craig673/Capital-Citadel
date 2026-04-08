@@ -16,6 +16,8 @@ import InsightsCurated from "@/pages/insights/Curated";
 import InsightsAiRevolution from "@/pages/insights/AiRevolution";
 import AuthLogin from "@/pages/auth/Login";
 import AuthRequestAccess from "@/pages/auth/RequestAccess";
+import AuthForgotPassword from "@/pages/auth/ForgotPassword";
+import AuthResetPassword from "@/pages/auth/ResetPassword";
 import AdminApprovals from "@/pages/admin/Approvals";
 import Dashboard from "@/pages/Dashboard";
 import Terms from "@/pages/Terms";
@@ -52,6 +54,8 @@ function Router() {
       <Route path="/insights/curated" component={InsightsCurated} />
       <Route path="/auth/login" component={AuthLogin} />
       <Route path="/auth/request-access" component={AuthRequestAccess} />
+      <Route path="/auth/forgot-password" component={AuthForgotPassword} />
+      <Route path="/auth/reset-password" component={AuthResetPassword} />
       <Route path="/admin/approvals" component={AdminApprovals} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/letters" component={Letters} />
