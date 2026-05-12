@@ -233,11 +233,11 @@ export default function OurValues() {
               transition={{ duration: 0.9 }}
             >
               <Link
-                href="/team"
+                href="/about/leadership"
                 className="inline-block border-2 border-white text-white font-display text-lg uppercase tracking-widest px-12 py-5 hover:bg-white hover:text-[#C5A059] transition-all duration-500"
-                data-testid="link-journey-team"
+                data-testid="link-journey-leadership"
               >
-                Meet the Team
+                Leadership
               </Link>
             </motion.div>
           </div>

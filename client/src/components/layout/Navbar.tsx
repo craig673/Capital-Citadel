@@ -15,7 +15,6 @@ const aboutItems = [
   { href: "/about/what-we-do", label: "What We Do" },
   { href: "/philosophy", label: "Our Philosophy" },
   { href: "/about/values", label: "Our Values" },
-  { href: "/team", label: "Our Team" },
   { href: "/about/leadership", label: "Leadership" },
   { href: "/about/locations", label: "Locations" },
   { href: "/about/careers", label: "Careers" },

@@ -8,7 +8,6 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import WhoWeAre from "@/pages/WhoWeAre";
 import Process from "@/pages/Process";
-import Team from "@/pages/Team";
 import Insights from "@/pages/Insights";
 import InsightsCommentary from "@/pages/insights/Commentary";
 import InsightsVideos from "@/pages/insights/Videos";
@@ -46,7 +45,6 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/who-we-are" component={WhoWeAre} />
       <Route path="/process" component={Process} />
-      <Route path="/team" component={Team} />
       <Route path="/insights" component={Insights} />
       <Route path="/insights/commentary" component={InsightsCommentary} />
       <Route path="/insights/videos" component={InsightsVideos} />
