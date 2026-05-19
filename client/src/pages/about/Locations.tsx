@@ -137,7 +137,7 @@ export default function Locations() {
           description="Our headquarters are located in the heart of Midtown Manhattan."
           addressLines={["555 Fifth Avenue, Ninth Floor", "Suite 900", "New York, NY 10017"]}
           contactLabel="Contact"
-          contactValue="ir@10000dayscapital.com"
+          contactValue="info@10000daysfund.com"
           imageSrc={nycImg}
           imageAlt="New York City skyline"
           reverse={false}
@@ -150,7 +150,7 @@ export default function Locations() {
           description="Away from the noise of Wall Street, our New Mexico operations focus on data science, algorithmic modeling, and long-term strategic signal generation."
           addressLines={["Las Cruces, New Mexico", "(Visits by appointment only)"]}
           contactLabel="Contact"
-          contactValue="+1 (575) 203-1075"
+          contactValue="info@10000daysfund.com"
           imageSrc={nmImg}
           imageAlt="New Mexico desert landscape"
           reverse={true}
